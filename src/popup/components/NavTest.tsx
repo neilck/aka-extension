@@ -44,7 +44,6 @@ function NavTest(props: any) {
               <div id="profileButtonText" className="flex-1">
                 {selected}{" "}
               </div>
-
               <svg
                 className="w-4 h-4 ml-2 mr-1"
                 aria-hidden="true"
@@ -54,9 +53,9 @@ function NavTest(props: any) {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M19 9l-7 7-7-7"
                 ></path>
               </svg>
@@ -71,7 +70,7 @@ function NavTest(props: any) {
                 aria-labelledby="dropdownDefaultButton"
               >
                 {additional.map((value) => (
-                  <li>
+                  <li key={value}>
                     <div
                       id={value}
                       onClick={profileItemClick}

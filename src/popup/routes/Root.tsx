@@ -1,7 +1,10 @@
 import React from "react";
 import { Link, Outlet, useLoaderData } from "react-router-dom";
 import NavTest from "../components/NavTest";
+// import { getProfiles } from "../common";
+
 import "./Root.css";
+import { getProfiles } from "../common";
 export default function Root() {
   const profiles: any = useLoaderData();
 
@@ -35,9 +38,8 @@ export default function Root() {
   );
 }
 
-export const loader = () => {
-  return {
-    selected: "profile1",
-    additional: ["profile2", "profile3"],
-  };
+export const loader = async () => {
+  console.log("root loader called");
+  const profiles = await getProfiles();
+  return profiles;
 };
