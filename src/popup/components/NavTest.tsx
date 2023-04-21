@@ -1,9 +1,13 @@
 import React from "react";
-import { Form, Link } from "react-router-dom";
+import { Link, useRouteLoaderData, useFetcher } from "react-router-dom";
+import { Profile, changeCurrentProfile } from "../common";
 
-function NavTest(props: any) {
-  const selected = props.selected;
-  const additional: string[] = props.additional;
+function NavTest() {
+  const profiles = useRouteLoaderData("root") as Profile[];
+
+  console.log("profiles: " + JSON.stringify(profiles));
+  const curProfile = profiles.find((profile) => profile.isCurrent);
+  let otherProfiles = profiles.filter((profile) => !profile.isCurrent);
 
   const profileButtonClick = () => {
     const dropdown = document.querySelector("#dropdown");
@@ -11,10 +15,7 @@ function NavTest(props: any) {
   };
 
   const profileItemClick = (e: React.MouseEvent<HTMLElement>) => {
-    const value = e.currentTarget.id;
-    // save new value and refresh
-    // const profileButton = document.querySelector("#profileButtonText");
-    // profileButton.innerHTML = value;
+    changeCurrentProfile(e.currentTarget.id);
 
     // hide dropdown
     const dropdown = document.querySelector("#dropdown");
@@ -42,7 +43,7 @@ function NavTest(props: any) {
               onClick={profileButtonClick}
             >
               <div id="profileButtonText" className="flex-1">
-                {selected}{" "}
+                {curProfile.name}{" "}
               </div>
               <svg
                 className="w-4 h-4 ml-2 mr-1"
@@ -69,14 +70,14 @@ function NavTest(props: any) {
                 className="py-2 text-sm text-gray-700 dark:text-gray-200"
                 aria-labelledby="dropdownDefaultButton"
               >
-                {additional.map((value) => (
-                  <li key={value}>
+                {otherProfiles.map((profile) => (
+                  <li key={profile.id}>
                     <div
-                      id={value}
+                      id={profile.id}
                       onClick={profileItemClick}
                       className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                     >
-                      {value}
+                      {profile.name}
                     </div>
                   </li>
                 ))}

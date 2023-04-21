@@ -1,16 +1,15 @@
 import React from "react";
 import { Link, Outlet, useLoaderData } from "react-router-dom";
 import NavTest from "../components/NavTest";
-// import { getProfiles } from "../common";
 
 import "./Root.css";
-import { getProfiles } from "../common";
+import { Profile, getProfiles } from "../common";
 export default function Root() {
   const profiles: any = useLoaderData();
 
   return (
     <>
-      <NavTest {...profiles} />
+      <NavTest />
       <div className=" bg-aka-blue text-aka-yellow">
         <div id="sidebar">
           <h1>
@@ -38,8 +37,9 @@ export default function Root() {
   );
 }
 
-export const loader = async () => {
-  console.log("root loader called");
-  const profiles = await getProfiles();
+export const loader = async (): Promise<Profile[]> => {
+  let profiles: Profile[] = null;
+  profiles = await getProfiles();
+  // profiles = [{ id: "1", name: "name", isCurrent: true }];
   return profiles;
 };

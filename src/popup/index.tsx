@@ -15,6 +15,7 @@ const routes = [
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
+    id: "root",
     children: [
       {
         path: "/about",
