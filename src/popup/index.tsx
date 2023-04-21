@@ -12,6 +12,11 @@ import About from "./components/About";
 import Badge from "./components/Badge";
 import ErrorPage from "./components/ErrorPage";
 
+import Test, {
+  loader as testLoader,
+  action as testAction,
+} from "./components/Test";
+
 const routes = [
   {
     path: "/",
@@ -30,6 +35,12 @@ const routes = [
         element: <Badge />,
       },
     ],
+  },
+  {
+    path: "/test",
+    element: <Test />,
+    loader: testLoader,
+    action: testAction,
   },
 ];
 

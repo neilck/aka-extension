@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, Outlet, useLoaderData, redirect } from "react-router-dom";
 import ProfileNav from "../components/ProfileNav";
+import Test from "../components/Test";
 
 import "./Root.css";
 import { Profile, getProfiles, changeCurrentProfile } from "../common";
@@ -21,7 +22,7 @@ export default function Root() {
                 <Link to="/badge">Badge</Link>
               </li>
               <li>
-                <Link to="/bad">Bad Link</Link>
+                <Link to="/test">Test</Link>
               </li>
             </ul>
           </nav>
@@ -45,12 +46,9 @@ export const loader = async (): Promise<Profile[]> => {
 };
 
 export async function action({ request, params }) {
-  console.log("root action called: " + console.log(JSON.stringify(request)));
   let formData = await request.formData();
   const updates = Object.fromEntries(formData);
-
   const selectedID = updates.selectedID;
-  console.log("form data: " + selectedID);
 
   changeCurrentProfile(selectedID);
   return redirect("/");
