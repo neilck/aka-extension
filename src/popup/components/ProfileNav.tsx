@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import { Profile, changeCurrentProfile } from "../common";
 
-function NavTest() {
+function ProfileNav() {
   const profiles = useRouteLoaderData("root") as Profile[];
   const curProfile = profiles.find((profile) => profile.isCurrent);
   let otherProfiles = profiles.filter((profile) => !profile.isCurrent);
@@ -108,4 +108,4 @@ function NavTest() {
   );
 }
 
-export default NavTest;
+export default ProfileNav;

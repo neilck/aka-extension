@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Outlet, useLoaderData, redirect } from "react-router-dom";
-import NavTest from "../components/NavTest";
+import ProfileNav from "../components/ProfileNav";
 
 import "./Root.css";
 import { Profile, getProfiles, changeCurrentProfile } from "../common";
@@ -9,7 +9,7 @@ export default function Root() {
 
   return (
     <>
-      <NavTest />
+      <ProfileNav />
       <div className=" bg-aka-blue text-aka-yellow">
         <div id="sidebar">
           <h1>
