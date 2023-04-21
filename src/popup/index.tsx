@@ -3,7 +3,10 @@ import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import "../assets/tailwind.css";
 
-import Root, { loader as rootLoader } from "./routes/Root";
+import Root, {
+  loader as rootLoader,
+  action as rootAction,
+} from "./routes/Root";
 import Popup from "./popup";
 import About from "./components/About";
 import Badge from "./components/Badge";
@@ -15,6 +18,7 @@ const routes = [
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
+    action: rootAction,
     id: "root",
     children: [
       {

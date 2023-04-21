@@ -1,11 +1,15 @@
 import React from "react";
-import { Link, useRouteLoaderData, useFetcher } from "react-router-dom";
+import {
+  Link,
+  useRouteLoaderData,
+  Form,
+  useSubmit,
+  redirect,
+} from "react-router-dom";
 import { Profile, changeCurrentProfile } from "../common";
 
 function NavTest() {
   const profiles = useRouteLoaderData("root") as Profile[];
-
-  console.log("profiles: " + JSON.stringify(profiles));
   const curProfile = profiles.find((profile) => profile.isCurrent);
   let otherProfiles = profiles.filter((profile) => !profile.isCurrent);
 
@@ -15,12 +19,18 @@ function NavTest() {
   };
 
   const profileItemClick = (e: React.MouseEvent<HTMLElement>) => {
-    changeCurrentProfile(e.currentTarget.id);
+    const selectedID = document.querySelector("#selectedID") as any;
+    selectedID.value = e.currentTarget.id;
 
     // hide dropdown
     const dropdown = document.querySelector("#dropdown");
     dropdown.classList.toggle("hidden");
+
+    const form = document.querySelector("#profileForm") as any;
+    submit(form);
   };
+
+  let submit = useSubmit();
 
   return (
     <nav className="bg-aka-blue text-aka-yellow shadow-lg">
@@ -62,27 +72,35 @@ function NavTest() {
               </svg>
             </button>
             {/* <!-- Dropdown menu --> */}
-            <div
-              id="dropdown"
-              className="w-40 z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow  dark:bg-gray-700"
-            >
-              <ul
-                className="py-2 text-sm text-gray-700 dark:text-gray-200"
-                aria-labelledby="dropdownDefaultButton"
+            <Form id="profileForm" action="/" method="post">
+              <input
+                type="hidden"
+                id="selectedID"
+                name="selectedID"
+                value="test"
+              />
+              <div
+                id="dropdown"
+                className="w-40 z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow  dark:bg-gray-700"
               >
-                {otherProfiles.map((profile) => (
-                  <li key={profile.id}>
-                    <div
-                      id={profile.id}
-                      onClick={profileItemClick}
-                      className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      {profile.name}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                <ul
+                  className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                  aria-labelledby="dropdownDefaultButton"
+                >
+                  {otherProfiles.map((profile) => (
+                    <li key={profile.id}>
+                      <div
+                        id={profile.id}
+                        onClick={profileItemClick}
+                        className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        {profile.name}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Form>
           </div>
         </div>
       </div>
