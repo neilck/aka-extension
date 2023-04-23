@@ -10,7 +10,11 @@ export default function Root() {
 
   return (
     <>
-      {profiles.selected} ( {window.location.pathname} )
+      <div className="bg-white">
+        {profiles.selected} ( {window.location.pathname} + " " )
+        <Link to="/test">Test</Link>
+      </div>
+
       <ProfileNav />
       <div className=" bg-aka-blue text-aka-yellow">
         <div id="detail">

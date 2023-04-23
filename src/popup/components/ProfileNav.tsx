@@ -4,7 +4,7 @@ import {
   useRouteLoaderData,
   Form,
   useSubmit,
-  redirect,
+  useLocation,
 } from "react-router-dom";
 import { Profile, changeCurrentProfile } from "../common";
 
@@ -12,6 +12,9 @@ function ProfileNav() {
   const profiles = useRouteLoaderData("root") as Profile[];
   const curProfile = profiles.find((profile) => profile.isCurrent);
   let otherProfiles = profiles.filter((profile) => !profile.isCurrent);
+
+  const hideDropdown: boolean = useLocation().pathname == "/";
+  console.log(useLocation().pathname);
 
   const profileButtonClick = () => {
     const dropdown = document.querySelector("#dropdown");
@@ -33,22 +36,25 @@ function ProfileNav() {
   let submit = useSubmit();
 
   return (
-    <nav className="bg-aka-blue text-aka-yellow shadow-lg">
+    <nav className="bg-white dark:bg-slate-800 shadow-lg">
       <div className="max-w-6xl mx-auto h-10 px-4 py-2">
         <div className="flex justify-between">
           <div className="flex space-x-7">
             <Link to="/">
               <div className="flex items-center">
                 <img src="logo.svg" alt="Logo" className="h-4 w-4 mr-2" />
-                <span className="font-semibold text-lg">AKA Profiles</span>
+                <span className="text-slate-900 dark:text-white font-semibold text-lg">
+                  AKA Profiles
+                </span>
               </div>
             </Link>
           </div>
-          <div className="py-[0.3rem]">
+          <div className={`py-[0.1rem] ${hideDropdown ? "hidden" : ""}`}>
+            {/* TODO: add dark:hover:bg-???? to button */}
             <button
               id="profileButton"
               data-dropdown-toggle="dropdown"
-              className="h-4 w-40  text-black bg-white hover:bg-gray-100 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="h-5 w-40 bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white hover:bg-gray-200 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  text-center inline-flex items-center"
               type="button"
               onClick={profileButtonClick}
             >
