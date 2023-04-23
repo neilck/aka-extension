@@ -10,26 +10,9 @@ export default function Root() {
 
   return (
     <>
+      {profiles.selected} ( {window.location.pathname} )
       <ProfileNav />
       <div className=" bg-aka-blue text-aka-yellow">
-        <div id="sidebar">
-          <h1>
-            {profiles.selected} ( {window.location.pathname} )
-          </h1>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/badge">Badge</Link>
-              </li>
-              <li>
-                <Link to="/test">Test</Link>
-              </li>
-            </ul>
-          </nav>
-        </div>
-        <div className="bg-green-300 border-green-600 border-b p-4 m-4 rounded">
-          Hello World
-        </div>
         <div id="detail">
           <Outlet />
         </div>

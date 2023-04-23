@@ -27,6 +27,10 @@ const routes = [
     id: "root",
     children: [
       {
+        index: true,
+        element: <Popup />,
+      },
+      {
         path: "/about",
         element: <About />,
       },
