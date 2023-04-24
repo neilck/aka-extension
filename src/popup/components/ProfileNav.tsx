@@ -36,7 +36,7 @@ function ProfileNav() {
   let submit = useSubmit();
 
   return (
-    <nav className="bg-white dark:bg-slate-800 shadow-lg">
+    <nav className="bg-white dark:bg-slate-800 shadow-sm">
       <div className="max-w-6xl mx-auto h-10 px-4 py-2">
         <div className="flex justify-between">
           <div className="flex space-x-7">

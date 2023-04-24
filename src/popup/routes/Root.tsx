@@ -1,27 +1,25 @@
+import "./Root.css";
+
 import React from "react";
 import { Link, Outlet, useLoaderData, redirect } from "react-router-dom";
 import ProfileNav from "../components/ProfileNav";
-import Test from "../components/Test";
-
-import "./Root.css";
 import { Profile, getProfiles, changeCurrentProfile } from "../common";
 export default function Root() {
   const profiles: any = useLoaderData();
 
   return (
-    <>
-      <div className="bg-white">
+    <div className="bg-gray-100 dark:bg-slate-900 w-full h-full">
+      <div>
         {profiles.selected} ( {window.location.pathname} + " " )
         <Link to="/test">Test</Link>
       </div>
 
       <ProfileNav />
-      <div className=" bg-aka-blue text-aka-yellow">
-        <div id="detail">
-          <Outlet />
-        </div>
+
+      <div id="detail">
+        <Outlet />
       </div>
-    </>
+    </div>
   );
 }
 
