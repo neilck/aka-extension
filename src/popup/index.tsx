@@ -7,7 +7,7 @@ import Root, {
   loader as rootLoader,
   action as rootAction,
 } from "./routes/Root";
-import Popup from "./popup";
+import Popup, { action as popupAction } from "./popup";
 import About from "./components/About";
 import Badge from "./components/Badge";
 import ErrorPage from "./components/ErrorPage";
@@ -29,6 +29,7 @@ const routes = [
       {
         index: true,
         element: <Popup />,
+        action: popupAction,
       },
       {
         path: "/about",

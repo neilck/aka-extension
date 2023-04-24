@@ -1,10 +1,12 @@
 import React from "react";
-import { Form } from "react-router-dom";
+import { Form, useActionData } from "react-router-dom";
 import Splash from "./components/Splash";
 import Panel from "./components/Panel";
 import InputButton from "./components/InputButton";
 
 const Popup = () => {
+  const errors = useActionData() as { privateKey: "" };
+
   return (
     <div className="flex flex-col items-center flex-1 p-3 w-auto gap-4">
       <Panel>
@@ -15,7 +17,7 @@ const Popup = () => {
         </p>
       </Panel>
       <div className=" w-full rounded-lg shadow-xl bg-aka-yellow p-3">
-        <Splash className="mx-auto  h-48 f-48 fill-aka-blue" />
+        <Splash className="mx-auto  h-44 w-44 fill-aka-blue" />
       </div>
 
       <Panel>
@@ -25,11 +27,14 @@ const Popup = () => {
               <input
                 type="text"
                 id="privateKey"
-                name="fPrivateKey"
+                name="privateKey"
                 autoFocus
                 className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
                 placeholder="private key (nsec or hex)"
               />
+              <div className="h-4 text-red-500">
+                {errors?.privateKey && <span>{errors.privateKey}</span>}
+              </div>
             </div>
 
             <div className="pt-4">
@@ -57,3 +62,17 @@ const Popup = () => {
 };
 
 export default Popup;
+
+export async function action({ request }) {
+  const formData = await request.formData();
+  const privateKey = formData.get("privateKey");
+  const errors = { privateKey: "" };
+
+  // validate the fields
+  errors.privateKey = "not a valid private key";
+  return errors;
+
+  // otherwise create the user and redirect
+  // await createUser(email, password);
+  // return redirect("/dashboard");
+}
