@@ -17,7 +17,8 @@ export default function Root() {
   return (
     <div className="bg-gray-100 dark:bg-slate-900 w-full h-full">
       <div>
-        {window.location.pathname} + " " )<Link to="/test">Test</Link>
+        {window.location.pathname + "  "} <Link to="/test">Test</Link>{" "}
+        <Link to="/profile">Profile</Link>
       </div>
 
       <ProfileNav />

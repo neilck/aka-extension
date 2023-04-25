@@ -8,7 +8,7 @@ import Root, {
   action as rootAction,
 } from "./routes/Root";
 import Popup, { action as popupAction } from "./popup";
-import About from "./components/About";
+import Profile from "./components/Profile";
 import Badge from "./components/Badge";
 import ErrorPage from "./components/ErrorPage";
 
@@ -32,8 +32,8 @@ const routes = [
         action: popupAction,
       },
       {
-        path: "/about",
-        element: <About />,
+        path: "/profile",
+        element: <Profile />,
       },
       {
         path: "/badge",

@@ -10,7 +10,7 @@ export function Test() {
   return (
     <>
       {/* Canvas */}
-      <div className=" bg-gray-50 dark:bg-slate-900 flex flex-col items-center h-80 pt-4">
+      <div className=" bg-gray-100 dark:bg-slate-900 flex flex-col items-center h-80 pt-4">
         {/* Panel */}
         <div className="bg-white dark:bg-slate-800 w-60 mx-auto rounded-lg px-6 py-6 ring-1 ring-slate-900/5 shadow-xl">
           {/* Title */}
