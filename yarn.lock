@@ -73,6 +73,16 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@noble/hashes@~1.2.0", "@noble/hashes@1.2.0":
+  "integrity" "sha512-FZfhjEDbT5GRswV3C6uvLPHMiVD6lQBmpoX5+eSiPaMTXte/IKqI5dykDxzZB/WBeK/CDuQRBWarPdi3FNY2zQ=="
+  "resolved" "https://registry.npmjs.org/@noble/hashes/-/hashes-1.2.0.tgz"
+  "version" "1.2.0"
+
+"@noble/secp256k1@~1.7.0", "@noble/secp256k1@1.7.1":
+  "integrity" "sha512-hOUk6AyBFmqVrv7k5WAw/LpszxVbj9gGN4JRkIX52fdFAj1UA61KXmZDvqVEm+pOyec3+fIeZB02LYa/pWOArw=="
+  "resolved" "https://registry.npmjs.org/@noble/secp256k1/-/secp256k1-1.7.1.tgz"
+  "version" "1.7.1"
+
 "@nodelib/fs.scandir@2.1.5":
   "integrity" "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="
   "resolved" "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
@@ -98,6 +108,28 @@
   "integrity" "sha512-bkUDCp8o1MvFO+qxkODcbhSqRa6P2GXgrGZVpt0dCXNW2HCSCqYI0ZoAqEOSAjRWmmlKcYgFvN4B4S+zo/f8kg=="
   "resolved" "https://registry.npmjs.org/@remix-run/router/-/router-1.5.0.tgz"
   "version" "1.5.0"
+
+"@scure/base@~1.1.0", "@scure/base@1.1.1":
+  "integrity" "sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA=="
+  "resolved" "https://registry.npmjs.org/@scure/base/-/base-1.1.1.tgz"
+  "version" "1.1.1"
+
+"@scure/bip32@1.1.4":
+  "integrity" "sha512-m925ACYK0wPELsF7Z/VdLGmKj1StIeHraPMYB9xiAFiq/PnvqWd/99I0TQ2OZhjjlMDsDJeZlyXMWi0beaA7NA=="
+  "resolved" "https://registry.npmjs.org/@scure/bip32/-/bip32-1.1.4.tgz"
+  "version" "1.1.4"
+  dependencies:
+    "@noble/hashes" "~1.2.0"
+    "@noble/secp256k1" "~1.7.0"
+    "@scure/base" "~1.1.0"
+
+"@scure/bip39@1.1.1":
+  "integrity" "sha512-t+wDck2rVkh65Hmv280fYdVdY25J9YeEUIgn2LG1WM6gxFkGzcksoDiUkWVpVp3Oex9xGC68JU2dSbUfwZ2jPg=="
+  "resolved" "https://registry.npmjs.org/@scure/bip39/-/bip39-1.1.1.tgz"
+  "version" "1.1.1"
+  dependencies:
+    "@noble/hashes" "~1.2.0"
+    "@scure/base" "~1.1.0"
 
 "@types/chrome@^0.0.188":
   "integrity" "sha512-fVxbcnSrQqCaaTFfaP9QooRr0Lf47Ni+QVGpd4SQafe6x8RlLrlp+AAgc4QKNUVK7W6xEoOePMAu5sBXrc2qhA=="
@@ -1391,6 +1423,17 @@
   "integrity" "sha1-LRDAa9/TEuqXd2laTShDlFa3WUI="
   "resolved" "https://registry.npmjs.org/normalize-range/-/normalize-range-0.1.2.tgz"
   "version" "0.1.2"
+
+"nostr-tools@^1.10.1":
+  "integrity" "sha512-zgTYJeuZQ3CDASsmBEcB5i6V6l0IaA6cjnll6OVik3FoZcvbCaL7yP8I40hYnOIi3KlJykV7jEF9fn8h1NzMnA=="
+  "resolved" "https://registry.npmjs.org/nostr-tools/-/nostr-tools-1.10.1.tgz"
+  "version" "1.10.1"
+  dependencies:
+    "@noble/hashes" "1.2.0"
+    "@noble/secp256k1" "1.7.1"
+    "@scure/base" "1.1.1"
+    "@scure/bip32" "1.1.4"
+    "@scure/bip39" "1.1.1"
 
 "npm-run-path@^4.0.1":
   "integrity" "sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw=="

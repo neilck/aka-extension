@@ -1,5 +1,7 @@
 import React from "react";
-import { Form, useActionData } from "react-router-dom";
+import { Form, useActionData, redirect } from "react-router-dom";
+import { nip19 } from "nostr-tools";
+
 import Splash from "./components/Splash";
 import Panel from "./components/Panel";
 import InputButton from "./components/InputButton";
@@ -69,10 +71,20 @@ export async function action({ request }) {
   const errors = { privateKey: "" };
 
   // validate the fields
-  errors.privateKey = "not a valid private key";
-  return errors;
+  if (!isKeyValid(privateKey)) {
+    errors.privateKey = "not a valid private key";
+    return errors;
+  }
 
-  // otherwise create the user and redirect
+  // otherwise save the profile and redirect
   // await createUser(email, password);
-  // return redirect("/dashboard");
+  return redirect("/badge");
+}
+
+function isKeyValid(key: string) {
+  if (key.match(/^[a-f0-9]{64}$/)) return true;
+  try {
+    if (nip19.decode(key).type === "nsec") return true;
+  } catch (_) {}
+  return false;
 }

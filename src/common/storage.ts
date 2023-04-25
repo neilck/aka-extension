@@ -8,6 +8,8 @@ export interface Profile {
   isCurrent?: boolean
 }
 
+/*** Local Storage ***/
+
 export async function getProfiles(): Promise<Profile[]> {
   
   let results = await browser.storage.local.get("root");
@@ -39,3 +41,4 @@ export async function changeCurrentProfile(id: string) {
   browser.storage.local.set(
     { root: { profiles: profiles } });
 }
+

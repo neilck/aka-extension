@@ -6,12 +6,15 @@ import {
   useSubmit,
   useLocation,
 } from "react-router-dom";
-import { Profile, changeCurrentProfile } from "../common";
+import { KeyPairManager } from "../../common/storage/keypairmanager";
+import { IKeyPair, KeyPair } from "../../common/storage/keypair";
 
 function ProfileNav() {
-  const profiles = useRouteLoaderData("root") as Profile[];
-  const curProfile = profiles.find((profile) => profile.isCurrent);
-  let otherProfiles = profiles.filter((profile) => !profile.isCurrent);
+  const keypairs = useRouteLoaderData("root") as KeyPair[];
+  console.log("ProfileNav");
+  console.log(keypairs);
+  const curProfile = keypairs.find((profile) => profile.isCurrent);
+  let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
 
   const hideDropdown: boolean = useLocation().pathname == "/";
   console.log(useLocation().pathname);
@@ -59,7 +62,7 @@ function ProfileNav() {
               onClick={profileButtonClick}
             >
               <div id="profileButtonText" className="flex-1">
-                {curProfile.name}{" "}
+                {curProfile && <span>curProfile.name</span>}{" "}
               </div>
               <svg
                 className="w-4 h-4 ml-2 mr-1"
@@ -94,9 +97,9 @@ function ProfileNav() {
                   aria-labelledby="dropdownDefaultButton"
                 >
                   {otherProfiles.map((profile) => (
-                    <li key={profile.id}>
+                    <li key={profile.name}>
                       <div
-                        id={profile.id}
+                        id={profile.name}
                         onClick={profileItemClick}
                         className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                       >

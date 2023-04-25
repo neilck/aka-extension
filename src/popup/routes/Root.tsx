@@ -3,15 +3,21 @@ import "./Root.css";
 import React from "react";
 import { Link, Outlet, useLoaderData, redirect } from "react-router-dom";
 import ProfileNav from "../components/ProfileNav";
-import { Profile, getProfiles, changeCurrentProfile } from "../common";
+import {
+  Profile,
+  getProfiles,
+  changeCurrentProfile,
+} from "../../common/storage";
+import { KeyPairManager } from "../../common/storage/keypairmanager";
+import { IKeyPair, KeyPair } from "../../common/storage/keypair";
+
 export default function Root() {
-  const profiles: any = useLoaderData();
+  const keypairs = useLoaderData() as IKeyPair[];
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 w-full h-full">
       <div>
-        {profiles.selected} ( {window.location.pathname} + " " )
-        <Link to="/test">Test</Link>
+        {window.location.pathname} + " " )<Link to="/test">Test</Link>
       </div>
 
       <ProfileNav />
@@ -23,11 +29,10 @@ export default function Root() {
   );
 }
 
-export const loader = async (): Promise<Profile[]> => {
-  let profiles: Profile[] = null;
-  profiles = await getProfiles();
-  // profiles = [{ id: "1", name: "name", isCurrent: true }];
-  return profiles;
+export const loader = async (): Promise<IKeyPair[]> => {
+  const keyPairManager = new KeyPairManager();
+  await keyPairManager.load();
+  return keyPairManager.keypairs;
 };
 
 export async function action({ request, params }) {
