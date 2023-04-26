@@ -6,27 +6,27 @@ import {
   useSubmit,
   useLocation,
 } from "react-router-dom";
-import { KeyPairManager } from "../../common/storage/keypairmanager";
-import { IKeyPair, KeyPair } from "../../common/storage/keypair";
+import { IKeyPair } from "../../common/model/keypair";
 
 function ProfileNav() {
-  const keypairs = useRouteLoaderData("root") as KeyPair[];
-  console.log("ProfileNav");
-  console.log(keypairs);
-  const curProfile = keypairs.find((profile) => profile.isCurrent);
-  let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
+  const keypairs = useRouteLoaderData("root") as IKeyPair[];
+
+  const curProfile = keypairs.find((profile) => profile.get_isCurrent());
+  console.log("ProfileNav current profile: " + JSON.stringify(curProfile));
+  let otherProfiles = keypairs.filter((profile) => !profile.get_isCurrent());
 
   const hideDropdown: boolean = useLocation().pathname == "/";
-  console.log(useLocation().pathname);
 
   const profileButtonClick = () => {
     const dropdown = document.querySelector("#dropdown");
     dropdown.classList.toggle("hidden");
   };
 
+  // on dropdown select, send selected dropdown pubkey to root action
   const profileItemClick = (e: React.MouseEvent<HTMLElement>) => {
-    const selectedID = document.querySelector("#selectedID") as any;
-    selectedID.value = e.currentTarget.id;
+    // hidden input field
+    const hiddenInput = document.querySelector("#selectedPubkey") as any;
+    hiddenInput.value = e.currentTarget.id;
 
     // hide dropdown
     const dropdown = document.querySelector("#dropdown");
@@ -62,7 +62,7 @@ function ProfileNav() {
               onClick={profileButtonClick}
             >
               <div id="profileButtonText" className="flex-1">
-                {curProfile && <span>curProfile.name</span>}{" "}
+                {curProfile.get_name() + " "}
               </div>
               <svg
                 className="w-4 h-4 ml-2 mr-1"
@@ -84,8 +84,8 @@ function ProfileNav() {
             <Form id="profileForm" action="/" method="post">
               <input
                 type="hidden"
-                id="selectedID"
-                name="selectedID"
+                id="selectedPubkey"
+                name="selectedPubkey"
                 value="test"
               />
               <div
@@ -97,13 +97,13 @@ function ProfileNav() {
                   aria-labelledby="dropdownDefaultButton"
                 >
                   {otherProfiles.map((profile) => (
-                    <li key={profile.name}>
+                    <li key={profile.get_publickey()}>
                       <div
-                        id={profile.name}
+                        id={profile.get_publickey()}
                         onClick={profileItemClick}
                         className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
-                        {profile.name}
+                        {profile.get_name()}
                       </div>
                     </li>
                   ))}

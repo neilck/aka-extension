@@ -3,13 +3,8 @@ import "./Root.css";
 import React from "react";
 import { Link, Outlet, useLoaderData, redirect } from "react-router-dom";
 import ProfileNav from "../components/ProfileNav";
-import {
-  Profile,
-  getProfiles,
-  changeCurrentProfile,
-} from "../../common/storage";
-import { KeyPairManager } from "../../common/storage/keypairmanager";
-import { IKeyPair, KeyPair } from "../../common/storage/keypair";
+import { loadKeyPairs, saveKeyPairs } from "../../common/storage";
+import { IKeyPair } from "../../common/model/keypair";
 
 export default function Root() {
   const keypairs = useLoaderData() as IKeyPair[];
@@ -31,16 +26,19 @@ export default function Root() {
 }
 
 export const loader = async (): Promise<IKeyPair[]> => {
-  const keyPairManager = new KeyPairManager();
-  await keyPairManager.load();
-  return keyPairManager.keypairs;
+  return await loadKeyPairs();
 };
 
 export async function action({ request, params }) {
   let formData = await request.formData();
   const updates = Object.fromEntries(formData);
-  const selectedID = updates.selectedID;
+  const selectedPubkey = updates.selectedPubkey;
 
-  changeCurrentProfile(selectedID);
+  const keypairs = useLoaderData() as IKeyPair[];
+  keypairs.map((item) => {
+    item.set_isCurrent(item.get_publickey() == selectedPubkey);
+  });
+
+  saveKeyPairs(keypairs);
   return redirect("/");
 }

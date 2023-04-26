@@ -1,44 +1,29 @@
 import browser from "webextension-polyfill";
-
-export interface Profile {
-  id: string,
-  name: string,
-  npub?: string,
-  hexpubkey?: string,
-  isCurrent?: boolean
-}
+import { IKeyPair, KeyPair } from "./model/keypair";
 
 /*** Local Storage ***/
 
-export async function getProfiles(): Promise<Profile[]> {
-  
-  let results = await browser.storage.local.get("root");
-
-  if (!results.root || !results.root.profiles ) {
-    const setProfiles = [
-      { id: "1", name: "Profile 1", isCurrent: true}, 
-      { id: "2", name: "Profile 2", isCurrent: false}
-    ];
-
-     browser.storage.local.set(
-      { root: { profiles: setProfiles } });
-     }
-
-   results = await browser.storage.local.get("root");
-   return results.root.profiles;
-
+export async function loadKeyPairs() {
+  let keypairs: IKeyPair[] = [];
+  const data = await browser.storage.local.get("keypairs");
+  console.log("load data:" + JSON.stringify(data));
+  if (data.keypairs && data.keypairs.length > 0) {
+    data.keypairs.map((item: any) => {
+      console.log("Item: " + JSON.stringify(item));
+      keypairs.push(new KeyPair(item.name, item.isCurrent, item.privatekey));
+    });
+  }
+  return keypairs;
 }
 
-export async function changeCurrentProfile(id: string) {
-  let results = await browser.storage.local.get("root");
-  if (!results.root.profiles) return;
-
-  const profiles: Profile[] = results.root.profiles;
-  profiles.map( (profile) => {
-    profile.isCurrent = profile.id == id;
+export async function saveKeyPairs(keypairs: IKeyPair[]) {
+  let data = { keypairs: [] };
+  keypairs.map((keypair: IKeyPair) => {
+    data.keypairs.push({
+      name: keypair.get_name(),
+      isCurrent: keypair.get_isCurrent(),
+      privatekey: keypair.get_privatekey(),
+    });
   });
-
-  browser.storage.local.set(
-    { root: { profiles: profiles } });
+  await await browser.storage.local.set(data);
 }
-

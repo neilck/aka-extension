@@ -1,11 +1,12 @@
 import browser from "webextension-polyfill";
 import { getPublicKey, nip19 } from "nostr-tools";
-import { isPrivateKeyValid } from "../util";
+import { isKeyValid } from "../util";
 
 export interface IKeyPair {
   get_discriminator: () => string;
   get_name: () => string;
   get_npub: () => string;
+  get_npubshort: () => string;
   get_nsec: () => string;
   get_publickey: () => string;
   get_privatekey: () => string;
@@ -27,11 +28,13 @@ export class KeyPair implements IKeyPair {
   isCurrent = false;
 
   constructor(name: string, isCurrent: boolean, privatekey: string) {
-    const key = isPrivateKeyValid(privatekey);
+    const key = isKeyValid(privatekey);
     if (key != null) {
-      this.name = name;
       this.privatekey = privatekey;
       this.isCurrent = isCurrent;
+      this.name = name;
+
+      if (this.name == "") this.name = this.get_npubshort();
     } else {
       throw new Error("Invalid private key.");
     }
@@ -52,6 +55,12 @@ export class KeyPair implements IKeyPair {
       this.npub = nip19.npubEncode(pubkey);
     }
     return this.npub;
+  }
+
+  get_npubshort() {
+    const key = this.get_npub();
+    if (key.length <= 10) return key;
+    return key.substring(0, 5) + "..." + key.substring(key.length - 5);
   }
 
   get_nsec() {

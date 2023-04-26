@@ -5,6 +5,9 @@ import { nip19 } from "nostr-tools";
 import Splash from "./components/Splash";
 import Panel from "./components/Panel";
 import InputButton from "./components/InputButton";
+import { KeyPair } from "../common/model/keypair";
+import { saveKeyPairs } from "../common/storage";
+import { isKeyValid } from "../common/util";
 
 const Popup = () => {
   const errors = useActionData() as { privateKey: "" };
@@ -68,24 +71,19 @@ export default Popup;
 
 export async function action({ request }) {
   const formData = await request.formData();
-  const privateKey = formData.get("privateKey");
+  const formkey = formData.get("privateKey");
   const errors = { privateKey: "" };
 
-  // validate the fields
-  if (!isKeyValid(privateKey)) {
+  const privatekey = isKeyValid(formkey);
+  if (!privatekey) {
     errors.privateKey = "not a valid private key";
     return errors;
   }
 
+  const newPair = new KeyPair("", true, privatekey);
+  saveKeyPairs([newPair]);
+
   // otherwise save the profile and redirect
   // await createUser(email, password);
-  return redirect("/badge");
-}
-
-function isKeyValid(key: string) {
-  if (key.match(/^[a-f0-9]{64}$/)) return true;
-  try {
-    if (nip19.decode(key).type === "nsec") return true;
-  } catch (_) {}
-  return false;
+  return redirect("/profile");
 }

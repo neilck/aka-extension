@@ -2,7 +2,7 @@ import { nip19 } from "nostr-tools";
 
 // takes in hex or nsec... string
 // returns hex privatekey is valid, null if not
-export function isPrivateKeyValid(key: string): string {
+export function isKeyValid(key: string): string {
   if (key.match(/^[a-f0-9]{64}$/)) return key;
   try {
     const decoded = nip19.decode(key);
@@ -10,4 +10,3 @@ export function isPrivateKeyValid(key: string): string {
   } catch (_) {}
   return null;
 }
-  
