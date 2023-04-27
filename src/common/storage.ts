@@ -6,10 +6,9 @@ import { IKeyPair, KeyPair } from "./model/keypair";
 export async function loadKeyPairs() {
   let keypairs: IKeyPair[] = [];
   const data = await browser.storage.local.get("keypairs");
-  console.log("load data:" + JSON.stringify(data));
+  console.log("loading data:" + JSON.stringify(data));
   if (data.keypairs && data.keypairs.length > 0) {
     data.keypairs.map((item: any) => {
-      console.log("Item: " + JSON.stringify(item));
       keypairs.push(new KeyPair(item.name, item.isCurrent, item.privatekey));
     });
   }
@@ -25,5 +24,6 @@ export async function saveKeyPairs(keypairs: IKeyPair[]) {
       privatekey: keypair.get_privatekey(),
     });
   });
-  await await browser.storage.local.set(data);
+  console.log("saving data:" + JSON.stringify(data));
+  await browser.storage.local.set(data);
 }

@@ -8,7 +8,14 @@ import Root, {
   action as rootAction,
 } from "./routes/Root";
 import Popup, { action as popupAction } from "./popup";
-import Profile from "./components/Profile";
+import Profile, {
+  loader as profileLoader,
+  action as profileAction,
+} from "./components/Profile";
+import ProfileEdit, {
+  loader as profileEditLoader,
+  action as profileEditAction,
+} from "./components/ProfileEdit";
 import Badge from "./components/Badge";
 import ErrorPage from "./components/ErrorPage";
 
@@ -28,24 +35,44 @@ const routes = [
     children: [
       {
         index: true,
-        element: <Popup />,
-        action: popupAction,
+        loader: profileEditLoader,
+        action: profileEditAction,
+        element: <ProfileEdit />,
+      },
+      // {
+      //   index: true,
+      //   element: <Popup />,
+      //   action: popupAction,
+      // },
+      {
+        path: "/profiles/:pubkey",
+        loader: profileLoader,
+        action: profileAction,
+        element: <Profile />,
       },
       {
-        path: "/profile",
-        element: <Profile />,
+        path: "/profiles/create",
+        loader: profileEditLoader,
+        action: profileEditAction,
+        element: <ProfileEdit />,
+      },
+      {
+        path: "/profiles/:pubkey/edit",
+        loader: profileEditLoader,
+        action: profileEditAction,
+        element: <ProfileEdit />,
       },
       {
         path: "/badge",
         element: <Badge />,
       },
+      {
+        path: "/test",
+        element: <Test />,
+        loader: testLoader,
+        action: testAction,
+      },
     ],
-  },
-  {
-    path: "/test",
-    element: <Test />,
-    loader: testLoader,
-    action: testAction,
   },
 ];
 

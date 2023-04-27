@@ -5,11 +5,13 @@ import {
   Form,
   useSubmit,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { IKeyPair } from "../../common/model/keypair";
 
 function ProfileNav() {
   const keypairs = useRouteLoaderData("root") as IKeyPair[];
+  const navigate = useNavigate();
 
   const curProfile = keypairs.find((profile) => profile.get_isCurrent());
   console.log("ProfileNav current profile: " + JSON.stringify(curProfile));
@@ -34,6 +36,16 @@ function ProfileNav() {
 
     const form = document.querySelector("#profileForm") as any;
     submit(form);
+  };
+
+  // new clicked from dropdown list
+  const profileNewClick = (e: React.MouseEvent<HTMLElement>) => {
+    // hide dropdown
+    const dropdown = document.querySelector("#dropdown");
+    dropdown.classList.toggle("hidden");
+
+    console.log("new profile clicked");
+    navigate("/profiles/create");
   };
 
   let submit = useSubmit();
@@ -62,7 +74,7 @@ function ProfileNav() {
               onClick={profileButtonClick}
             >
               <div id="profileButtonText" className="flex-1">
-                {curProfile.get_name() + " "}
+                {curProfile && curProfile.get_name() + " "}
               </div>
               <svg
                 className="w-4 h-4 ml-2 mr-1"
@@ -90,7 +102,7 @@ function ProfileNav() {
               />
               <div
                 id="dropdown"
-                className="w-40 z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow  dark:bg-gray-700"
+                className="w-40 hidden bg-white divide-y divide-gray-100 rounded-lg shadow  dark:bg-gray-700"
               >
                 <ul
                   className="py-2 text-sm text-gray-700 dark:text-gray-200"
@@ -107,6 +119,15 @@ function ProfileNav() {
                       </div>
                     </li>
                   ))}
+                  <li key="add_new">
+                    <div
+                      id="add_new"
+                      onClick={profileNewClick}
+                      className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    >
+                      Add new profile...
+                    </div>
+                  </li>
                 </ul>
               </div>
             </Form>

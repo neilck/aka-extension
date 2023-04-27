@@ -28,6 +28,12 @@ export class KeyPair implements IKeyPair {
   isCurrent = false;
 
   constructor(name: string, isCurrent: boolean, privatekey: string) {
+    if (privatekey == "") {
+      this.name = name;
+      this.isCurrent = isCurrent;
+      return;
+    }
+
     const key = isKeyValid(privatekey);
     if (key != null) {
       this.privatekey = privatekey;
@@ -59,8 +65,8 @@ export class KeyPair implements IKeyPair {
 
   get_npubshort() {
     const key = this.get_npub();
-    if (key.length <= 10) return key;
-    return key.substring(0, 5) + "..." + key.substring(key.length - 5);
+    if (key.length <= 14) return key;
+    return key.substring(0, 9) + "..." + key.substring(key.length - 5);
   }
 
   get_nsec() {

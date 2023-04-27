@@ -16,9 +16,10 @@ export default function Root() {
         <Link to="/profile">Profile</Link>
       </div>
 
-      <ProfileNav />
-
-      <div id="detail">
+      <div className="relative z-50">
+        <ProfileNav />
+      </div>
+      <div id="detail" className="relative z-10">
         <Outlet />
       </div>
     </div>
@@ -39,6 +40,6 @@ export async function action({ request, params }) {
     item.set_isCurrent(item.get_publickey() == selectedPubkey);
   });
 
-  saveKeyPairs(keypairs);
+  await saveKeyPairs(keypairs);
   return redirect("/");
 }
