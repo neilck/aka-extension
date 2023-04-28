@@ -1,18 +1,24 @@
 import "./Root.css";
 
 import React from "react";
-import { Link, Outlet, useLoaderData, redirect } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLoaderData,
+  redirect,
+  useLocation,
+} from "react-router-dom";
 import ProfileNav from "../components/ProfileNav";
-import { loadKeyPairs, saveKeyPairs } from "../../common/storage";
+import Storage from "../../common/Storage";
 import { IKeyPair } from "../../common/model/keypair";
 
 export default function Root() {
+  // load data so can be accessed by other components
   const keypairs = useLoaderData() as IKeyPair[];
-
   return (
     <div className="bg-gray-100 dark:bg-slate-900 w-full h-full">
       <div>
-        {window.location.pathname + "  "} <Link to="/test">Test</Link>{" "}
+        {useLocation().pathname + "  "} <Link to="/test">Test</Link>{" "}
         <Link to="/profile">Profile</Link>
       </div>
 
@@ -27,7 +33,10 @@ export default function Root() {
 }
 
 export const loader = async (): Promise<IKeyPair[]> => {
-  return await loadKeyPairs();
+  const storage = Storage.getInstance();
+  const keypairs = await storage.getKeys();
+  console.log("Root loader() returning " + JSON.stringify(keypairs));
+  return keypairs;
 };
 
 export async function action({ request, params }) {
@@ -35,11 +44,7 @@ export async function action({ request, params }) {
   const updates = Object.fromEntries(formData);
   const selectedPubkey = updates.selectedPubkey;
 
-  const keypairs = useLoaderData() as IKeyPair[];
-  keypairs.map((item) => {
-    item.set_isCurrent(item.get_publickey() == selectedPubkey);
-  });
-
-  await saveKeyPairs(keypairs);
-  return redirect("/");
+  const storage = Storage.getInstance();
+  await storage.setCurrentPubkey(selectedPubkey);
+  return redirect(`/profiles/${selectedPubkey}`);
 }

@@ -1,4 +1,4 @@
-import React, { FocusEvent } from "react";
+import React, { FocusEvent, useContext } from "react";
 import {
   Link,
   useRouteLoaderData,
@@ -12,12 +12,15 @@ import {
 import Panel from "../components/Panel";
 import InputButton from "./InputButton";
 import { IKeyPair, KeyPair } from "../../common/model/keypair";
-import { loadKeyPairs, saveKeyPairs } from "../../common/storage";
+import Storage from "../../common/Storage";
 import { isKeyValid } from "../../common/util";
 
 function ProfileEdit() {
   const keypair = useLoaderData() as IKeyPair;
   const errors = useActionData() as { privateKey: ""; name: "" };
+
+  const isUpdating = keypair.get_privatekey() != "";
+  console.log("ProfileEdit isUpdating: " + JSON.stringify(isUpdating));
 
   const privateKeyOnBlurHandler = (e: FocusEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
@@ -47,9 +50,9 @@ function ProfileEdit() {
                 type="text"
                 id="privateKey"
                 name="privateKey"
-                autoFocus
                 placeholder="private key (nsec or hex)"
                 onBlur={privateKeyOnBlurHandler}
+                defaultValue={keypair.get_privatekey()}
                 className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
               />
               <div className="h-4 text-red-500">
@@ -64,6 +67,7 @@ function ProfileEdit() {
                 id="name"
                 name="name"
                 placeholder="profile name"
+                defaultValue={keypair.get_name()}
                 className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
               />
               <div className="h-4 text-red-500">
@@ -81,20 +85,19 @@ function ProfileEdit() {
 }
 
 export const loader = async ({ params }) => {
+  console.log("ProfileEdit loader(): " + JSON.stringify(params));
   if (!params || !params.pubkey) {
     // create new pubkey
     return new KeyPair("New Profile", false, "");
   }
 
-  const keypairs = useRouteLoaderData("root") as IKeyPair[];
-  const foundKeypair = keypairs.find(
-    (keypair) => keypair.get_publickey() == params.pubkey
-  );
-
-  return foundKeypair ? foundKeypair : new KeyPair("New Profile", false, "");
+  const storage = Storage.getInstance();
+  const foundKeypair = await storage.getKey(params.pubkey);
+  return foundKeypair ? foundKeypair : new KeyPair("Not Found", false, "");
 };
 
 export async function action({ request, params }) {
+  const storage = Storage.getInstance();
   const formData = await request.formData();
   const formkey = formData.get("privateKey");
   const name = formData.get("name");
@@ -110,8 +113,7 @@ export async function action({ request, params }) {
     return;
   }
 
-  // check for duplicate private keys
-  const keypairs = await loadKeyPairs();
+  const keypairs = await storage.getKeys();
   const existingKey = keypairs.find(
     (keypair) => keypair.get_privatekey() == privatekey
   );
@@ -125,9 +127,7 @@ export async function action({ request, params }) {
     return errors;
   }
   const keypair = new KeyPair(name, true, privatekey);
-  keypairs.map((keypair) => keypair.set_isCurrent(false));
-  keypairs.push(keypair);
-  await saveKeyPairs(keypairs);
+  storage.upsertKey(keypair);
 
   return redirect(`/profiles/${keypair.get_publickey()}`);
 }

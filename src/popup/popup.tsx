@@ -6,7 +6,7 @@ import Splash from "./components/Splash";
 import Panel from "./components/Panel";
 import InputButton from "./components/InputButton";
 import { KeyPair } from "../common/model/keypair";
-import { saveKeyPairs } from "../common/storage";
+import Storage from "../common/Storage";
 import { isKeyValid } from "../common/util";
 
 const Popup = () => {
@@ -81,7 +81,8 @@ export async function action({ request }) {
   }
 
   const newPair = new KeyPair("", true, privatekey);
-  saveKeyPairs([newPair]);
+  const storage = Storage.getInstance();
+  storage.upsertKey(newPair);
 
   // otherwise save the profile and redirect
   // await createUser(email, password);

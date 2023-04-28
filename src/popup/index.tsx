@@ -24,6 +24,8 @@ import Test, {
   action as testAction,
 } from "./components/Test";
 
+import Storage from "../common/Storage";
+
 const routes = [
   {
     path: "/",
@@ -35,15 +37,26 @@ const routes = [
     children: [
       {
         index: true,
-        loader: profileEditLoader,
-        action: profileEditAction,
-        element: <ProfileEdit />,
+        loader: profileLoader,
+        action: profileAction,
+        element: <Profile />,
       },
+      // {
+      //   index: true,
+      //   loader: profileEditLoader,
+      //   action: profileEditAction,
+      //   element: <ProfileEdit />,
+      // },
       // {
       //   index: true,
       //   element: <Popup />,
       //   action: popupAction,
       // },
+      {
+        path: "/popup",
+        action: popupAction,
+        element: <Popup />,
+      },
       {
         path: "/profiles/:pubkey",
         loader: profileLoader,
@@ -78,6 +91,10 @@ const routes = [
 
 const router = createMemoryRouter(routes);
 
+const storage = Storage.getInstance();
+// loads keys
+storage.getKeys();
+
 function init() {
   const appContainer = document.createElement("div");
   document.body.appendChild(appContainer);
@@ -85,7 +102,6 @@ function init() {
     throw new Error("Can not find AppContainer");
   }
   const root = createRoot(appContainer);
-  console.log(appContainer);
   root.render(
     <React.StrictMode>
       <RouterProvider router={router} />

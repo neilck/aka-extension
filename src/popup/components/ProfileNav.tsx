@@ -17,7 +17,7 @@ function ProfileNav() {
   console.log("ProfileNav current profile: " + JSON.stringify(curProfile));
   let otherProfiles = keypairs.filter((profile) => !profile.get_isCurrent());
 
-  const hideDropdown: boolean = useLocation().pathname == "/";
+  const hideDropdown: boolean = useLocation().pathname == "/popup";
 
   const profileButtonClick = () => {
     const dropdown = document.querySelector("#dropdown");
