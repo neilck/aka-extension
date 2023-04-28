@@ -16,6 +16,10 @@ import ProfileEdit, {
   loader as profileEditLoader,
   action as profileEditAction,
 } from "./components/ProfileEdit";
+import ProfileCreate, {
+  loader as profileCreateLoader,
+  action as profileCreateAction,
+} from "./components/ProfileCreate";
 import Badge from "./components/Badge";
 import ErrorPage from "./components/ErrorPage";
 
@@ -62,6 +66,12 @@ const routes = [
         loader: profileLoader,
         action: profileAction,
         element: <Profile />,
+      },
+      {
+        path: "/profiles/create",
+        loader: profileCreateLoader,
+        action: profileCreateAction,
+        element: <ProfileCreate />,
       },
       {
         path: "/profiles/create",
