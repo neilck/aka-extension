@@ -131,7 +131,7 @@ export async function action({ request, params }) {
   const keypair = new KeyPair(name, true, privatekey);
   storage.upsertKey(keypair);
 
-  return redirect(`/profiles/${keypair.get_publickey()}`);
+  return redirect("/profiles");
 }
 
 export default ProfileCreate;

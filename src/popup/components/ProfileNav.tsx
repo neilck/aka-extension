@@ -14,12 +14,14 @@ function ProfileNav() {
   const navigate = useNavigate();
 
   const curProfile = keypairs.find((profile) => profile.get_isCurrent());
-  console.log("ProfileNav current profile: " + JSON.stringify(curProfile));
   let otherProfiles = keypairs.filter((profile) => !profile.get_isCurrent());
 
-  const hideDropdown: boolean =
-    useLocation().pathname == "/popup" ||
-    useLocation().pathname == "/profiles/create";
+  const hideDropdownPaths = ["/popup", "/profiles/create"];
+  const pathname = useLocation().pathname;
+  let hideDropdown = false;
+  hideDropdownPaths.map((path) => {
+    if (pathname.includes(path)) hideDropdown = true;
+  });
 
   const profileButtonClick = () => {
     const dropdown = document.querySelector("#dropdown");
@@ -48,6 +50,13 @@ function ProfileNav() {
 
     console.log("new profile clicked");
     navigate("/profiles/create");
+  };
+
+  // new clicked from dropdown list
+  const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
+    // hide dropdown
+    const dropdown = document.querySelector("#dropdown");
+    dropdown.classList.add("hidden");
   };
 
   let submit = useSubmit();
@@ -104,6 +113,7 @@ function ProfileNav() {
               />
               <div
                 id="dropdown"
+                onMouseLeave={onMouseLeave}
                 className="w-40 hidden bg-white divide-y divide-gray-100 rounded-lg shadow  dark:bg-gray-700"
               >
                 <ul
@@ -125,7 +135,7 @@ function ProfileNav() {
                     <div
                       id="add_new"
                       onClick={profileNewClick}
-                      className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      className="block italic px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                     >
                       Add new profile...
                     </div>

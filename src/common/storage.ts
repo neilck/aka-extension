@@ -124,6 +124,32 @@ class Storage {
 
     await this.saveKeyPairs();
   }
+
+  public async deleteKey(pubkey: string) {
+    console.log(`deleting pubkey ${pubkey}`);
+    await this.load();
+
+    let i = -1;
+
+    // get index of element to delete
+    for (i = 0; i < this.keypairs.length; i++) {
+      if (this.keypairs[i].get_publickey() == pubkey) break;
+    }
+
+    // ensure index in range
+    if (i < 0 || i > this.keypairs.length - 1) return;
+
+    // delete item
+    console.log(`Before delete i=${i}: ${JSON.stringify(this.keypairs)}`);
+    this.keypairs.splice(i, 1);
+    console.log(`After delete: ${JSON.stringify(this.keypairs)}`);
+    // set new current
+    if (this.keypairs.length > 0) {
+      this.keypairs[0].set_isCurrent(true);
+    }
+
+    await this.saveKeyPairs();
+  }
 }
 
 export default Storage;

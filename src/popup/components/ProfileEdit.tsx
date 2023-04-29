@@ -26,11 +26,11 @@ function ProfileEdit() {
   return (
     <div className="p-5">
       <Panel>
-        <div className="h-4 w-4 cursor-pointer hover:bg-gray-100">
+        <div className="h-6 w-6 cursor-pointer hover:bg-gray-100">
           <BackButton />
         </div>
         <h1 className="font-semibold text-lg text-aka-blue pt-1">
-          {keypair.get_name()}
+          Edit {keypair.get_name()}
         </h1>
         <Form id="profileForm" method="post">
           <input
@@ -74,15 +74,13 @@ function ProfileEdit() {
 }
 
 export const loader = async ({ params }) => {
-  console.log("ProfileEdit loader(): " + JSON.stringify(params));
-  if (!params || !params.pubkey) {
-    // create new pubkey
-    return new KeyPair("New Profile", false, "");
-  }
-
   const storage = Storage.getInstance();
-  const foundKeypair = await storage.getKey(params.pubkey);
-  return foundKeypair ? foundKeypair : new KeyPair("Not Found", false, "");
+  const currentKey = await storage.getCurrentKey();
+
+  console.log("Profile loader() currentKey: " + JSON.stringify(currentKey));
+  if (currentKey == null) return redirect("/popup");
+
+  return currentKey;
 };
 
 export async function action({ request, params }) {
@@ -96,9 +94,9 @@ export async function action({ request, params }) {
 
   // save data
   const keypair = new KeyPair(name, true, formkey);
-  storage.upsertKey(keypair);
+  await storage.upsertKey(keypair);
 
-  return redirect(`/profiles/${keypair.get_publickey()}`);
+  return redirect("/profiles");
 }
 
 export default ProfileEdit;

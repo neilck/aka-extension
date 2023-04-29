@@ -49,6 +49,9 @@ function PrivateKeyDisplay(props: any) {
           >
             hide private key
           </button>
+          <div className="text-slate-500 ml-auto">
+            <Link to={`/profiles/delete`}>delete</Link>
+          </div>
         </div>
       </div>
     );
@@ -93,12 +96,10 @@ function Profile() {
               className="w-full flex flex-row flex-nowrap justify-between"
             >
               <div className="font-semibold text-lg text-aka-blue">
-                <Link to={`/profiles/${currentProfile.get_publickey()}/edit`}>
-                  {currentProfile.get_name()}
-                </Link>
+                <Link to={`/profiles/edit`}>{currentProfile.get_name()}</Link>
               </div>
-              <Link to={`/profiles/${currentProfile.get_publickey()}/edit`}>
-                <div className="w-4 h-4">
+              <Link to={`/profiles/edit`}>
+                <div className="w-6 h-6">
                   <PencilSquareIcon stroke="#234e70" />
                 </div>
               </Link>
@@ -144,9 +145,6 @@ export const loader = async () => {
   if (currentKey == null) return redirect("/popup");
 
   return currentKey;
-  /*
-  return redirect("/profiles/" + currentKey.get_publickey());
-  */
 };
 
 export async function action({ request, params }) {

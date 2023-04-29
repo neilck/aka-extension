@@ -20,6 +20,10 @@ import ProfileCreate, {
   loader as profileCreateLoader,
   action as profileCreateAction,
 } from "./components/ProfileCreate";
+import ProfileDelete, {
+  loader as profileDeleteLoader,
+  action as profileDeleteAction,
+} from "./components/ProfileDelete";
 import Badge from "./components/Badge";
 import ErrorPage from "./components/ErrorPage";
 
@@ -62,7 +66,7 @@ const routes = [
         element: <Popup />,
       },
       {
-        path: "/profiles/:pubkey",
+        path: "/profiles",
         loader: profileLoader,
         action: profileAction,
         element: <Profile />,
@@ -74,13 +78,13 @@ const routes = [
         element: <ProfileCreate />,
       },
       {
-        path: "/profiles/create",
-        loader: profileEditLoader,
-        action: profileEditAction,
-        element: <ProfileEdit />,
+        path: "/profiles/delete",
+        loader: profileDeleteLoader,
+        action: profileDeleteAction,
+        element: <ProfileDelete />,
       },
       {
-        path: "/profiles/:pubkey/edit",
+        path: "/profiles/edit",
         loader: profileEditLoader,
         action: profileEditAction,
         element: <ProfileEdit />,

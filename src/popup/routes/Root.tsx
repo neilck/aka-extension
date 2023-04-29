@@ -46,5 +46,5 @@ export async function action({ request, params }) {
 
   const storage = Storage.getInstance();
   await storage.setCurrentPubkey(selectedPubkey);
-  return redirect(`/profiles/${selectedPubkey}`);
+  return redirect("/profiles");
 }

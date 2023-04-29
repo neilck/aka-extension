@@ -82,9 +82,9 @@ export async function action({ request }) {
 
   const newPair = new KeyPair("", true, privatekey);
   const storage = Storage.getInstance();
-  storage.upsertKey(newPair);
+  await storage.upsertKey(newPair);
 
   // otherwise save the profile and redirect
   // await createUser(email, password);
-  return redirect("/profile");
+  return redirect("/profiles");
 }
