@@ -129,7 +129,7 @@ export async function action({ request, params }) {
 
   // save data
   const keypair = new KeyPair(name, true, privatekey);
-  storage.upsertKey(keypair);
+  await storage.upsertKey(keypair);
 
   return redirect("/profiles");
 }
