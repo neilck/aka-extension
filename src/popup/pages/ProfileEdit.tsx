@@ -10,11 +10,11 @@ import {
   useActionData,
 } from "react-router-dom";
 import Panel from "../components/Panel";
-import InputButton from "./InputButton";
+import InputButton from "../components//InputButton";
 import { IKeyPair, KeyPair } from "../../common/model/keypair";
 import Storage from "../../common/Storage";
 import { isKeyValid } from "../../common/util";
-import { BackButton } from "./BackButton";
+import { BackButton } from "../components//BackButton";
 
 function ProfileEdit() {
   const keypair = useLoaderData() as IKeyPair;

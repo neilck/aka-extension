@@ -7,30 +7,26 @@ import Root, {
   loader as rootLoader,
   action as rootAction,
 } from "./routes/Root";
-import Popup, { action as popupAction } from "./popup";
+import Popup, { action as popupAction } from "./pages/Popup";
 import Profile, {
   loader as profileLoader,
   action as profileAction,
-} from "./components/Profile";
+} from "./pages/Profile";
 import ProfileEdit, {
   loader as profileEditLoader,
   action as profileEditAction,
-} from "./components/ProfileEdit";
+} from "./pages/ProfileEdit";
 import ProfileCreate, {
   loader as profileCreateLoader,
   action as profileCreateAction,
-} from "./components/ProfileCreate";
+} from "./pages/ProfileCreate";
 import ProfileDelete, {
   loader as profileDeleteLoader,
   action as profileDeleteAction,
-} from "./components/ProfileDelete";
+} from "./pages/ProfileDelete";
 import Badge from "./components/Badge";
-import ErrorPage from "./components/ErrorPage";
-
-import Test, {
-  loader as testLoader,
-  action as testAction,
-} from "./components/Test";
+import ErrorPage from "./pages/ErrorPage";
+import Test, { loader as testLoader, action as testAction } from "./pages/Test";
 
 import Storage from "../common/Storage";
 

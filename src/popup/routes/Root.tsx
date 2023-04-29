@@ -17,11 +17,12 @@ export default function Root() {
   const keypairs = useLoaderData() as IKeyPair[];
   return (
     <div className="bg-gray-100 dark:bg-slate-900 w-full h-full">
+      {/*
       <div>
         {useLocation().pathname + "  "} <Link to="/test">Test</Link>{" "}
         <Link to="/profile">Profile</Link>
       </div>
-
+    */}
       <div className="relative z-50">
         <ProfileNav />
       </div>

@@ -1,8 +1,7 @@
 import React from "react";
 import { Form, useLoaderData, redirect } from "react-router-dom";
-import Panel from "./Panel";
-import InputButton from "./InputButton";
-import { BackButton } from "./BackButton";
+import Panel from "../components//Panel";
+import { BackButton } from "../components//BackButton";
 import { IKeyPair } from "../../common/model/keypair";
 import Storage from "../../common/Storage";
 
