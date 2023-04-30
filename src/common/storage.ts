@@ -40,13 +40,23 @@ class Storage {
 
   private async saveKeyPairs() {
     let data = { keypairs: [] };
+    let current: IKeyPair = null;
     this.keypairs.map((keypair: IKeyPair) => {
+      if (keypair.get_isCurrent()) current = keypair;
       data.keypairs.push({
         name: keypair.get_name(),
         isCurrent: keypair.get_isCurrent(),
         privatekey: keypair.get_privatekey(),
       });
     });
+
+    // makes compatible with nos2x scripts
+    if (current) {
+      await browser.storage.local.set({
+        private_key: current.get_privatekey(),
+      });
+    }
+
     console.log("saving data:" + JSON.stringify(data));
     await browser.storage.local.set(data);
   }

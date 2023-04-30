@@ -496,6 +496,13 @@
   "resolved" "https://registry.npmjs.org/array-uniq/-/array-uniq-1.0.3.tgz"
   "version" "1.0.3"
 
+"async-mutex@^0.3.2":
+  "integrity" "sha512-HuTK7E7MT7jZEh1P9GtRW9+aTWiDWWi9InbZ5hjxrnRa39KS4BW04+xLBhYNS2aXhHUIKZSw3gj4Pn1pj+qGAA=="
+  "resolved" "https://registry.npmjs.org/async-mutex/-/async-mutex-0.3.2.tgz"
+  "version" "0.3.2"
+  dependencies:
+    "tslib" "^2.3.1"
+
 "autoprefixer@^10.4.7":
   "integrity" "sha512-ypHju4Y2Oav95SipEcCcI5J7CGPuvz8oat7sUtYj3ClK44bldfvtvcxK6IEK++7rqB7YchDGzweZIBG+SD0ZAA=="
   "resolved" "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.7.tgz"
@@ -1424,7 +1431,7 @@
   "resolved" "https://registry.npmjs.org/normalize-range/-/normalize-range-0.1.2.tgz"
   "version" "0.1.2"
 
-"nostr-tools@^1.10.1":
+"nostr-tools@^1.1.0":
   "integrity" "sha512-zgTYJeuZQ3CDASsmBEcB5i6V6l0IaA6cjnll6OVik3FoZcvbCaL7yP8I40hYnOIi3KlJykV7jEF9fn8h1NzMnA=="
   "resolved" "https://registry.npmjs.org/nostr-tools/-/nostr-tools-1.10.1.tgz"
   "version" "1.10.1"
@@ -2025,7 +2032,7 @@
     "micromatch" "^4.0.0"
     "semver" "^7.3.4"
 
-"tslib@^2.0.3":
+"tslib@^2.0.3", "tslib@^2.3.1":
   "integrity" "sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ=="
   "resolved" "https://registry.npmjs.org/tslib/-/tslib-2.4.0.tgz"
   "version" "2.4.0"

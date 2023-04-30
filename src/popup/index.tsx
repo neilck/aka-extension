@@ -24,7 +24,6 @@ import ProfileDelete, {
   loader as profileDeleteLoader,
   action as profileDeleteAction,
 } from "./pages/ProfileDelete";
-import Badge from "./components/Badge";
 import ErrorPage from "./pages/ErrorPage";
 import Test, { loader as testLoader, action as testAction } from "./pages/Test";
 
@@ -84,10 +83,6 @@ const routes = [
         loader: profileEditLoader,
         action: profileEditAction,
         element: <ProfileEdit />,
-      },
-      {
-        path: "/badge",
-        element: <Badge />,
       },
       {
         path: "/test",

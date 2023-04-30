@@ -1,19 +1,13 @@
 {
-    "manifest_version": 3,
     "name": "AKA Profiles",
-    "description": "Nostr Signer Extension with multiple profiles",
+    "description": "Nostr signer extension with multiple profiles",
     "version": "1.0.0",
+    "manifest_version": 3,
     "action" : {
         "default_popup": "popup.html",
         "default_title": "AKA Profiles",
         "default_icon" : "icon.png"
     },
-    "permissions": [
-        "tabs",
-        "bookmarks",
-        "storage",
-        "identity"
-    ],
     "icons": {
         "16" : "icon.png",
         "48" : "icon.png",
@@ -26,7 +20,17 @@
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["browser-polyfill.js", "contentScript.js"]
+            "js": ["browser-polyfill.js", "contentScript.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "permissions": [
+        "storage"
+    ],
+    "web_accessible_resources": [
+        {
+          "resources": ["nostr-provider.js"],
+          "matches": ["https://*/*", "http://localhost:*/*"]
         }
     ]
 }
