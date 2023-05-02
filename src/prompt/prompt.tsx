@@ -3,11 +3,15 @@ import { render } from "react-dom";
 import React from "react";
 
 import { getAllowedCapabilities } from "../common/common";
+import { PencilSquareIcon } from "../popup/components/PencilSquareIcon";
 
 function Prompt() {
   let qs = new URLSearchParams(location.search);
+  // token id
   let id = qs.get("id");
+  // host name from URL
   let host = qs.get("host");
+  // index to permission description
   let level = parseInt(qs.get("level"));
   let params;
   try {
@@ -19,6 +23,7 @@ function Prompt() {
 
   return (
     <>
+      <PencilSquareIcon />
       <div>
         <b style={{ display: "block", textAlign: "center", fontSize: "200%" }}>
           {host}
