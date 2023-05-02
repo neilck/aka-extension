@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   sendResponse("From the background Script");
 });
 
+console.log(browser);
 // import {
 //   validateEvent,
 //   signEvent,

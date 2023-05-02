@@ -1,11 +1,10 @@
-import { browser } from "webextension-polyfill";
-
 chrome.runtime.sendMessage("CS: I am loading", (response) => {
   console.log(response);
 });
 
 window.onload = (event) => {
   console.log("page is fully loaded");
+  console.log("browser" + JSON.stringify(browser));
 };
 
 // inject the script that will provide window.nostr

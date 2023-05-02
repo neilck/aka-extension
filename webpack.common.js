@@ -12,7 +12,6 @@ module.exports = {
     options: path.resolve("src/options/index.tsx"),
     prompt: path.resolve("src/prompt/index.tsx"),
     background: path.resolve("src/background/background.js"),
-    contentScript: path.resolve("src/contentScript/contentScript.js"),
   },
   devtool: "eval-source-map",
   module: {
@@ -58,6 +57,10 @@ module.exports = {
         {
           from: path.resolve("src/static"),
           to: path.resolve("dist"),
+        },
+        {
+          from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+          to: "browser-polyfill.js",
         },
       ],
     }),
