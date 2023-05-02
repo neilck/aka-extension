@@ -61,14 +61,6 @@ module.exports = {
         },
       ],
     }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: "node_modules/webextension-polyfill/dist/browser-polyfill.js",
-          to: path.resolve("dist"),
-        },
-      ],
-    }),
     ...getHtmlPlugins(["popup", "options", "prompt"]),
   ],
   resolve: {
@@ -79,9 +71,10 @@ module.exports = {
     path: path.join(__dirname, "dist"),
   },
   optimization: {
-    splitChunks: {
-      chunks: "all",
-    },
+    // splitChunks: {
+    //   chunks: "all",
+    // },
+    runtimeChunk: false,
   },
 };
 

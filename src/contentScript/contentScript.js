@@ -1,4 +1,4 @@
-// import browser from "webextension-polyfill";
+import { browser } from "webextension-polyfill";
 
 chrome.runtime.sendMessage("CS: I am loading", (response) => {
   console.log(response);
@@ -15,28 +15,28 @@ script.setAttribute("type", "text/javascript");
 script.setAttribute("src", browser.runtime.getURL("nostr-provider.js"));
 document.head.appendChild(script);
 
-// // listen for messages from that script
-// window.addEventListener("message", async (message) => {
-//   if (message.source !== window) return;
-//   if (!message.data) return;
-//   if (!message.data.params) return;
-//   if (message.data.ext !== "aka-profiles") return;
+// listen for messages from that script
+window.addEventListener("message", async (message) => {
+  if (message.source !== window) return;
+  if (!message.data) return;
+  if (!message.data.params) return;
+  if (message.data.ext !== "aka-profiles") return;
 
-//   // pass on to background
-//   var response;
-//   try {
-//     response = await browser.runtime.sendMessage({
-//       type: message.data.type,
-//       params: message.data.params,
-//       host: location.host,
-//     });
-//   } catch (error) {
-//     response = { error };
-//   }
+  // pass on to background
+  var response;
+  try {
+    response = await browser.runtime.sendMessage({
+      type: message.data.type,
+      params: message.data.params,
+      host: location.host,
+    });
+  } catch (error) {
+    response = { error };
+  }
 
-//   // return response
-//   window.postMessage(
-//     { id: message.data.id, ext: "aka-profiles", response },
-//     message.origin
-//   );
-// });
+  // return response
+  window.postMessage(
+    { id: message.data.id, ext: "aka-profiles", response },
+    message.origin
+  );
+});

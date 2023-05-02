@@ -1,10 +1,12 @@
+import browser from "webextension-polyfill";
+
+console.log("background.js started");
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   console.log(msg);
   console.log(sender);
   sendResponse("From the background Script");
 });
 
-// import browser from "webextension-polyfill";
 // import {
 //   validateEvent,
 //   signEvent,
@@ -28,9 +30,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 // let promptMutex = new Mutex();
 // let releasePromptMutex = () => {};
 
-// browser.runtime.onInstalled.addListener((_, __, reason) => {
-//   if (reason === "install") browser.runtime.openOptionsPage();
-// });
+browser.runtime.onInstalled.addListener((_, __, reason) => {
+  if (reason === "install") browser.runtime.openOptionsPage();
+});
 
 // browser.runtime.onMessage.addListener(async (req, sender) => {
 //   let { prompt } = req;
