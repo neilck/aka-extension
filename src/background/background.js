@@ -201,7 +201,7 @@ async function promptPermission(host, level, params) {
       url: `${browser.runtime.getURL("prompt.html")}?${qs.toString()}`,
       type: "popup",
       width: 340,
-      height: 330,
+      height: 520,
     });
   });
 }
