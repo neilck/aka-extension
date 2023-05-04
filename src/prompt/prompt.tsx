@@ -8,8 +8,8 @@ import React from "react";
 import { getAllowedCapabilities } from "../common/common";
 import Storage from "../common/Storage";
 import { IKeyPair } from "../common/model/keypair";
-import AppBar from "./appbar";
-import Panel from "./Panel";
+import AppBar from "./Appbar";
+import Panel from "../common/components/Panel";
 import ProfileSelect from "./ProfileSelect";
 import EventModal from "./EventModal";
 
@@ -28,6 +28,9 @@ function Prompt() {
   } catch (err) {
     params = null;
   }
+
+  const result = getAllowedCapabilities(level);
+  const allowedCapabilities = result == "nothing" ? null : result;
 
   return (
     <div className="h-full">
@@ -49,11 +52,13 @@ function Prompt() {
             is requesting permission to
           </div>
           <div className="pt-2 italic text-slate-900 dark:text-white font-semibold flex flex-col flex-nowrap justify-center">
-            <div className="mx-auto">
-              {getAllowedCapabilities(level).map((cap) => (
-                <div key={cap}>{cap}</div>
-              ))}
-            </div>
+            {allowedCapabilities && (
+              <div className="mx-auto">
+                {allowedCapabilities.map((cap) => (
+                  <div key={cap}>{cap}</div>
+                ))}
+              </div>
+            )}
           </div>
           {params && (
             <div className="pt-1 text-center">

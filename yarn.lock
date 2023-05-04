@@ -1957,7 +1957,7 @@
   "resolved" "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   "version" "4.17.21"
 
-"loose-envify@^1.1.0":
+"loose-envify@^1.1.0", "loose-envify@^1.4.0":
   "integrity" "sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q=="
   "resolved" "https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz"
   "version" "1.4.0"
@@ -2387,7 +2387,7 @@
   dependencies:
     "boolbase" "^1.0.0"
 
-"object-assign@^4.0.1":
+"object-assign@^4.0.1", "object-assign@^4.1.1":
   "integrity" "sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM="
   "resolved" "https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz"
   "version" "4.1.1"
@@ -2692,10 +2692,24 @@
   dependencies:
     "read" "^2.0.0"
 
+"prop-types@^15.8.1":
+  "integrity" "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg=="
+  "resolved" "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
+  "version" "15.8.1"
+  dependencies:
+    "loose-envify" "^1.4.0"
+    "object-assign" "^4.1.1"
+    "react-is" "^16.13.1"
+
 "punycode@^2.1.0":
   "integrity" "sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A=="
   "resolved" "https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz"
   "version" "2.1.1"
+
+"qr.js@0.0.0":
+  "integrity" "sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ=="
+  "resolved" "https://registry.npmjs.org/qr.js/-/qr.js-0.0.0.tgz"
+  "version" "0.0.0"
 
 "qrcode-terminal@^0.12.0":
   "version" "0.12.0"
@@ -2725,6 +2739,19 @@
     "loose-envify" "^1.1.0"
     "scheduler" "^0.22.0"
 
+"react-is@^16.13.1":
+  "integrity" "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="
+  "resolved" "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
+  "version" "16.13.1"
+
+"react-qr-code@^2.0.11":
+  "integrity" "sha512-P7mvVM5vk9NjGdHMt4Z0KWeeJYwRAtonHTghZT2r+AASinLUUKQ9wfsGH2lPKsT++gps7hXmaiMGRvwTDEL9OA=="
+  "resolved" "https://registry.npmjs.org/react-qr-code/-/react-qr-code-2.0.11.tgz"
+  "version" "2.0.11"
+  dependencies:
+    "prop-types" "^15.8.1"
+    "qr.js" "0.0.0"
+
 "react-router-dom@6.10.0":
   "integrity" "sha512-E5dfxRPuXKJqzwSe/qGcqdwa18QiWC6f3H3cWXM24qj4N0/beCIf/CWTipop2xm7mR0RCS99NnaqPNjHtrAzCg=="
   "resolved" "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.10.0.tgz"
@@ -2740,7 +2767,7 @@
   dependencies:
     "@remix-run/router" "1.5.0"
 
-"react@^18.1.0", "react@>=16.8":
+"react@^16.x || ^17.x || ^18.x", "react@^18.1.0", "react@>=16.8":
   "integrity" "sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ=="
   "resolved" "https://registry.npmjs.org/react/-/react-18.1.0.tgz"
   "version" "18.1.0"

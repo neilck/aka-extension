@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Link, useLoaderData, redirect } from "react-router-dom";
 import Storage from "../../common/Storage";
-import Panel from "../components/Panel";
+import Panel from "../../common/components/Panel";
 import { IKeyPair } from "../../common/model/keypair";
 import { PencilSquareIcon } from "../components/PencilSquareIcon";
 

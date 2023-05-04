@@ -9,8 +9,8 @@ import {
   useLoaderData,
   useActionData,
 } from "react-router-dom";
-import Panel from "../components/Panel";
-import InputButton from "../components//InputButton";
+import Panel from "../../common/components/Panel";
+import InputButton from "../../common/components/InputButton";
 import { IKeyPair, KeyPair } from "../../common/model/keypair";
 import Storage from "../../common/Storage";
 import { isKeyValid } from "../../common/util";

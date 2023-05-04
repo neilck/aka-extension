@@ -3,8 +3,8 @@ import { Form, useActionData, redirect, useLoaderData } from "react-router-dom";
 import { nip19 } from "nostr-tools";
 
 import Splash from "../components/Splash";
-import Panel from "../components/Panel";
-import InputButton from "../components/InputButton";
+import Panel from "../../common/components/Panel";
+import InputButton from "../../common/components/InputButton";
 import { KeyPair } from "../../common/model/keypair";
 import Storage from "../../common/Storage";
 import { isKeyValid } from "../../common/util";

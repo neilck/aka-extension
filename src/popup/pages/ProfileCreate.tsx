@@ -1,7 +1,7 @@
 import React, { FocusEvent, useState, useEffect } from "react";
 import { Form, redirect, useLoaderData, useActionData } from "react-router-dom";
-import Panel from "../components/Panel";
-import InputButton from "../components/InputButton";
+import Panel from "../../common/components/Panel";
+import InputButton from "../../common/components/InputButton";
 import { BackButton } from "../components//BackButton";
 import { IKeyPair, KeyPair } from "../../common/model/keypair";
 import Storage from "../../common/Storage";
