@@ -1,3 +1,5 @@
+import "./options.css";
+
 import browser from "webextension-polyfill";
 import React, { useState, useCallback, useEffect } from "react";
 import { render } from "react-dom";
@@ -12,37 +14,25 @@ import {
 import Panel from "../common/components/Panel";
 import { Form } from "react-router-dom";
 import Relays from "./components/Relays";
+import AppBar from "./components/Appbar";
 
 const Options = () => {
   return (
-    <div className="flex flex-col space-y-2 p-4">
-      <Panel>
-        <Relays />
-        <Form method="post">
-          <input name="form-id" hidden defaultValue="form 1" />
-          <input
-            type="text"
-            id="input1"
-            name="input1"
-            placeholder="placeholder"
-            defaultValue="default value"
-            className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
-          />
-        </Form>
-      </Panel>
-      <Panel>
-        <Form method="post">
-          <input name="form-id" hidden defaultValue="form 2" />
-          <input
-            type="text"
-            id="input1"
-            name="input1"
-            placeholder="placeholder"
-            defaultValue="default value"
-            className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
-          />
-        </Form>
-      </Panel>
+    <div className="w-[400px] mt-4 mx-auto border-2">
+      <AppBar></AppBar>
+      <div className="flex flex-col space-y-4 p-4 bg-gray-100">
+        <Panel>
+          <h1 className="font-semibold text-lg text-aka-blue pt-1">
+            Preferred Relays
+          </h1>
+          <Relays />
+        </Panel>
+        <Panel>
+          <h1 className="font-semibold text-lg text-aka-blue pt-1">
+            App Permissions
+          </h1>
+        </Panel>
+      </div>
     </div>
   );
 };
