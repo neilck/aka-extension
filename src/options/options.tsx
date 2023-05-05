@@ -14,6 +14,7 @@ import {
 import Panel from "../common/components/Panel";
 import { Form } from "react-router-dom";
 import Relays from "./components/Relays";
+import Permissions from "./components/Permissions";
 import AppBar from "./components/Appbar";
 
 const Options = () => {
@@ -31,6 +32,7 @@ const Options = () => {
           <h1 className="font-semibold text-lg text-aka-blue pt-1">
             App Permissions
           </h1>
+          <Permissions />
         </Panel>
       </div>
     </div>
