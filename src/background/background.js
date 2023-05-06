@@ -21,8 +21,6 @@ import {
 
 console.log("background.js started");
 
-export async function runTest() {}
-
 const { encrypt, decrypt } = nip04;
 
 let openPrompt = null;
@@ -58,12 +56,11 @@ browser.windows.onRemoved.addListener((windowId) => {
 
 async function handleContentScriptMessage({ type, params, host }) {
   let pubkey = await readCurrentPubkey();
-
+  console.log("[hcsm] message received, pubkey: " + pubkey + " type " + type);
   if (NO_PERMISSIONS_REQUIRED[type]) {
     // authorized, and we won't do anything with private key here, so do a separate handler
     switch (type) {
       case "replaceURL": {
-        let pubkey = await readCurrentPubkey();
         let { protocol_handler: ph } = await getProtocolHandler(pubkey);
         if (!ph) return false;
 
@@ -95,11 +92,12 @@ async function handleContentScriptMessage({ type, params, host }) {
         return result;
       }
     }
-
     return;
   } else {
+    console.log(`[hcsm] Checking permission level ${pubkey} ${host}`);
     let level = await readPermissionLevel(pubkey, host);
 
+    console.log("[hcsm] Permission level " + level);
     if (level >= PERMISSIONS_REQUIRED[type]) {
       // authorized, proceed
     } else {
@@ -116,12 +114,12 @@ async function handleContentScriptMessage({ type, params, host }) {
     }
   }
 
-  let results = await getPrivateKey(pubkey);
-  if (!results || !results.private_key) {
+  console.log(`[hcsm] getPrivateKey(${pubkey}) `);
+  let sk = await getPrivateKey(pubkey);
+  console.log(`[hcsm] private key length ${sk.length}) `);
+  if (!sk) {
     return { error: "no private key found" };
   }
-
-  let sk = results.private_key;
 
   try {
     switch (type) {
