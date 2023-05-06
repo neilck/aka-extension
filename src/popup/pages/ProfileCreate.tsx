@@ -3,15 +3,13 @@ import { Form, redirect, useLoaderData, useActionData } from "react-router-dom";
 import Panel from "../../common/components/Panel";
 import InputButton from "../../common/components/InputButton";
 import { BackButton } from "../components//BackButton";
-import { IKeyPair, KeyPair } from "../../common/model/keypair";
+import { KeyPair } from "../../common/model/KeyPair";
 import Storage from "../../common/Storage";
 import { isKeyValid } from "../../common/util";
+import { getPublicKey, nip19 } from "nostr-tools";
 
 function ProfileCreate() {
   const [errors, setErrors] = useState({ privateKey: "", name: "" });
-
-  const keypair = useLoaderData() as IKeyPair;
-
   const actionError = useActionData() as string;
 
   const privateKeyOnBlurHandler = (e: FocusEvent<HTMLInputElement>) => {
@@ -26,9 +24,8 @@ function ProfileCreate() {
       return;
     }
 
-    keypair.set_privatekey(privatekey);
     const inputName = document.querySelector("#name") as HTMLInputElement;
-    inputName.value = keypair.get_npubshort();
+    inputName.value = getNpubshort(privatekey);
   };
 
   const nameOnBlurHandler = (e: FocusEvent<HTMLInputElement>) => {
@@ -60,7 +57,6 @@ function ProfileCreate() {
                 onFocus={(e) =>
                   setErrors({ privateKey: "", name: errors.name })
                 }
-                defaultValue={keypair.get_privatekey()}
                 className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
               />
               <div className="h-4 text-red-500">
@@ -79,7 +75,6 @@ function ProfileCreate() {
                 onFocus={(e) =>
                   setErrors({ privateKey: errors.privateKey, name: "" })
                 }
-                defaultValue={keypair.get_name()}
                 className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
               />
               <div className="h-4 text-red-500">
@@ -101,9 +96,11 @@ function ProfileCreate() {
   );
 }
 
-export const loader = async () => {
-  return new KeyPair("New Profile", false, "");
-};
+function getNpubshort(private_key: string) {
+  let public_key = getPublicKey(private_key);
+  let npub = nip19.npubEncode(public_key);
+  return npub.substring(0, 9) + "..." + npub.substring(npub.length - 5);
+}
 
 export async function action({ request, params }) {
   const storage = Storage.getInstance();
@@ -120,15 +117,15 @@ export async function action({ request, params }) {
 
   const keypairs = await storage.getKeys();
   const existingKey = keypairs.find(
-    (keypair) => keypair.get_privatekey() == privatekey
+    (keypair) => keypair.private_key === privatekey
   );
 
   if (existingKey) {
-    return `private key already in use by profile ${existingKey.get_name()}`;
+    return `private key already in use by profile ${existingKey.name}`;
   }
 
   // save data
-  const keypair = new KeyPair(name, true, privatekey);
+  const keypair = KeyPair.initKeyPair(privatekey, name, true);
   await storage.upsertKey(keypair);
 
   return redirect("/profiles");

@@ -31,6 +31,57 @@ const PERMISSION_NAMES = {
   "nip26.delegate": "create key delegation tokens",
 };
 
+/* <--- Profiles ---> */
+
+// sort by order created asc
+function compareProfiles(a, b) {
+  if (a.details.created_at < b.details.created_at) return -1;
+  if (a.details.created_at > b.details.created_at) return 1;
+  return 0;
+}
+
+// list of profiles in "keys"
+// returns {<public_key>: {name: string, private_key: string, created_at: number}, ... }
+export async function readKeys() {
+  let results = await browser.storage.local.get("keys");
+  return results.keys;
+}
+
+export async function saveKeys(keys) {
+  return browser.storage.local.set({
+    keys: keys,
+  });
+}
+
+// returns {permissions: {[]}, relays: {[]}, ... }
+export async function readProfile(pubkey) {
+  let results = await browser.storage.local.get(pubkey);
+  if (!results)
+    throw Error("readProfile failed. Storage with key not found: " + pubkey);
+  return results[pubkey];
+}
+
+// expects profileData = {permissions: {[]}, relays: {[]}, ... }
+export async function saveProfile(pubkey, profileData) {
+  let profile = {};
+  profile[pubkey] = profileData;
+  return browser.local.set(profile);
+}
+
+// returns current pubkey string, "" if not found
+export async function readCurrentPubkey() {
+  const result = await browser.storage.local.get("current_pubkey");
+  if (result.current_pubkey) return result.current_pubkey;
+  return "";
+}
+
+export async function saveCurrentPubkey(pubkey) {
+  console.log(`saveCurrentPubkey() ${pubkey}`);
+  return browser.storage.local.set({
+    current_pubkey: pubkey,
+  });
+}
+
 export function getAllowedCapabilities(permission) {
   let requestedMethods = [];
   for (let i = 0; i < ORDERED_PERMISSIONS.length; i++) {
@@ -57,8 +108,20 @@ export function getPermissionsString(permission) {
   );
 }
 
-export async function readPermissions() {
-  let { permissions = {} } = await browser.storage.local.get("permissions");
+/* <--- Permissions ---> */
+
+// return in order created
+function comparePermissions(a, b) {
+  if (a.policy.created_at < b.policy.created_at) return -1;
+  if (a.policy.created_at > b.policy.created_at) return 1;
+  return 0;
+}
+
+// returns [{ host: <host>, policy: {condition: string, level: number, created_at: number}}]
+export async function readPermissions(pubkey) {
+  let profile = await readProfile(pubkey);
+
+  let { permissions = {} } = profile.permissions;
 
   // delete expired
   var needsUpdate = false;
@@ -71,26 +134,52 @@ export async function readPermissions() {
       needsUpdate = true;
     }
   }
-  if (needsUpdate) browser.storage.local.set({ permissions });
 
+  if (needsUpdate) await saveProfile(pubkey, profile);
   return permissions;
 }
 
-export async function readPermissionLevel(host) {
-  return (await readPermissions())[host]?.level || 0;
+export async function readPermissionLevel(pubkey, host) {
+  let permissionList = await readPermissions(pubkey);
+  let permission = permissionList.find(
+    (permission) => permission.host === host
+  );
+  if (permission) return permission.policy.level;
+  return 0;
 }
 
-export async function updatePermission(host, permission) {
-  let { permissions = {} } = await browser.storage.local.get("permissions");
+// returns [{ host: <host>, policy: {condition: string, level: number, created_at: number}}]
+export async function updatePermission(pubkey, host, policy) {
+  let profile = await readProfile(pubkey);
+  let permissions = profile.permissions;
+
   permissions[host] = {
-    ...permission,
+    ...policy,
     created_at: Math.round(Date.now() / 1000),
   };
-  browser.storage.local.set({ permissions });
+
+  saveProfile(pubkey, profile);
 }
 
-export async function removePermissions(host) {
-  let { permissions = {} } = await browser.storage.local.get("permissions");
+export async function removePermissions(pubkey, host) {
+  let profile = await readProfile(pubkey);
+  let permissions = profile.permissions;
+
   delete permissions[host];
-  browser.storage.local.set({ permissions });
+  saveProfile(pubkey, profile);
+}
+
+export async function getPrivateKey(pubkey) {
+  let profile = await readProfile(pubkey);
+  return profile.private_key;
+}
+
+export async function getRelays(pubkey) {
+  let profile = await readProfile(pubkey);
+  return profile.relays;
+}
+
+export async function getProtocolHandler(pubkey) {
+  let profile = await readProfile(pubkey);
+  return profile.protocol_handler;
 }

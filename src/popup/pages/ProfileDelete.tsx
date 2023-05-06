@@ -2,11 +2,11 @@ import React from "react";
 import { Form, useLoaderData, redirect } from "react-router-dom";
 import Panel from "../../common/components/Panel";
 import { BackButton } from "../components//BackButton";
-import { IKeyPair } from "../../common/model/keypair";
+import { KeyPair } from "../../common/model/KeyPair";
 import Storage from "../../common/Storage";
 
 function ProfileDelete() {
-  const currentProfile = useLoaderData() as IKeyPair;
+  const currentProfile = useLoaderData() as KeyPair;
 
   return (
     <div>
@@ -24,7 +24,7 @@ function ProfileDelete() {
               className="w-full flex flex-row flex-nowrap justify-between"
             >
               <div className="font-semibold text-lg text-aka-blue">
-                Delete {currentProfile.get_name()}
+                Delete {currentProfile.name}
               </div>
             </div>
           </div>
@@ -37,7 +37,7 @@ function ProfileDelete() {
                 Public Key (npub)
               </div>
               <div id="npub_value" className="break-words">
-                {currentProfile.get_npub()}
+                {currentProfile.npub}
               </div>
             </div>
           </div>
@@ -47,7 +47,7 @@ function ProfileDelete() {
                 type="hidden"
                 id="pubkey"
                 name="pubkey"
-                value={currentProfile.get_publickey()}
+                value={currentProfile.public_key}
               />
               <button
                 type="submit"

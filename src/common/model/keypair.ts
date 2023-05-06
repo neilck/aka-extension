@@ -1,110 +1,74 @@
-import browser from "webextension-polyfill";
 import { getPublicKey, nip19 } from "nostr-tools";
 import { isKeyValid } from "../util";
 
-export interface IKeyPair {
-  get_discriminator: () => string;
-  get_name: () => string;
-  get_npub: () => string;
-  get_npubshort: () => string;
-  get_nsec: () => string;
-  get_publickey: () => string;
-  get_privatekey: () => string;
-  get_isCurrent: () => boolean;
-  set_name: (name: string) => void;
-  set_privatekey: (privatekey: string) => void;
-  set_isCurrent: (value: boolean) => void;
-}
-
 // only name, isCurrent, and privatekey actually stored
 // all other values calculated as needed
-export class KeyPair implements IKeyPair {
-  discriminator: string = "V1";
-  privatekey: string;
-  name: string;
-  publickey = "";
-  npub = "";
-  nsec = "";
-  isCurrent = false;
+export class KeyPair {
+  private _private_key: string;
+  private _name: string;
+  private _created_at: number;
+  private _public_key = "";
+  private _isCurrent = false;
 
-  constructor(name: string, isCurrent: boolean, privatekey: string) {
-    if (privatekey == "") {
-      this.name = name;
-      this.isCurrent = isCurrent;
-      return;
-    }
+  static initKeyPair(
+    private_key: string,
+    name: string,
+    isCurrent?: boolean,
+    created_at?: number
+  ): KeyPair {
+    const key = isKeyValid(private_key);
+    if (!key) throw Error("private_key is invalid");
 
-    const key = isKeyValid(privatekey);
-    if (key != null) {
-      this.privatekey = privatekey;
-      this.isCurrent = isCurrent;
-      this.name = name;
-
-      if (this.name == "") this.name = this.get_npubshort();
-    } else {
-      throw new Error("Invalid private key.");
-    }
+    let keypair = new KeyPair();
+    keypair._private_key = private_key;
+    keypair._name = name;
+    keypair._public_key = getPublicKey(private_key);
+    if (typeof isCurrent !== "undefined") keypair._isCurrent = isCurrent;
+    else keypair._isCurrent = false;
+    if (typeof created_at !== "undefined") keypair._created_at = created_at;
+    else keypair._created_at = Math.round(Date.now() / 1000);
+    console.log("initKeyPair: " + JSON.stringify(keypair));
+    return keypair;
   }
 
-  get_discriminator() {
-    return this.discriminator;
+  get name() {
+    return this._name;
   }
 
-  get_name() {
-    return this.name;
+  set name(name: string) {
+    this._name = name;
   }
 
-  get_npub() {
-    if (this.npub != "") return this.npub;
-    else {
-      const pubkey = this.get_publickey();
-      this.npub = nip19.npubEncode(pubkey);
-    }
-    return this.npub;
+  get npub() {
+    return nip19.npubEncode(this._public_key);
   }
 
-  get_npubshort() {
-    const key = this.get_npub();
-    if (key.length <= 14) return key;
-    return key.substring(0, 9) + "..." + key.substring(key.length - 5);
+  get created_at() {
+    return this._created_at;
   }
 
-  get_nsec() {
-    if (this.nsec != "") return this.nsec;
-    else {
-      this.nsec = nip19.nsecEncode(this.privatekey);
-    }
-    return this.nsec;
+  get npubshort() {
+    let npub = this.npub;
+    return npub.substring(0, 9) + "..." + npub.substring(npub.length - 5);
   }
 
-  get_publickey() {
-    if (this.publickey != "") return this.publickey;
-    else {
-      this.publickey = getPublicKey(this.privatekey);
-    }
-    return this.publickey;
+  get nsec() {
+    return nip19.nsecEncode(this._private_key);
   }
 
-  get_privatekey() {
-    return this.privatekey;
+  get public_key() {
+    return this._public_key;
   }
 
-  get_isCurrent() {
-    return this.isCurrent;
+  get private_key() {
+    return this._private_key;
   }
 
-  set_name(name: string) {
-    this.name = name;
+  get isCurrent() {
+    return this._isCurrent;
   }
 
-  set_privatekey(privatekey: string) {
-    this.privatekey = privatekey;
-    this.publickey = "";
-    this.npub = "";
-    this.nsec = "";
-  }
-
-  set_isCurrent(value: boolean) {
-    this.isCurrent = value;
+  set isCurrent(value: boolean) {
+    this._isCurrent = value;
   }
 }

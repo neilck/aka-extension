@@ -17,7 +17,6 @@ import ProfileEdit, {
   action as profileEditAction,
 } from "./pages/ProfileEdit";
 import ProfileCreate, {
-  loader as profileCreateLoader,
   action as profileCreateAction,
 } from "./pages/ProfileCreate";
 import ProfileDelete, {
@@ -44,17 +43,6 @@ const routes = [
         action: profileAction,
         element: <Profile />,
       },
-      // {
-      //   index: true,
-      //   loader: profileEditLoader,
-      //   action: profileEditAction,
-      //   element: <ProfileEdit />,
-      // },
-      // {
-      //   index: true,
-      //   element: <Popup />,
-      //   action: popupAction,
-      // },
       {
         path: "/popup",
         action: popupAction,
@@ -68,7 +56,6 @@ const routes = [
       },
       {
         path: "/profiles/create",
-        loader: profileCreateLoader,
         action: profileCreateAction,
         element: <ProfileCreate />,
       },
@@ -97,7 +84,7 @@ const routes = [
 const router = createMemoryRouter(routes);
 
 const storage = Storage.getInstance();
-// loads keys
+// loads keys to load static class
 storage.getKeys();
 
 function init() {

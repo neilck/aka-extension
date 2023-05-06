@@ -1,7 +1,4 @@
 import browser from "webextension-polyfill";
-
-console.log("background.js started");
-
 import {
   validateEvent,
   signEvent,
@@ -11,13 +8,20 @@ import {
 } from "nostr-tools";
 import { nip04, nip26 } from "nostr-tools";
 import { Mutex } from "async-mutex";
-
 import {
   PERMISSIONS_REQUIRED,
   NO_PERMISSIONS_REQUIRED,
   readPermissionLevel,
   updatePermission,
+  getPrivateKey,
+  getRelays,
+  getProtocolHandler,
+  readCurrentPubkey,
 } from "../common/common";
+
+console.log("background.js started");
+
+export async function runTest() {}
 
 const { encrypt, decrypt } = nip04;
 
@@ -53,13 +57,14 @@ browser.windows.onRemoved.addListener((windowId) => {
 });
 
 async function handleContentScriptMessage({ type, params, host }) {
+  let pubkey = await readCurrentPubkey();
+
   if (NO_PERMISSIONS_REQUIRED[type]) {
     // authorized, and we won't do anything with private key here, so do a separate handler
     switch (type) {
       case "replaceURL": {
-        let { protocol_handler: ph } = await browser.storage.local.get([
-          "protocol_handler",
-        ]);
+        let pubkey = await readCurrentPubkey();
+        let { protocol_handler: ph } = await getProtocolHandler(pubkey);
         if (!ph) return false;
 
         let { url } = params;
@@ -93,7 +98,7 @@ async function handleContentScriptMessage({ type, params, host }) {
 
     return;
   } else {
-    let level = await readPermissionLevel(host);
+    let level = await readPermissionLevel(pubkey, host);
 
     if (level >= PERMISSIONS_REQUIRED[type]) {
       // authorized, proceed
@@ -111,7 +116,7 @@ async function handleContentScriptMessage({ type, params, host }) {
     }
   }
 
-  let results = await browser.storage.local.get("private_key");
+  let results = await getPrivateKey(pubkey);
   if (!results || !results.private_key) {
     return { error: "no private key found" };
   }
@@ -121,16 +126,16 @@ async function handleContentScriptMessage({ type, params, host }) {
   try {
     switch (type) {
       case "getPublicKey": {
-        return getPublicKey(sk);
+        return pubkey;
       }
       case "getRelays": {
-        let results = await browser.storage.local.get("relays");
+        let results = await getRelays(pubkey);
         return results.relays || {};
       }
       case "signEvent": {
         let { event } = params;
 
-        if (!event.pubkey) event.pubkey = getPublicKey(sk);
+        if (!event.pubkey) event.pubkey = pubkey;
         if (!event.id) event.id = getEventHash(event);
         if (!validateEvent(event))
           return { error: { message: "invalid event" } };
@@ -157,12 +162,13 @@ async function handleContentScriptMessage({ type, params, host }) {
   }
 }
 
-function handlePromptMessage({ id, condition, host, level }, sender) {
+async function handlePromptMessage({ id, condition, host, level }, sender) {
   switch (condition) {
     case "forever":
     case "expirable":
       openPrompt?.resolve?.();
-      updatePermission(host, {
+      let pubkey = await readCurrentPubkey();
+      updatePermission(pubkey, host, {
         level,
         condition,
       });

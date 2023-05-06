@@ -10,11 +10,11 @@ import {
 } from "react-router-dom";
 import ProfileNav from "../components/ProfileNav";
 import Storage from "../../common/Storage";
-import { IKeyPair } from "../../common/model/keypair";
+import { KeyPair } from "../../common/model/KeyPair";
 
 export default function Root() {
   // load data so can be accessed by other components
-  const keypairs = useLoaderData() as IKeyPair[];
+  const keypairs = useLoaderData() as KeyPair[];
   return (
     <div className="bg-gray-100 dark:bg-slate-900 w-full h-full">
       {/* 
@@ -35,7 +35,7 @@ export default function Root() {
   );
 }
 
-export const loader = async (): Promise<IKeyPair[]> => {
+export const loader = async (): Promise<KeyPair[]> => {
   const storage = Storage.getInstance();
   const keypairs = await storage.getKeys();
   console.log("Root loader() returning " + JSON.stringify(keypairs));

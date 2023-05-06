@@ -1,11 +1,11 @@
 import React, { FocusEvent } from "react";
 import { Form, useActionData, redirect, useLoaderData } from "react-router-dom";
-import { nip19 } from "nostr-tools";
+import { getPublicKey, nip19 } from "nostr-tools";
 
 import Splash from "../components/Splash";
 import Panel from "../../common/components/Panel";
 import InputButton from "../../common/components/InputButton";
-import { KeyPair } from "../../common/model/keypair";
+import { KeyPair } from "../../common/model/KeyPair";
 import Storage from "../../common/Storage";
 import { isKeyValid } from "../../common/util";
 
@@ -67,6 +67,12 @@ const Popup = () => {
   );
 };
 
+function getNpubshort(private_key: string) {
+  let public_key = getPublicKey(private_key);
+  let npub = nip19.npubEncode(public_key);
+  return npub.substring(0, 9) + "..." + npub.substring(npub.length - 5);
+}
+
 export default Popup;
 
 export async function action({ request }) {
@@ -74,13 +80,17 @@ export async function action({ request }) {
   const formkey = formData.get("privateKey");
   const errors = { privateKey: "" };
 
-  const privatekey = isKeyValid(formkey);
-  if (!privatekey) {
+  const private_key = isKeyValid(formkey);
+  if (!private_key) {
     errors.privateKey = "not a valid private key";
     return errors;
   }
 
-  const newPair = new KeyPair("", true, privatekey);
+  const newPair = KeyPair.initKeyPair(
+    private_key,
+    getNpubshort(private_key),
+    true
+  );
   const storage = Storage.getInstance();
   await storage.upsertKey(newPair);
 

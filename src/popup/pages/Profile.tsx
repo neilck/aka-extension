@@ -2,7 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Link, useLoaderData, redirect } from "react-router-dom";
 import Storage from "../../common/Storage";
 import Panel from "../../common/components/Panel";
-import { IKeyPair } from "../../common/model/keypair";
+import { KeyPair } from "../../common/model/KeyPair";
 import { PencilSquareIcon } from "../components/PencilSquareIcon";
 
 function PrivateKeyDisplay(props: any) {
@@ -10,7 +10,7 @@ function PrivateKeyDisplay(props: any) {
 
   const [showPrivate, setShowPrivate] = useState(props.showPrivate);
   const parentSetShowPrivate = props.setShowPrivate;
-  const profile = props.profile as IKeyPair;
+  const profile = props.profile as KeyPair;
 
   useEffect(() => {
     parentSetShowPrivate(showPrivate);
@@ -28,7 +28,7 @@ function PrivateKeyDisplay(props: any) {
               Private Key (nsec)
             </div>
             <div id="nsec_value" className="break-words">
-              {profile.get_nsec()}
+              {profile.nsec}
             </div>
           </div>
           <div id="privatekey" className="w-80">
@@ -36,7 +36,7 @@ function PrivateKeyDisplay(props: any) {
               Private Key (hex)
             </div>
             <div id="privatekey_value" className="break-words">
-              {profile.get_privatekey()}
+              {profile.private_key}
             </div>
           </div>
 
@@ -72,7 +72,7 @@ function PrivateKeyDisplay(props: any) {
 }
 
 function Profile() {
-  const currentProfile = useLoaderData() as IKeyPair;
+  const currentProfile = useLoaderData() as KeyPair;
   const [showPrivate, setShowPrivate] = useState(false);
 
   // make wrapper function to give child
@@ -96,7 +96,7 @@ function Profile() {
               className="w-full flex flex-row flex-nowrap justify-between"
             >
               <div className="font-semibold text-lg text-aka-blue">
-                <Link to={`/profiles/edit`}>{currentProfile.get_name()}</Link>
+                <Link to={`/profiles/edit`}>{currentProfile.name}</Link>
               </div>
               <Link to={`/profiles/edit`}>
                 <div className="w-6 h-6">
@@ -114,7 +114,7 @@ function Profile() {
                 Public Key (npub)
               </div>
               <div id="npub_value" className="break-words">
-                {currentProfile.get_npub()}
+                {currentProfile.npub}
               </div>
             </div>
             <div id="pubkey" className="w-80">
@@ -122,7 +122,7 @@ function Profile() {
                 Public Key (hex)
               </div>
               <div id="pubkey_value" className="break-words">
-                {currentProfile.get_publickey()}
+                {currentProfile.public_key}
               </div>
             </div>
             <PrivateKeyDisplay

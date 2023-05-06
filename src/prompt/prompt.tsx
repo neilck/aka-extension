@@ -7,7 +7,7 @@ import React from "react";
 
 import { getAllowedCapabilities } from "../common/common";
 import Storage from "../common/Storage";
-import { IKeyPair } from "../common/model/keypair";
+import { KeyPair } from "../common/model/KeyPair";
 import AppBar from "./Appbar";
 import Panel from "../common/components/Panel";
 import ProfileSelect from "./ProfileSelect";
@@ -121,7 +121,7 @@ function Prompt() {
   }
 }
 
-export const loader = async (): Promise<IKeyPair[]> => {
+export const loader = async (): Promise<KeyPair[]> => {
   const storage = Storage.getInstance();
   const keypairs = await storage.getKeys();
   console.log("Root loader() returning " + JSON.stringify(keypairs));

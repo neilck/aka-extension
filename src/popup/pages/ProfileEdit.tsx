@@ -11,16 +11,16 @@ import {
 } from "react-router-dom";
 import Panel from "../../common/components/Panel";
 import InputButton from "../../common/components/InputButton";
-import { IKeyPair, KeyPair } from "../../common/model/keypair";
+import { KeyPair } from "../../common/model/KeyPair";
 import Storage from "../../common/Storage";
 import { isKeyValid } from "../../common/util";
 import { BackButton } from "../components//BackButton";
 
 function ProfileEdit() {
-  const keypair = useLoaderData() as IKeyPair;
+  const keypair = useLoaderData() as KeyPair;
   const error = useActionData() as string;
 
-  const isUpdating = keypair.get_privatekey() != "";
+  const isUpdating = keypair.private_key != "";
   console.log("ProfileEdit isUpdating: " + JSON.stringify(isUpdating));
 
   return (
@@ -30,14 +30,14 @@ function ProfileEdit() {
           <BackButton />
         </div>
         <h1 className="font-semibold text-lg text-aka-blue pt-1">
-          Edit {keypair.get_name()}
+          Edit {keypair.name}
         </h1>
         <Form id="profileForm" method="post">
           <input
             type="hidden"
             id="privateKey"
             name="privateKey"
-            value={keypair.get_privatekey()}
+            value={keypair.private_key}
           />
           <div className="w-full pt-2 font-semibold">
             <label htmlFor="name">Profile name</label>
@@ -47,7 +47,7 @@ function ProfileEdit() {
               id="name"
               name="name"
               placeholder="profile name"
-              defaultValue={keypair.get_name()}
+              defaultValue={keypair.name}
               className="w-full bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white p-2 placeholder:italic placeholder:text-slate-400 border border-slate-300"
             />
             <div className="h-4 text-red-500">
@@ -60,7 +60,7 @@ function ProfileEdit() {
                 Public Key (npub)
               </div>
               <div id="npub_value" className="break-words">
-                {keypair.get_npub()}
+                {keypair.npub}
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@ export async function action({ request, params }) {
   if (name == "") return "name can not be blank";
 
   // save data
-  const keypair = new KeyPair(name, true, formkey);
+  const keypair = KeyPair.initKeyPair(formkey, name, true);
   await storage.upsertKey(keypair);
 
   return redirect("/profiles");

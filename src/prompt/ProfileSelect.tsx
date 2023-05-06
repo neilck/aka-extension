@@ -7,14 +7,14 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { IKeyPair } from "../common/model/keypair";
+import { KeyPair } from "../common/model/KeyPair";
 
 function ProfileSelect() {
-  const keypairs = useRouteLoaderData("prompt") as IKeyPair[];
+  const keypairs = useRouteLoaderData("prompt") as KeyPair[];
   const navigate = useNavigate();
 
-  const curProfile = keypairs.find((profile) => profile.get_isCurrent());
-  let otherProfiles = keypairs.filter((profile) => !profile.get_isCurrent());
+  const curProfile = keypairs.find((profile) => profile.isCurrent);
+  let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
 
   const hideDropdownPaths = ["/popup", "/profiles/create"];
   const pathname = useLocation().pathname;
@@ -62,7 +62,7 @@ function ProfileSelect() {
           onClick={profileButtonClick}
         >
           <div id="profileButtonText" className="flex-1">
-            {curProfile && curProfile.get_name() + " "}
+            {curProfile && curProfile.name + " "}
           </div>
           <svg
             className="w-4 h-4 ml-2 mr-1"
@@ -98,13 +98,13 @@ function ProfileSelect() {
               aria-labelledby="dropdownDefaultButton"
             >
               {otherProfiles.map((profile) => (
-                <li key={profile.get_publickey()}>
+                <li key={profile.public_key}>
                   <div
-                    id={profile.get_publickey()}
+                    id={profile.public_key}
                     onClick={profileItemClick}
                     className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                   >
-                    {profile.get_name()}
+                    {profile.name}
                   </div>
                 </li>
               ))}

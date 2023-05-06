@@ -1,12 +1,17 @@
 import browser from "webextension-polyfill";
-import { IKeyPair, KeyPair } from "./model/keypair";
-import { isKeyValid } from "./util";
+import { KeyPair } from "./model/KeyPair";
+import {
+  readKeys,
+  readCurrentPubkey,
+  saveKeys,
+  saveCurrentPubkey,
+} from "./common";
 
 /*** Local Storage ***/
 class Storage {
   private static instance: Storage;
 
-  private keypairs: IKeyPair[] = null;
+  private keypairs: KeyPair[] = null;
   private loadPromise: Promise<void> | null;
 
   private constructor() {
@@ -24,41 +29,70 @@ class Storage {
   private async loadKeyPairs() {
     console.log("loadKeyPairs() called");
 
+    // {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
+    let keys = await readKeys();
+    let currentPubkey = await readCurrentPubkey();
     this.keypairs = [];
-    const data = await browser.storage.local.get("keypairs");
-    if (data.keypairs && data.keypairs.length > 0) {
-      data.keypairs.map((item: any) => {
+
+    if (keys) {
+      let keyList = Object.entries<{
+        name: string;
+        private_key: string;
+        created_at: number;
+      }>(keys);
+
+      keyList.map(([public_key, data]) => {
+        let isCurrent = public_key === currentPubkey;
         this.keypairs.push(
-          new KeyPair(item.name, item.isCurrent, item.privatekey)
+          KeyPair.initKeyPair(
+            data.private_key,
+            data.name,
+            isCurrent,
+            data.created_at
+          )
         );
       });
-      console.log(
-        "loadKeyPairs() loaded keys: " + JSON.stringify(this.keypairs)
-      );
     }
   }
 
   private async saveKeyPairs() {
-    let data = { keypairs: [] };
-    let current: IKeyPair = null;
-    this.keypairs.map((keypair: IKeyPair) => {
-      if (keypair.get_isCurrent()) current = keypair;
-      data.keypairs.push({
-        name: keypair.get_name(),
-        isCurrent: keypair.get_isCurrent(),
-        privatekey: keypair.get_privatekey(),
-      });
-    });
+    // convert list to look like
+    // [ [<public_key>,{name: string, private_key: string, created_at: number}],
+    //   [<public_key>,{...} ]]
+    // so Object.fromEntries converts to {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
+    let filteredList = this.keypairs.filter(
+      (keypair) => keypair.public_key != ""
+    );
+    let keys = Object.fromEntries(
+      filteredList.map((keypair) => [
+        keypair.public_key,
+        {
+          name: keypair.name,
+          private_key: keypair.private_key,
+          created_at: keypair.created_at,
+        },
+      ])
+    );
+    await saveKeys(keys);
 
-    // makes compatible with nos2x scripts
-    if (current) {
-      await browser.storage.local.set({
-        private_key: current.get_privatekey(),
-      });
+    // and save current publickey
+    let i = 0;
+    for (i = 0; i < this.keypairs.length; i++) {
+      let keypair = this.keypairs[i];
+      console.log(`loop: ${keypair}`);
+      if (keypair.isCurrent) {
+        console.log("current found");
+        break;
+      }
     }
 
-    console.log("saving data:" + JSON.stringify(data));
-    await browser.storage.local.set(data);
+    if (i < this.keypairs.length) {
+      console.log(`saving ${i} ${this.keypairs[i]} as current`);
+      await saveCurrentPubkey(this.keypairs[i].public_key);
+    }
+    // let current = this.keypairs.find((keypair) => {
+    //   keypair.isCurrent;
+    // });
   }
 
   /**
@@ -76,35 +110,33 @@ class Storage {
   }
 
   // returns undefined if not found
-  public async getCurrentKey(): Promise<IKeyPair> {
+  public async getCurrentKey(): Promise<KeyPair> {
     await this.load();
-    const current = this.keypairs.find((keypair) => keypair.get_isCurrent());
+    let current = this.keypairs.find((keypair) => keypair.isCurrent);
     return current;
   }
 
-  public async getKey(pubkey: string): Promise<IKeyPair> {
+  public async getKey(pubkey: string): Promise<KeyPair> {
     await this.load();
-    const found = this.keypairs.find(
-      (keypair) => keypair.get_publickey() == pubkey
-    );
-    return found;
+    return this.keypairs.find((keypair) => keypair.public_key == pubkey);
   }
 
-  public async getKeys(): Promise<IKeyPair[]> {
+  public async getKeys(): Promise<KeyPair[]> {
     await this.load();
     return this.keypairs;
   }
 
-  public async upsertKey(newKeypair: IKeyPair) {
+  public async upsertKey(newKeypair: KeyPair) {
     await this.load();
-    const existingKey = this.keypairs.find(
-      (keypair) => keypair.get_privatekey() == newKeypair.get_privatekey()
+    let existingKey = this.keypairs.find(
+      (keypair) => keypair.private_key === newKeypair.private_key
     );
 
     // new isCurrent
-    if (newKeypair.get_isCurrent()) {
+    if (newKeypair.isCurrent) {
       this.keypairs.map((keypair) => {
-        keypair.set_isCurrent(false);
+        if (keypair.private_key != newKeypair.private_key)
+          keypair.isCurrent = false;
       });
     }
 
@@ -113,26 +145,26 @@ class Storage {
       this.keypairs.push(newKeypair);
     } else {
       // update key
-      existingKey.set_name(newKeypair.get_name());
-      existingKey.set_isCurrent(newKeypair.get_isCurrent());
+      existingKey.name = newKeypair.name;
+      existingKey.isCurrent = newKeypair.isCurrent;
     }
 
-    await this.saveKeyPairs();
+    return this.saveKeyPairs();
   }
 
   public async setCurrentPubkey(pubkey: string) {
     await this.load();
-    const existingKey = this.keypairs.find(
-      (keypair) => keypair.get_publickey() == pubkey
+    let existingKey = this.keypairs.find(
+      (keypair) => keypair.public_key === pubkey
     );
 
     if (!existingKey) throw new Error("Pubkey not found: " + pubkey);
 
     this.keypairs.map((keypair) => {
-      keypair.set_isCurrent(keypair.get_publickey() == pubkey);
+      keypair.isCurrent = keypair.public_key === pubkey;
     });
 
-    await this.saveKeyPairs();
+    return this.saveKeyPairs();
   }
 
   public async deleteKey(pubkey: string) {
@@ -143,22 +175,22 @@ class Storage {
 
     // get index of element to delete
     for (i = 0; i < this.keypairs.length; i++) {
-      if (this.keypairs[i].get_publickey() == pubkey) break;
+      if (this.keypairs[i].public_key === pubkey) break;
     }
 
     // ensure index in range
     if (i < 0 || i > this.keypairs.length - 1) return;
 
     // delete item
-    console.log(`Before delete i=${i}: ${JSON.stringify(this.keypairs)}`);
+    // console.log(`Before delete i=${i}: ${JSON.stringify(this.keypairs)}`);
     this.keypairs.splice(i, 1);
-    console.log(`After delete: ${JSON.stringify(this.keypairs)}`);
+    // console.log(`After delete: ${JSON.stringify(this.keypairs)}`);
     // set new current
     if (this.keypairs.length > 0) {
-      this.keypairs[0].set_isCurrent(true);
+      this.keypairs[0].isCurrent = true;
     }
 
-    await this.saveKeyPairs();
+    return this.saveKeyPairs();
   }
 }
 
