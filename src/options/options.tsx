@@ -36,7 +36,7 @@ const Options = () => {
           <h1 className="font-semibold text-lg text-aka-blue pt-1">
             App Permissions
           </h1>
-          <Permissions />
+          <Permissions currentPublicKey={public_key} />
         </Panel>
       </div>
     </div>

@@ -1,58 +1,38 @@
-import browser from "webextension-polyfill";
 import React, { useState, useEffect } from "react";
+import Storage from "../../common/Storage";
+import { Permission } from "../../common/model/Permission";
 import Alert from "../../common/components/Alert";
 
-export type Permission = Record<
-  string,
-  { condition: string; created_at: number; level: number }
->;
-
-function Permissions() {
-  const [permissions, setPermissions] = useState([]);
+function Permissions({ currentPublicKey }) {
+  const [permissions, setPermissions] = useState<Permission[]>([]);
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
+  const storage = Storage.getInstance();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setAlert(false);
     }, 5000);
-
-    // To clear or cancel a timer, you call the clearTimeout(); method,
-    // passing in the timer object that you created into clearTimeout().
-
     return () => clearTimeout(timer);
   });
 
   useEffect(() => {
-    browser.storage.local.get(["permissions"]).then((results) => {
-      if (results.permissions) {
-        let permissionsList = [];
-        for (let host in results.permissions) {
-          permissionsList.push({
-            host,
-            data: results.permissions[host],
-          });
-        }
-        setPermissions(permissionsList);
-      }
+    readPermissions(currentPublicKey).then((permissions) => {
+      console.log(permissions);
+      setPermissions(permissions);
     });
-  }, []);
+    console.log(
+      `Permissions for ${currentPublicKey}: ${JSON.stringify(permissions)}`
+    );
+  }, [currentPublicKey]);
 
   return (
     <>
-      <div>
-        <ul>
-          <li>P: read your public key</li>
-          <li>R: read your list of preferred relays</li>
-          <li>S: sign events using your private key</li>
-          <li>E: encrypt and decrypt messages from peers</li>
-        </ul>
-      </div>
       <div className="flex flex-col space-y-1">
-        {permissions.map(({ host, data }, i) => (
+        {permissions.map(({ host, level }, i) => (
           <div key={i} className="flex flex-row content-center space-x-1">
             <div>{host}</div>
-            <div>{leveltoText(data.level)}</div>
+            <div>{leveltoText(level)}</div>
             <div>{" REVOKE "}</div>
           </div>
         ))}
@@ -60,6 +40,15 @@ function Permissions() {
 
       <div className="mx-auto w-40 pt-2">
         {alert && <Alert>{message}</Alert>}
+      </div>
+
+      <div>
+        <ul>
+          <li>P: read your public key</li>
+          <li>R: read your list of preferred relays</li>
+          <li>S: sign events using your private key</li>
+          <li>E: encrypt and decrypt messages from peers</li>
+        </ul>
       </div>
     </>
   );
@@ -72,6 +61,12 @@ function Permissions() {
     if (level >= 1) return "P";
 
     return "";
+  }
+
+  async function readPermissions(
+    currentPublicKey: string
+  ): Promise<Permission[]> {
+    return storage.readPermissions(currentPublicKey);
   }
 }
 

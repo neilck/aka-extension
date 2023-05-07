@@ -1,4 +1,3 @@
-import browser from "webextension-polyfill";
 import React, { useState, useEffect } from "react";
 import Alert from "../../common/components/Alert";
 import Storage from "../../common/Storage";
@@ -16,10 +15,6 @@ function Relays({ currentPublicKey }) {
     const timer = setTimeout(() => {
       setAlert(false);
     }, 5000);
-
-    // To clear or cancel a timer, you call the clearTimeout(); method,
-    // passing in the timer object that you created into clearTimeout().
-
     return () => clearTimeout(timer);
   });
 
@@ -111,7 +106,6 @@ function Relays({ currentPublicKey }) {
   }
 
   async function readRelays(currentPublicKey: string): Promise<Relay[]> {
-    // let currentKey = await storage.getCurrentKey();
     return storage.readRelays(currentPublicKey);
   }
 
@@ -123,7 +117,6 @@ function Relays({ currentPublicKey }) {
   }
 
   async function saveRelays(currentPublicKey: string) {
-    // let currentKey = await storage.getCurrentKey();
     storage.saveRelays(currentPublicKey, relays);
     setAlert(true);
     setMessage("saved");

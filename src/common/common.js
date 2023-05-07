@@ -130,21 +130,12 @@ export function getPermissionsString(permission) {
   );
 }
 
-/* <--- Permissions ---> */
-
-// return in order created
-function comparePermissions(a, b) {
-  if (a.policy.created_at < b.policy.created_at) return -1;
-  if (a.policy.created_at > b.policy.created_at) return 1;
-  return 0;
-}
-
 // returns [{ host: <host>, policy: {condition: string, level: number, created_at: number}}]
 export async function readPermissions(pubkey) {
-  // console.log(`readPermissions(${pubkey})`);
+  console.log(`readPermissions(${pubkey})`);
   let profile = await readProfile(pubkey);
   if (profile === null) {
-    // console.log(`readPermissions(${pubkey}) returning null`);
+    console.log(`readPermissions(${pubkey}) returning null`);
     return null;
   }
 
@@ -163,9 +154,9 @@ export async function readPermissions(pubkey) {
   }
 
   if (needsUpdate) await saveProfile(pubkey, profile);
-  // console.log(
-  //   `readPermissions(${pubkey}) returning ${JSON.stringify(permissions)}`
-  // );
+  console.log(
+    `readPermissions(${pubkey}) returning ${JSON.stringify(permissions)}`
+  );
   return permissions;
 }
 

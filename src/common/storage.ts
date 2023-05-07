@@ -1,6 +1,8 @@
 import browser from "webextension-polyfill";
 import { KeyPair } from "./model/KeyPair";
 import { Relay } from "./model/Relay";
+import { Permission } from "./model/Permission";
+
 import {
   readKeys,
   readCurrentPubkey,
@@ -8,6 +10,7 @@ import {
   saveCurrentPubkey,
   readRelays as jsReadRelays,
   saveRelays as jsSaveRelays,
+  readPermissions as jsReadPermissions,
 } from "./common";
 
 /*** Local Storage ***/
@@ -112,6 +115,8 @@ class Storage {
     return Storage.instance;
   }
 
+  /* <!--- KEYS ---> */
+
   // returns undefined if not found
   public async getCurrentKey(): Promise<KeyPair> {
     await this.load();
@@ -196,7 +201,7 @@ class Storage {
     return this.saveKeyPairs();
   }
 
-  /* <!--- relays ---> */
+  /* <!--- RELAYS ---> */
 
   // { <url>: {read: boolean, write: boolean} }
   public async readRelays(pubkey: string): Promise<Relay[]> {
@@ -205,7 +210,7 @@ class Storage {
     let relayEntries = [];
 
     if (relays) {
-      let relayEntries = Object.entries<{
+      relayEntries = Object.entries<{
         read: boolean;
         write: boolean;
       }>(relays);
@@ -235,9 +240,33 @@ class Storage {
     );
 
     // console.log(`saveRelays relays ${JSON.stringify(relays)}`);
-
     await jsSaveRelays(pubkey, relays);
     return true;
+  }
+
+  /* <!--- PERMISSIONS ---> */
+  // { <url>: {read: boolean, write: boolean} }
+  // <host>: {condition: string, level: number, created_at: number}
+  public async readPermissions(pubkey: string): Promise<Permission[]> {
+    let permissions = await jsReadPermissions(pubkey);
+    let permissionList: Permission[] = [];
+    let permissionEntries = [];
+
+    if (permissions) {
+      permissionEntries = Object.entries<{
+        condition: string;
+        level: number;
+        created_at: number;
+      }>(permissions);
+
+      permissionEntries.map(([host, data]) => {
+        permissionList.push(
+          new Permission(host, data.condition, data.level, data.created_at)
+        );
+      });
+    }
+
+    return permissionList;
   }
 }
 
