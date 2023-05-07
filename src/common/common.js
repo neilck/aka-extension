@@ -216,13 +216,26 @@ export async function removePermissions(pubkey, host) {
   saveProfile(pubkey, profile);
 }
 
-export async function getRelays(pubkey) {
+export async function readRelays(pubkey) {
+  console.log(`readRelays(${pubkey})`);
   let profile = await readProfile(pubkey);
   if (profile === null) {
-    console.log(`getRelays(${pubkey}) returning null`);
+    console.log(`readRelays(${pubkey}) returning null`);
     return null;
   }
+
   return profile.relays;
+}
+
+export async function saveRelays(pubkey, relays) {
+  let profile = await readProfile(pubkey);
+
+  if (profile === null) {
+    throw Error("Profile does not exist " + pubkey);
+  }
+
+  profile.relays = relays;
+  return saveProfile(pubkey, profile);
 }
 
 export async function getProtocolHandler(pubkey) {

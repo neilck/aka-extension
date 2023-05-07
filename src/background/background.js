@@ -14,7 +14,7 @@ import {
   readPermissionLevel,
   updatePermission,
   getPrivateKey,
-  getRelays,
+  readRelays,
   getProtocolHandler,
   readCurrentPubkey,
 } from "../common/common";
@@ -127,8 +127,8 @@ async function handleContentScriptMessage({ type, params, host }) {
         return pubkey;
       }
       case "getRelays": {
-        let results = await getRelays(pubkey);
-        return results.relays || {};
+        let relays = await readRelays(pubkey);
+        return relays || {};
       }
       case "signEvent": {
         let { event } = params;

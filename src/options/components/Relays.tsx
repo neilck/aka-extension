@@ -1,15 +1,16 @@
 import browser from "webextension-polyfill";
 import React, { useState, useEffect } from "react";
-import { useRouteLoaderData } from "react-router-dom";
 import Alert from "../../common/components/Alert";
-export type Relay = Record<string, { read: boolean; write: boolean }>;
+import Storage from "../../common/Storage";
+import { Relay } from "../../common/model/Relay";
 
 function Relays() {
   // const relays = useRouteLoaderData("options") as Relay[];
 
-  const [relays, setRelays] = useState([]);
+  const [relays, setRelays] = useState<Relay[]>([]);
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
+  const storage = Storage.getInstance();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -23,24 +24,13 @@ function Relays() {
   });
 
   useEffect(() => {
-    browser.storage.local.get(["relays"]).then((results) => {
-      if (results.relays) {
-        let relaysList = [];
-        for (let url in results.relays) {
-          relaysList.push({
-            url,
-            policy: results.relays[url],
-          });
-        }
-        setRelays(relaysList);
-      }
-    });
+    readRelays().then((relays) => setRelays(relays));
   }, []);
 
   return (
     <>
       <div className="flex flex-col space-y-1">
-        {relays.map(({ url, policy }, i) => (
+        {relays.map(({ url, read, write }, i) => (
           <div key={i} className="flex flex-row content-center space-x-1">
             <input
               style={{ marginRight: "10px", width: "400px" }}
@@ -55,7 +45,7 @@ function Relays() {
             <input
               id={`read${i}`}
               type="checkbox"
-              checked={policy.read}
+              checked={read}
               onChange={toggleRelayPolicy.bind(null, i, "read")}
             />
 
@@ -65,7 +55,7 @@ function Relays() {
             <input
               id={`write${i}`}
               type="checkbox"
-              checked={policy.write}
+              checked={write}
               onChange={toggleRelayPolicy.bind(null, i, "write")}
             />
           </div>
@@ -96,9 +86,10 @@ function Relays() {
   );
 
   function changeRelayURL(i, ev) {
+    let relay: Relay = relays[i];
     setRelays([
       ...relays.slice(0, i),
-      { url: ev.target.value, policy: relays[i].policy },
+      new Relay(ev.target.value, relay.read, relay.write),
       ...relays.slice(i + 1),
     ]);
   }
@@ -111,34 +102,28 @@ function Relays() {
   }
 
   function toggleRelayPolicy(i, cat) {
-    setRelays([
-      ...relays.slice(0, i),
-      {
-        url: relays[i].url,
-        policy: { ...relays[i].policy, [cat]: !relays[i].policy[cat] },
-      },
-      ...relays.slice(i + 1),
-    ]);
+    let relay: Relay = relays[i];
+    if (cat === "read") relay.read = !relay.read;
+    if (cat === "write") relay.write = !relay.write;
+
+    setRelays([...relays.slice(0, i), relay, ...relays.slice(i + 1)]);
+  }
+
+  async function readRelays(): Promise<Relay[]> {
+    let currentKey = await storage.getCurrentKey();
+    return storage.readRelays(currentKey.public_key);
   }
 
   function addNewRelay() {
-    const newArr = [...relays];
+    const newArr: Relay[] = [...relays];
 
-    newArr.push({
-      url: "",
-      policy: { read: true, write: true },
-    });
+    newArr.push(new Relay("", true, true));
     setRelays(newArr);
   }
 
   async function saveRelays() {
-    await browser.storage.local.set({
-      relays: Object.fromEntries(
-        relays
-          .filter(({ url }) => url.trim() !== "")
-          .map(({ url, policy }) => [url.trim(), policy])
-      ),
-    });
+    let currentKey = await storage.getCurrentKey();
+    storage.saveRelays(currentKey.public_key, relays);
     setAlert(true);
     setMessage("saved");
   }

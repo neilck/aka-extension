@@ -1,10 +1,13 @@
 import browser from "webextension-polyfill";
 import { KeyPair } from "./model/KeyPair";
+import { Relay } from "./model/Relay";
 import {
   readKeys,
   readCurrentPubkey,
   saveKeys,
   saveCurrentPubkey,
+  readRelays as jsReadRelays,
+  saveRelays as jsSaveRelays,
 } from "./common";
 
 /*** Local Storage ***/
@@ -191,6 +194,50 @@ class Storage {
     }
 
     return this.saveKeyPairs();
+  }
+
+  /* <!--- relays ---> */
+
+  // { <url>: {read: boolean, write: boolean} }
+  public async readRelays(pubkey: string): Promise<Relay[]> {
+    let relays = await jsReadRelays(pubkey);
+    let relayList: Relay[] = [];
+    let relayEntries = [];
+
+    if (relays) {
+      let relayEntries = Object.entries<{
+        read: boolean;
+        write: boolean;
+      }>(relays);
+
+      relayEntries.map(([url, data]) => {
+        relayList.push(new Relay(url, data.read, data.write));
+      });
+    }
+
+    return relayList;
+  }
+
+  public async saveRelays(
+    pubkey: string,
+    relayList: Relay[]
+  ): Promise<boolean> {
+    console.log(`saveRelays(${pubkey},${JSON.stringify(relayList)})`);
+    let filteredList = relayList.filter((relay) => relay.url != "");
+    let relays = Object.fromEntries(
+      filteredList.map((relay) => [
+        relay.url,
+        {
+          read: relay.read,
+          write: relay.write,
+        },
+      ])
+    );
+
+    console.log(`saveRelays relays ${JSON.stringify(relays)}`);
+
+    await jsSaveRelays(pubkey, relays);
+    return true;
   }
 }
 

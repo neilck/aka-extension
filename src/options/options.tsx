@@ -1,18 +1,8 @@
 import "./options.css";
 
-import browser from "webextension-polyfill";
-import React, { useState, useCallback, useEffect } from "react";
-import { render } from "react-dom";
-import { generatePrivateKey, getPublicKey, nip19 } from "nostr-tools";
-import QRCode from "react-qr-code";
+import React from "react";
 
-import {
-  getPermissionsString,
-  readPermissions,
-  removePermissions,
-} from "../common/common";
 import Panel from "../common/components/Panel";
-import { Form } from "react-router-dom";
 import Relays from "./components/Relays";
 import Permissions from "./components/Permissions";
 import AppBar from "./components/Appbar";
