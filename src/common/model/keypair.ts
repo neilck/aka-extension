@@ -27,7 +27,7 @@ export class KeyPair {
     else keypair._isCurrent = false;
     if (typeof created_at !== "undefined") keypair._created_at = created_at;
     else keypair._created_at = Math.round(Date.now() / 1000);
-    console.log("initKeyPair: " + JSON.stringify(keypair));
+    // console.log("initKeyPair: " + JSON.stringify(keypair));
     return keypair;
   }
 

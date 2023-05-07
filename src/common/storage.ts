@@ -30,7 +30,7 @@ class Storage {
   }
 
   private async loadKeyPairs() {
-    console.log("loadKeyPairs() called");
+    // console.log("loadKeyPairs() called");
 
     // {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
     let keys = await readKeys();
@@ -82,15 +82,15 @@ class Storage {
     let i = 0;
     for (i = 0; i < this.keypairs.length; i++) {
       let keypair = this.keypairs[i];
-      console.log(`loop: ${keypair}`);
+      // console.log(`loop: ${keypair}`);
       if (keypair.isCurrent) {
-        console.log("current found");
+        // console.log("current found");
         break;
       }
     }
 
     if (i < this.keypairs.length) {
-      console.log(`saving ${i} ${this.keypairs[i]} as current`);
+      // console.log(`saving ${i} ${this.keypairs[i]} as current`);
       await saveCurrentPubkey(this.keypairs[i].public_key);
     }
     // let current = this.keypairs.find((keypair) => {
@@ -171,7 +171,7 @@ class Storage {
   }
 
   public async deleteKey(pubkey: string) {
-    console.log(`deleting pubkey ${pubkey}`);
+    // console.log(`deleting pubkey ${pubkey}`);
     await this.load();
 
     let i = -1;
@@ -222,7 +222,7 @@ class Storage {
     pubkey: string,
     relayList: Relay[]
   ): Promise<boolean> {
-    console.log(`saveRelays(${pubkey},${JSON.stringify(relayList)})`);
+    // console.log(`saveRelays(${pubkey},${JSON.stringify(relayList)})`);
     let filteredList = relayList.filter((relay) => relay.url != "");
     let relays = Object.fromEntries(
       filteredList.map((relay) => [
@@ -234,7 +234,7 @@ class Storage {
       ])
     );
 
-    console.log(`saveRelays relays ${JSON.stringify(relays)}`);
+    // console.log(`saveRelays relays ${JSON.stringify(relays)}`);
 
     await jsSaveRelays(pubkey, relays);
     return true;

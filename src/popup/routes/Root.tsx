@@ -38,7 +38,7 @@ export default function Root() {
 export const loader = async (): Promise<KeyPair[]> => {
   const storage = Storage.getInstance();
   const keypairs = await storage.getKeys();
-  console.log("Root loader() returning " + JSON.stringify(keypairs));
+  // console.log("Root loader() returning " + JSON.stringify(keypairs));
   return keypairs;
 };
 

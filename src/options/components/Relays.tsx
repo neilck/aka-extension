@@ -4,7 +4,7 @@ import Alert from "../../common/components/Alert";
 import Storage from "../../common/Storage";
 import { Relay } from "../../common/model/Relay";
 
-function Relays() {
+function Relays({ currentPublicKey }) {
   // const relays = useRouteLoaderData("options") as Relay[];
 
   const [relays, setRelays] = useState<Relay[]>([]);
@@ -24,12 +24,13 @@ function Relays() {
   });
 
   useEffect(() => {
-    readRelays().then((relays) => setRelays(relays));
-  }, []);
+    readRelays(currentPublicKey).then((relays) => setRelays(relays));
+    console.log(`Relays for ${currentPublicKey}: ${JSON.stringify(relays)}`);
+  }, [currentPublicKey]);
 
   return (
     <>
-      <div className="flex flex-col space-y-1">
+      <div key={currentPublicKey} className="flex flex-col space-y-1">
         {relays.map(({ url, read, write }, i) => (
           <div key={i} className="flex flex-row content-center space-x-1">
             <input
@@ -73,7 +74,7 @@ function Relays() {
         <button
           className="mx-auto w-20 bg-aka-blue hover:bg-blue text-white font-bold py-1 px-4 rounded"
           onClick={(e) => {
-            saveRelays();
+            saveRelays(currentPublicKey);
           }}
         >
           <p className="tracking-widest">Save</p>
@@ -109,9 +110,9 @@ function Relays() {
     setRelays([...relays.slice(0, i), relay, ...relays.slice(i + 1)]);
   }
 
-  async function readRelays(): Promise<Relay[]> {
-    let currentKey = await storage.getCurrentKey();
-    return storage.readRelays(currentKey.public_key);
+  async function readRelays(currentPublicKey: string): Promise<Relay[]> {
+    // let currentKey = await storage.getCurrentKey();
+    return storage.readRelays(currentPublicKey);
   }
 
   function addNewRelay() {
@@ -121,9 +122,9 @@ function Relays() {
     setRelays(newArr);
   }
 
-  async function saveRelays() {
-    let currentKey = await storage.getCurrentKey();
-    storage.saveRelays(currentKey.public_key, relays);
+  async function saveRelays(currentPublicKey: string) {
+    // let currentKey = await storage.getCurrentKey();
+    storage.saveRelays(currentPublicKey, relays);
     setAlert(true);
     setMessage("saved");
   }
