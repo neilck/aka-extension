@@ -11,6 +11,7 @@ import {
   readRelays as jsReadRelays,
   saveRelays as jsSaveRelays,
   readPermissions as jsReadPermissions,
+  removePermissions as jsRemovePermissions,
 } from "./common";
 
 /*** Local Storage ***/
@@ -267,6 +268,10 @@ class Storage {
     }
 
     return permissionList;
+  }
+
+  public async deletePermission(pubkey: string, host: string) {
+    return jsRemovePermissions(pubkey, host);
   }
 }
 

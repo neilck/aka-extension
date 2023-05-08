@@ -45,7 +45,7 @@ function PrivateKeyDisplay(props: any) {
             onClick={(e) => {
               setShowPrivate(false);
             }}
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-1 px-2 border border-blue-500 hover:border-transparent rounded"
+            className="bg-transparent hover:bg-aka-blue-light text-aka-blue font-semibold hover:text-white py-1 px-2 border border-aka-blue-light hover:border-transparent rounded"
           >
             hide private key
           </button>
@@ -62,7 +62,7 @@ function PrivateKeyDisplay(props: any) {
           onClick={(e) => {
             setShowPrivate(true);
           }}
-          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-1 px-2 border border-blue-500 hover:border-transparent rounded"
+          className="bg-transparent hover:bg-aka-blue-light text-aka-blue font-semibold hover:text-white py-1 px-2 border border-aka-blue-light hover:border-transparent rounded"
         >
           show private key
         </button>

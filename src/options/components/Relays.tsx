@@ -42,6 +42,7 @@ function Relays({ currentPublicKey }) {
               id={`read${i}`}
               type="checkbox"
               checked={read}
+              className="accent-aka-blue"
               onChange={toggleRelayPolicy.bind(null, i, "read")}
             />
 
@@ -52,6 +53,7 @@ function Relays({ currentPublicKey }) {
               id={`write${i}`}
               type="checkbox"
               checked={write}
+              className="accent-aka-blue"
               onChange={toggleRelayPolicy.bind(null, i, "write")}
             />
           </div>
@@ -61,7 +63,7 @@ function Relays({ currentPublicKey }) {
         onClick={(e) => {
           addNewRelay();
         }}
-        className="bg-transparent hover:bg-blue-500 text-blue-700 hover:text-white py-1 px-2"
+        className="bg-transparent hover:bg-blue-500 text-aka-blue hover:text-white py-1 px-2"
       >
         add new...
       </button>
