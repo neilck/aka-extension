@@ -10,10 +10,19 @@ import Storage from "../common/Storage";
 import { KeyPair } from "../common/model/KeyPair";
 
 const Options = () => {
-  let keys = useLoaderData() as KeyPair[];
-  let curPublicKey = keys.find((key) => key.isCurrent).public_key;
-  const [public_key, setPublicKey] = useState(curPublicKey);
+  const [public_key, setPublicKey] = useState("");
   const onKeyChange = onKeyChangeHandler.bind(this);
+
+  let keys = useLoaderData() as KeyPair[];
+  useEffect(() => {
+    if (keys && keys.length > 0) {
+      notEmpty = true;
+      let curPublicKey = keys.find((key) => key.isCurrent).public_key;
+      setPublicKey(curPublicKey);
+    }
+  }, []);
+
+  let notEmpty = public_key != "";
 
   function onKeyChangeHandler(key: string) {
     console.log(`Options onKeyChange(${key})`);
@@ -25,20 +34,31 @@ const Options = () => {
       <div className="z-40 relative">
         <AppBar onKeyChange={onKeyChange}></AppBar>
       </div>
-      <div className="z-10 relative flex flex-col space-y-4 p-4 bg-gray-100">
-        <Panel>
-          <h1 className="font-semibold text-lg text-aka-blue pt-1">
-            Preferred Relays
-          </h1>
-          <Relays currentPublicKey={public_key} />
-        </Panel>
-        <Panel>
-          <h1 className="font-semibold text-lg text-aka-blue pt-1">
-            App Permissions
-          </h1>
-          <Permissions currentPublicKey={public_key} />
-        </Panel>
-      </div>
+      {!notEmpty && (
+        <div>
+          <Panel>
+            <p className="italic">
+              Add a private key first before setting options.
+            </p>
+          </Panel>
+        </div>
+      )}
+      {notEmpty && (
+        <div className="z-10 relative flex flex-col space-y-4 p-4 bg-gray-100">
+          <Panel>
+            <h1 className="font-semibold text-lg text-aka-blue pt-1">
+              Preferred Relays
+            </h1>
+            <Relays currentPublicKey={public_key} />
+          </Panel>
+          <Panel>
+            <h1 className="font-semibold text-lg text-aka-blue pt-1">
+              App Permissions
+            </h1>
+            <Permissions currentPublicKey={public_key} />
+          </Panel>
+        </div>
+      )}
     </div>
   );
 };
