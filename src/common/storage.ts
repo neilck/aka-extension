@@ -12,6 +12,8 @@ import {
   saveRelays as jsSaveRelays,
   readPermissions as jsReadPermissions,
   removePermissions as jsRemovePermissions,
+  removeCurrentPubkey as jsRemoveCurrentPubkey,
+  removeProfile as jsRemoveProfile,
 } from "./common";
 
 /*** Local Storage ***/
@@ -67,6 +69,10 @@ class Storage {
     // [ [<public_key>,{name: string, private_key: string, created_at: number}],
     //   [<public_key>,{...} ]]
     // so Object.fromEntries converts to {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
+    if (this.keypairs.length === 0) {
+      jsRemoveCurrentPubkey();
+    }
+
     let filteredList = this.keypairs.filter(
       (keypair) => keypair.public_key != ""
     );
@@ -87,10 +93,9 @@ class Storage {
     for (i = 0; i < this.keypairs.length; i++) {
       let keypair = this.keypairs[i];
       // console.log(`loop: ${keypair}`);
-      if (keypair.isCurrent) {
-        // console.log("current found");
-        break;
-      }
+      //if (keypair.isCurrent) {
+      // console.log("current found");
+      break;
     }
 
     if (i < this.keypairs.length) {
@@ -180,9 +185,11 @@ class Storage {
     // console.log(`deleting pubkey ${pubkey}`);
     await this.load();
 
-    let i = -1;
+    // delete associated profile
+    await jsRemoveProfile(pubkey);
 
     // get index of element to delete
+    let i = -1;
     for (i = 0; i < this.keypairs.length; i++) {
       if (this.keypairs[i].public_key === pubkey) break;
     }

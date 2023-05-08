@@ -76,7 +76,6 @@ export async function readProfile(pubkey) {
     // );
     return profileData;
   }
-
   // console.log(
   //   `readProfile(${pubkey}) returning ${JSON.stringify(results[pubkey])}`
   // );
@@ -90,11 +89,20 @@ export async function saveProfile(pubkey, profileData) {
   return browser.storage.local.set(profile);
 }
 
+export async function removeProfile(pubkey) {
+  return browser.storage.local.remove(pubkey);
+}
+
 // returns current pubkey string, "" if not found
 export async function readCurrentPubkey() {
   const result = await browser.storage.local.get("current_pubkey");
   if (result.current_pubkey) return result.current_pubkey;
   return "";
+}
+
+// returns current pubkey string, "" if not found
+export async function removeCurrentPubkey() {
+  return browser.storage.local.remove("current_pubkey");
 }
 
 export async function saveCurrentPubkey(pubkey) {
