@@ -78,7 +78,7 @@ function AppBar({ onKeyChange }) {
               </svg>
             </button>
             {/* <!-- Dropdown menu --> */}
-            <Form id="optionProfileForm" action="/" method="post">
+            <Form id="optionProfileForm" action="/options" method="post">
               <input
                 type="hidden"
                 id="optionSelectedPubkey"
