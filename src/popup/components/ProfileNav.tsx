@@ -16,7 +16,7 @@ function ProfileNav() {
   const curProfile = keypairs.find((profile) => profile.isCurrent);
   let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
 
-  const hideDropdownPaths = ["/popup", "/profiles/create"];
+  const hideDropdownPaths = ["/popup", "/profiles/create", "/options"];
   const pathname = useLocation().pathname;
   let hideDropdown = false;
   hideDropdownPaths.map((path) => {

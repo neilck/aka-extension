@@ -1,13 +1,11 @@
-import "./options.css";
-
 import React, { useEffect, useState } from "react";
 import { redirect, useLoaderData } from "react-router-dom";
-import Panel from "../common/components/Panel";
-import Relays from "./components/Relays";
-import Permissions from "./components/Permissions";
-import AppBar from "./components/Appbar";
-import Storage from "../common/Storage";
-import { KeyPair } from "../common/model/KeyPair";
+import Panel from "../../common/components/Panel";
+import Relays from "../components/Relays";
+import Permissions from "../components/Permissions";
+import AppBar from "../components/Appbar";
+import Storage from "../../common/Storage";
+import { KeyPair } from "../../common/model/KeyPair";
 
 const Options = () => {
   const [public_key, setPublicKey] = useState("");

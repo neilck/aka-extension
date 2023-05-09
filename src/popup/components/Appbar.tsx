@@ -43,9 +43,8 @@ function AppBar({ onKeyChange }) {
         <div className="flex justify-between">
           <div className="flex space-x-7">
             <div className="flex items-center h-8">
-              <img src="logo.svg" alt="Logo" className="h-4 w-4 mr-2" />
               <span className="text-slate-900 dark:text-white font-semibold text-lg">
-                AKA Profiles
+                Options
               </span>
             </div>
           </div>

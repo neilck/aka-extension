@@ -17,14 +17,11 @@ export default function Root() {
   const keypairs = useLoaderData() as KeyPair[];
   return (
     <div className="bg-gray-100 dark:bg-slate-900 w-full h-full">
-      {/* 
       <div>
-        {`windows: ${window.location.pathname} ${
-          window.location.search
-        }   locaton: ${useLocation().pathname}`}
-        <Link to="/profile">Profile</Link>
+        <p>{`window.location.hash: ${window.location.hash}`}</p>
+        <p>{`useLocation().pathname: ${useLocation().pathname}`}</p>
       </div>
-      */}
+
       <div className="relative z-50">
         <ProfileNav />
       </div>

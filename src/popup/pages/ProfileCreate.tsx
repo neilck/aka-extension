@@ -40,7 +40,7 @@ function ProfileCreate() {
   return (
     <div className="p-5">
       <Panel>
-        <div className="h-4 w-4 cursor-pointer hover:bg-gray-100">
+        <div className="h-6 w-6 cursor-pointer hover:bg-gray-100">
           <BackButton />
         </div>
         <h1 className="font-semibold text-lg text-aka-blue">New Profile</h1>

@@ -8,8 +8,7 @@ const autoprefixer = require("autoprefixer");
 
 module.exports = {
   entry: {
-    popup: path.resolve("src/popup/index.tsx"),
-    options: path.resolve("src/options/index.tsx"),
+    app: path.resolve("src/popup/index.tsx"),
     prompt: path.resolve("src/prompt/index.tsx"),
     background: path.resolve("src/background/background.js"),
   },
@@ -64,7 +63,7 @@ module.exports = {
         },
       ],
     }),
-    ...getHtmlPlugins(["popup", "options", "prompt"]),
+    ...getHtmlPlugins(["app", "options", "prompt"]),
   ],
   resolve: {
     extensions: [".tsx", ".js", ".ts"],

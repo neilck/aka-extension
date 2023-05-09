@@ -1,5 +1,9 @@
 import React from "react";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import {
+  RouterProvider,
+  createMemoryRouter,
+  createHashRouter,
+} from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import "../assets/tailwind.css";
 
@@ -23,6 +27,10 @@ import ProfileDelete, {
   loader as profileDeleteLoader,
   action as profileDeleteAction,
 } from "./pages/ProfileDelete";
+import Options, {
+  loader as optionsLoader,
+  action as optionsAction,
+} from "./pages/Options";
 import ErrorPage from "./pages/ErrorPage";
 import Test, { loader as testLoader, action as testAction } from "./pages/Test";
 
@@ -47,6 +55,13 @@ const routes = [
         path: "/popup",
         action: popupAction,
         element: <Popup />,
+      },
+      {
+        path: "/options",
+        loader: optionsLoader,
+        action: optionsAction,
+        id: "options",
+        element: <Options />,
       },
       {
         path: "/profiles",
@@ -81,7 +96,7 @@ const routes = [
   },
 ];
 
-const router = createMemoryRouter(routes);
+const router = createHashRouter(routes);
 
 const storage = Storage.getInstance();
 // loads keys to load static class
