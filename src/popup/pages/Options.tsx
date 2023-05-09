@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { redirect, useLoaderData } from "react-router-dom";
+import { redirect, useRouteLoaderData } from "react-router-dom";
 import Panel from "../../common/components/Panel";
 import Relays from "../components/Relays";
 import Permissions from "../components/Permissions";
@@ -11,7 +11,7 @@ const Options = () => {
   const [public_key, setPublicKey] = useState("");
   const onKeyChange = onKeyChangeHandler.bind(this);
 
-  let keys = useLoaderData() as KeyPair[];
+  let keys = useRouteLoaderData("root") as KeyPair[];
   useEffect(() => {
     if (keys && keys.length > 0) {
       notEmpty = true;

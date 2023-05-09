@@ -3,28 +3,29 @@ import { Form, useSubmit, useRouteLoaderData } from "react-router-dom";
 import { KeyPair } from "../../common/model/KeyPair";
 
 function AppBar({ onKeyChange }) {
-  const keypairs = useRouteLoaderData("options") as KeyPair[];
+  const keypairs = useRouteLoaderData("root") as KeyPair[];
 
   const curProfile = keypairs.find((profile) => profile.isCurrent);
   let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
+  console.log(`Other Profiles ${JSON.stringify({ otherProfiles })}`);
   let hideDropdown = false;
 
   const profileButtonClick = () => {
-    const dropdown = document.querySelector("#dropdown");
+    const dropdown = document.querySelector("#optionDropdown");
     dropdown.classList.toggle("hidden");
   };
 
   // on dropdown select, send selected dropdown pubkey to root action
   const profileItemClick = (e: React.MouseEvent<HTMLElement>) => {
     // hidden input field
-    const hiddenInput = document.querySelector("#selectedPubkey") as any;
+    const hiddenInput = document.querySelector("#optionSelectedPubkey") as any;
     hiddenInput.value = e.currentTarget.id;
 
     // hide dropdown
-    const dropdown = document.querySelector("#dropdown");
+    const dropdown = document.querySelector("#optionDropdown");
     dropdown.classList.toggle("hidden");
 
-    const form = document.querySelector("#profileForm") as any;
+    const form = document.querySelector("#optionProfileForm") as any;
     onKeyChange(hiddenInput.value);
 
     submit(form);
@@ -32,7 +33,7 @@ function AppBar({ onKeyChange }) {
 
   const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
     // hide dropdown
-    const dropdown = document.querySelector("#dropdown");
+    const dropdown = document.querySelector("#optionDropdown");
     dropdown.classList.add("hidden");
   };
 
@@ -77,15 +78,15 @@ function AppBar({ onKeyChange }) {
               </svg>
             </button>
             {/* <!-- Dropdown menu --> */}
-            <Form id="profileForm" action="/" method="post">
+            <Form id="optionProfileForm" action="/" method="post">
               <input
                 type="hidden"
-                id="selectedPubkey"
+                id="optionSelectedPubkey"
                 name="selectedPubkey"
                 value="test"
               />
               <div
-                id="dropdown"
+                id="optionDropdown"
                 onMouseLeave={onMouseLeave}
                 className="w-40 hidden bg-white divide-y divide-gray-100 rounded-lg shadow  dark:bg-gray-700"
               >
