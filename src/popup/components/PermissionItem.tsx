@@ -35,7 +35,7 @@ export function PermissionItem({ host, level, onDelete }) {
 // levels defined in ORDERED_PERMISSIONS
 function leveltoText(level: number) {
   if (level >= 20)
-    return "get public key, get relays, sign events,\nencrypt/decrypt messages";
+    return "get public key, get relays, sign events, encrypt/decrypt messages";
   if (level >= 10) return "get public key, get relays, sign events";
   if (level >= 5) return "get public key, get relays";
   if (level >= 1) return "get public key";

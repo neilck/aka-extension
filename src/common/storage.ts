@@ -93,9 +93,7 @@ class Storage {
     for (i = 0; i < this.keypairs.length; i++) {
       let keypair = this.keypairs[i];
       // console.log(`loop: ${keypair}`);
-      //if (keypair.isCurrent) {
-      // console.log("current found");
-      break;
+      if (keypair.isCurrent) break;
     }
 
     if (i < this.keypairs.length) {
@@ -167,6 +165,7 @@ class Storage {
   }
 
   public async setCurrentPubkey(pubkey: string) {
+    console.log("Saving current key: " + pubkey);
     await this.load();
     let existingKey = this.keypairs.find(
       (keypair) => keypair.public_key === pubkey

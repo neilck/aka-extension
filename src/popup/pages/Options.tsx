@@ -28,7 +28,7 @@ const Options = () => {
   }
 
   return (
-    <div className="w-[400px] mt-4 mx-auto border-2">
+    <div className="w-[600px] mt-4 mx-auto border-2">
       <div className="z-40 relative">
         <AppBar onKeyChange={onKeyChange}></AppBar>
       </div>
@@ -45,15 +45,15 @@ const Options = () => {
         <div className="z-10 relative flex flex-col space-y-4 p-4 bg-gray-100">
           <Panel>
             <h1 className="font-semibold text-lg text-aka-blue pt-1">
-              Preferred Relays
-            </h1>
-            <Relays currentPublicKey={public_key} />
-          </Panel>
-          <Panel>
-            <h1 className="font-semibold text-lg text-aka-blue pt-1">
               App Permissions
             </h1>
             <Permissions currentPublicKey={public_key} />
+          </Panel>
+          <Panel>
+            <h1 className="font-semibold text-lg text-aka-blue pt-1">
+              Preferred Relays
+            </h1>
+            <Relays currentPublicKey={public_key} />
           </Panel>
         </div>
       )}
@@ -89,7 +89,7 @@ export async function action({ request, params }) {
 
   const storage = Storage.getInstance();
   await storage.setCurrentPubkey(selectedPubkey);
-  return redirect("/");
+  return redirect("/options");
 }
 
 export default Options;

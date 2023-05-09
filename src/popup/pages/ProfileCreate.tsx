@@ -38,7 +38,7 @@ function ProfileCreate() {
   };
 
   return (
-    <div className="p-5">
+    <div className="p-5 w-[400px]">
       <Panel>
         <div className="h-6 w-6 cursor-pointer hover:bg-gray-100">
           <BackButton />
