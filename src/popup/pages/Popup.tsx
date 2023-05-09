@@ -13,7 +13,7 @@ const Popup = () => {
   const errors = useActionData() as { privateKey: "" };
 
   return (
-    <div className="flex flex-col items-center flex-1 w-auto ">
+    <div className="flex flex-col items-center flex-1 w-[400px] ">
       <div className=" w-full bg-aka-yellow p-1">
         <Splash className="mx-auto  h-48 w-48 fill-aka-blue" />
       </div>

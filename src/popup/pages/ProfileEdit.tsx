@@ -68,6 +68,13 @@ function ProfileEdit() {
             <InputButton>Save</InputButton>
           </div>
         </Form>
+        <div>
+          <div className="flex justify-end text-slate-500">
+            <Link className="hover:text-red-500" to={`/profiles/delete`}>
+              delete
+            </Link>
+          </div>
+        </div>
       </Panel>
     </div>
   );

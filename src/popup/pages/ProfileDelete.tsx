@@ -21,10 +21,13 @@ function ProfileDelete() {
           >
             <div
               id="top_row"
-              className="w-full flex flex-row flex-nowrap justify-between"
+              className="w-full flex flex-col flex-nowrap justify-between space-y-1"
             >
               <div className="font-semibold text-lg text-aka-blue">
-                Delete {currentProfile.name}
+                <p>Remove profile {currentProfile.name}?</p>
+              </div>
+              <div className="italic">
+                <p>This profile and associated keys will be removed.</p>
               </div>
             </div>
           </div>
@@ -53,7 +56,7 @@ function ProfileDelete() {
                 type="submit"
                 className="bg-red-600 hover:bg-blue text-white font-bold py-2 px-4 rounded"
               >
-                <p className="tracking-widest">Delete</p>
+                <p className="tracking-widest">Remove</p>
               </button>
             </div>
           </Form>

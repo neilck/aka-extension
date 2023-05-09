@@ -49,9 +49,6 @@ function PrivateKeyDisplay(props: any) {
           >
             hide private key
           </button>
-          <div className="text-slate-500 ml-auto">
-            <Link to={`/profiles/delete`}>delete</Link>
-          </div>
         </div>
       </div>
     );
