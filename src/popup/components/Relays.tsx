@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Alert from "../../common/components/Alert";
-import * as storage from "../../common/storage";
 import { Relay } from "../../common/model/Relay";
+import browser from "webextension-polyfill";
+import * as storage from "../../common/storage";
 
 function Relays({ currentPublicKey }) {
-  // const relays = useRouteLoaderData("options") as Relay[];
-
   const [relays, setRelays] = useState<Relay[]>([]);
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    browser.storage.local.onChanged.addListener(handleChange);
+    return () => {
+      browser.storage.local.onChanged.removeListener(handleChange);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,8 +25,17 @@ function Relays({ currentPublicKey }) {
 
   useEffect(() => {
     readRelays(currentPublicKey).then((relays) => setRelays(relays));
-    console.log(`Relays for ${currentPublicKey}: ${JSON.stringify(relays)}`);
   }, [currentPublicKey]);
+
+  const handleChange = (changes) => {
+    for (var key in changes) {
+      if (key === currentPublicKey) {
+        let profile = changes[key].newValue;
+        setRelays(storage.getRelaysFromProfile(profile));
+        break;
+      }
+    }
+  };
 
   return (
     <>

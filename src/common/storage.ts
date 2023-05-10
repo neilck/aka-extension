@@ -1,4 +1,3 @@
-import browser from "webextension-polyfill";
 import { KeyPair } from "./model/KeyPair";
 import { Relay } from "./model/Relay";
 import { Permission } from "./model/Permission";
@@ -180,6 +179,25 @@ export async function readRelays(pubkey: string): Promise<Relay[]> {
   return relayList;
 }
 
+export function getRelaysFromProfile(profile: { relays: {} }): Relay[] {
+  let relays = profile.relays;
+  let relayList: Relay[] = [];
+  let relayEntries = [];
+
+  if (relays) {
+    relayEntries = Object.entries<{
+      read: boolean;
+      write: boolean;
+    }>(relays);
+
+    relayEntries.map(([url, data]) => {
+      relayList.push(new Relay(url, data.read, data.write));
+    });
+  }
+
+  return relayList;
+}
+
 export async function saveRelays(
   pubkey: string,
   relayList: Relay[]
@@ -206,6 +224,30 @@ export async function saveRelays(
 // <host>: {condition: string, level: number, created_at: number}
 export async function readPermissions(pubkey: string): Promise<Permission[]> {
   let permissions = await jsReadPermissions(pubkey);
+  let permissionList: Permission[] = [];
+  let permissionEntries = [];
+
+  if (permissions) {
+    permissionEntries = Object.entries<{
+      condition: string;
+      level: number;
+      created_at: number;
+    }>(permissions);
+
+    permissionEntries.map(([host, data]) => {
+      permissionList.push(
+        new Permission(host, data.condition, data.level, data.created_at)
+      );
+    });
+  }
+
+  return permissionList;
+}
+
+export function getPermissionsFromProfile(profile: {
+  permissions: {};
+}): Permission[] {
+  let permissions = profile.permissions;
   let permissionList: Permission[] = [];
   let permissionEntries = [];
 

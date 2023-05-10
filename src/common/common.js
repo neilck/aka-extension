@@ -47,12 +47,8 @@ export async function saveKeys(keys) {
 }
 
 export async function getPrivateKey(pubkey) {
-  // console.log(`getPrivateKey(${pubkey})`);
   let results = await browser.storage.local.get("keys");
-  // console.log(`getPrivateKey results ${JSON.stringify(results)}`);
-
   let key = results.keys[pubkey];
-  // console.log(`getPrivateKey results[pubkey] ${JSON.stringify(key)}`);
   if (!key) return "";
 
   return key.private_key;
@@ -62,23 +58,15 @@ export async function getPrivateKey(pubkey) {
 
 // returns {permissions: {[]}, relays: {[]}, ... }
 export async function readProfile(pubkey) {
-  // console.log(`readProfile(${pubkey})`);
   let results = await browser.storage.local.get(pubkey);
 
   // if profile doesn't exist, create and save
   if (!results[pubkey]) {
     let profileData = { permissions: {}, relays: {}, protocol_handler: "" };
     saveProfile(pubkey, profileData);
-    // console.log(
-    //   `readProfile(${pubkey}) returning new profile ${JSON.stringify(
-    //     profileData
-    //   )}`
-    // );
     return profileData;
   }
-  // console.log(
-  //   `readProfile(${pubkey}) returning ${JSON.stringify(results[pubkey])}`
-  // );
+
   return results[pubkey];
 }
 
@@ -106,7 +94,6 @@ export async function removeCurrentPubkey() {
 }
 
 export async function saveCurrentPubkey(pubkey) {
-  // console.log(`saveCurrentPubkey() ${pubkey}`);
   return browser.storage.local.set({
     current_pubkey: pubkey,
   });
@@ -140,7 +127,6 @@ export function getPermissionsString(permission) {
 
 // returns [{ host: <host>, policy: {condition: string, level: number, created_at: number}}]
 export async function readPermissions(pubkey) {
-  console.log(`readPermissions(${pubkey})`);
   let profile = await readProfile(pubkey);
   if (profile === null) {
     console.log(`readPermissions(${pubkey}) returning null`);
@@ -162,31 +148,16 @@ export async function readPermissions(pubkey) {
   }
 
   if (needsUpdate) await saveProfile(pubkey, profile);
-  console.log(
-    `readPermissions(${pubkey}) returning ${JSON.stringify(permissions)}`
-  );
   return permissions;
 }
 
 export async function readPermissionLevel(pubkey, host) {
-  // console.log(`readPermissionLevel(${pubkey},${host})`);
-
   let permissions = await readPermissions(pubkey);
-  // console.log(`readPermissionLevel permissions ${JSON.stringify(permissions)}`);
-
   let hostPermission = permissions[host];
-  // console.log(
-  //   `readPermissionLevel hostPermission ${JSON.stringify(hostPermission)}`
-  // );
 
   if (hostPermission === undefined) {
-    // console.log(`readPermissionLevel(${pubkey},${host}) returning 0`);
     return 0;
   }
-
-  // console.log(
-  //   `readPermissionLevel(${pubkey},${host}) returning ${hostPermission.level}`
-  // );
   return hostPermission.level;
 }
 
@@ -216,10 +187,8 @@ export async function removePermissions(pubkey, host) {
 }
 
 export async function readRelays(pubkey) {
-  // console.log(`readRelays(${pubkey})`);
   let profile = await readProfile(pubkey);
   if (profile === null) {
-    // console.log(`readRelays(${pubkey}) returning null`);
     return null;
   }
 
@@ -240,7 +209,6 @@ export async function saveRelays(pubkey, relays) {
 export async function getProtocolHandler(pubkey) {
   let profile = await readProfile(pubkey);
   if (profile === null) {
-    // console.log(`getProtocolHandler(${pubkey}) returning null`);
     return null;
   }
   return profile.protocol_handler;

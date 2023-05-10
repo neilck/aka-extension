@@ -7,7 +7,6 @@ function AppBar({ onKeyChange }) {
 
   const curProfile = keypairs.find((profile) => profile.isCurrent);
   let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
-  console.log(`Other Profiles ${JSON.stringify({ otherProfiles })}`);
   let hideDropdown = false;
 
   const profileButtonClick = () => {

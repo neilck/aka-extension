@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { Permission } from "../../common/model/Permission";
 import { PermissionItem } from "./PermissionItem";
+import browser from "webextension-polyfill";
 import * as storage from "../../common/storage";
-
-import Alert from "../../common/components/Alert";
 
 function Permissions({ currentPublicKey }) {
   const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [alert, setAlert] = useState(false);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAlert(false);
-    }, 5000);
-    return () => clearTimeout(timer);
-  });
+    browser.storage.local.onChanged.addListener(handleChange);
+    return () => {
+      browser.storage.local.onChanged.removeListener(handleChange);
+    };
+  }, []);
 
   useEffect(() => {
-    readPermissions(currentPublicKey).then((permissions) => {
-      console.log(permissions);
-      setPermissions(permissions);
-    });
-    console.log(
-      `Permissions for ${currentPublicKey}: ${JSON.stringify(permissions)}`
-    );
+    load(currentPublicKey);
   }, [currentPublicKey]);
+
+  const handleChange = (changes) => {
+    for (var key in changes) {
+      if (key === currentPublicKey) {
+        let profile = changes[key].newValue;
+        setPermissions(storage.getPermissionsFromProfile(profile));
+        break;
+      }
+    }
+  };
 
   return (
     <>
@@ -40,26 +41,18 @@ function Permissions({ currentPublicKey }) {
           </div>
         ))}
       </div>
-
-      <div className="mx-auto w-40 pt-2">
-        {alert && <Alert>{message}</Alert>}
-      </div>
     </>
   );
 
   async function onPermissionDeletedHandler(host: string) {
     // delete permission
     await storage.deletePermission(currentPublicKey, host);
-    readPermissions(currentPublicKey).then((permissions) => {
-      console.log(permissions);
-      setPermissions(permissions);
-    });
   }
 
-  async function readPermissions(
-    currentPublicKey: string
-  ): Promise<Permission[]> {
-    return storage.readPermissions(currentPublicKey);
+  function load(currentPublicKey: string) {
+    storage.readPermissions(currentPublicKey).then((permissions) => {
+      setPermissions(permissions);
+    });
   }
 }
 
