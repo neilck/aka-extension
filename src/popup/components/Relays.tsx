@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Alert from "../../common/components/Alert";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 import { Relay } from "../../common/model/Relay";
 
 function Relays({ currentPublicKey }) {
@@ -9,7 +9,6 @@ function Relays({ currentPublicKey }) {
   const [relays, setRelays] = useState<Relay[]>([]);
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
-  const storage = Storage.getInstance();
 
   useEffect(() => {
     const timer = setTimeout(() => {

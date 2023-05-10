@@ -34,8 +34,6 @@ import Options, {
 import ErrorPage from "./pages/ErrorPage";
 import Test, { loader as testLoader, action as testAction } from "./pages/Test";
 
-import Storage from "../common/Storage";
-
 const routes = [
   {
     path: "/",
@@ -97,10 +95,6 @@ const routes = [
 ];
 
 const router = createHashRouter(routes);
-
-const storage = Storage.getInstance();
-// loads keys to load static class
-storage.getKeys();
 
 function init() {
   const appContainer = document.createElement("div");

@@ -16,269 +16,216 @@ import {
   removeProfile as jsRemoveProfile,
 } from "./common";
 
-/*** Local Storage ***/
-class Storage {
-  private static instance: Storage;
-
-  private keypairs: KeyPair[] = null;
-  private loadPromise: Promise<void> | null;
-
-  private constructor() {
-    this.loadPromise = null;
+export async function saveKeyPairs(keypairs: KeyPair[]) {
+  // convert list to look like
+  // [ [<public_key>,{name: string, private_key: string, created_at: number}],
+  //   [<public_key>,{...} ]]
+  // so Object.fromEntries converts to {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
+  if (keypairs.length === 0) {
+    jsRemoveCurrentPubkey();
   }
 
-  private async load() {
-    if (!this.loadPromise) {
-      this.loadPromise = this.loadKeyPairs();
-    }
+  let filteredList = keypairs.filter((keypair) => keypair.public_key != "");
+  let keys = Object.fromEntries(
+    filteredList.map((keypair) => [
+      keypair.public_key,
+      {
+        name: keypair.name,
+        private_key: keypair.private_key,
+        created_at: keypair.created_at,
+      },
+    ])
+  );
+  await saveKeys(keys);
 
-    return this.loadPromise;
+  // and save current publickey
+  let i = 0;
+  for (i = 0; i < keypairs.length; i++) {
+    let keypair = keypairs[i];
+    // console.log(`loop: ${keypair}`);
+    if (keypair.isCurrent) break;
   }
 
-  private async loadKeyPairs() {
-    // console.log("loadKeyPairs() called");
-
-    // {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
-    let keys = await readKeys();
-    let currentPubkey = await readCurrentPubkey();
-    this.keypairs = [];
-
-    if (keys) {
-      let keyList = Object.entries<{
-        name: string;
-        private_key: string;
-        created_at: number;
-      }>(keys);
-
-      keyList.map(([public_key, data]) => {
-        let isCurrent = public_key === currentPubkey;
-        this.keypairs.push(
-          KeyPair.initKeyPair(
-            data.private_key,
-            data.name,
-            isCurrent,
-            data.created_at
-          )
-        );
-      });
-    }
-  }
-
-  private async saveKeyPairs() {
-    // convert list to look like
-    // [ [<public_key>,{name: string, private_key: string, created_at: number}],
-    //   [<public_key>,{...} ]]
-    // so Object.fromEntries converts to {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
-    if (this.keypairs.length === 0) {
-      jsRemoveCurrentPubkey();
-    }
-
-    let filteredList = this.keypairs.filter(
-      (keypair) => keypair.public_key != ""
-    );
-    let keys = Object.fromEntries(
-      filteredList.map((keypair) => [
-        keypair.public_key,
-        {
-          name: keypair.name,
-          private_key: keypair.private_key,
-          created_at: keypair.created_at,
-        },
-      ])
-    );
-    await saveKeys(keys);
-
-    // and save current publickey
-    let i = 0;
-    for (i = 0; i < this.keypairs.length; i++) {
-      let keypair = this.keypairs[i];
-      // console.log(`loop: ${keypair}`);
-      if (keypair.isCurrent) break;
-    }
-
-    if (i < this.keypairs.length) {
-      // console.log(`saving ${i} ${this.keypairs[i]} as current`);
-      await saveCurrentPubkey(this.keypairs[i].public_key);
-    }
-    // let current = this.keypairs.find((keypair) => {
-    //   keypair.isCurrent;
-    // });
-  }
-
-  /**
-   * The static method that controls the access to the singleton instance.
-   *
-   * This implementation let you subclass the Singleton class while keeping
-   * just one instance of each subclass around.
-   */
-  public static getInstance(): Storage {
-    if (!Storage.instance) {
-      Storage.instance = new Storage();
-    }
-
-    return Storage.instance;
-  }
-
-  /* <!--- KEYS ---> */
-
-  // returns undefined if not found
-  public async getCurrentKey(): Promise<KeyPair> {
-    await this.load();
-    let current = this.keypairs.find((keypair) => keypair.isCurrent);
-    return current;
-  }
-
-  public async getKey(pubkey: string): Promise<KeyPair> {
-    await this.load();
-    return this.keypairs.find((keypair) => keypair.public_key == pubkey);
-  }
-
-  public async getKeys(): Promise<KeyPair[]> {
-    await this.load();
-    return this.keypairs;
-  }
-
-  public async upsertKey(newKeypair: KeyPair) {
-    await this.load();
-    let existingKey = this.keypairs.find(
-      (keypair) => keypair.private_key === newKeypair.private_key
-    );
-
-    // new isCurrent
-    if (newKeypair.isCurrent) {
-      this.keypairs.map((keypair) => {
-        if (keypair.private_key != newKeypair.private_key)
-          keypair.isCurrent = false;
-      });
-    }
-
-    if (!existingKey) {
-      // insert key
-      this.keypairs.push(newKeypair);
-    } else {
-      // update key
-      existingKey.name = newKeypair.name;
-      existingKey.isCurrent = newKeypair.isCurrent;
-    }
-
-    return this.saveKeyPairs();
-  }
-
-  public async setCurrentPubkey(pubkey: string) {
-    console.log("Saving current key: " + pubkey);
-    await this.load();
-    let existingKey = this.keypairs.find(
-      (keypair) => keypair.public_key === pubkey
-    );
-
-    if (!existingKey) throw new Error("Pubkey not found: " + pubkey);
-
-    this.keypairs.map((keypair) => {
-      keypair.isCurrent = keypair.public_key === pubkey;
-    });
-
-    return this.saveKeyPairs();
-  }
-
-  public async deleteKey(pubkey: string) {
-    // console.log(`deleting pubkey ${pubkey}`);
-    await this.load();
-
-    // delete associated profile
-    await jsRemoveProfile(pubkey);
-
-    // get index of element to delete
-    let i = -1;
-    for (i = 0; i < this.keypairs.length; i++) {
-      if (this.keypairs[i].public_key === pubkey) break;
-    }
-
-    // ensure index in range
-    if (i < 0 || i > this.keypairs.length - 1) return;
-
-    // delete item
-    // console.log(`Before delete i=${i}: ${JSON.stringify(this.keypairs)}`);
-    this.keypairs.splice(i, 1);
-    // console.log(`After delete: ${JSON.stringify(this.keypairs)}`);
-    // set new current
-    if (this.keypairs.length > 0) {
-      this.keypairs[0].isCurrent = true;
-    }
-
-    return this.saveKeyPairs();
-  }
-
-  /* <!--- RELAYS ---> */
-
-  // { <url>: {read: boolean, write: boolean} }
-  public async readRelays(pubkey: string): Promise<Relay[]> {
-    let relays = await jsReadRelays(pubkey);
-    let relayList: Relay[] = [];
-    let relayEntries = [];
-
-    if (relays) {
-      relayEntries = Object.entries<{
-        read: boolean;
-        write: boolean;
-      }>(relays);
-
-      relayEntries.map(([url, data]) => {
-        relayList.push(new Relay(url, data.read, data.write));
-      });
-    }
-
-    return relayList;
-  }
-
-  public async saveRelays(
-    pubkey: string,
-    relayList: Relay[]
-  ): Promise<boolean> {
-    // console.log(`saveRelays(${pubkey},${JSON.stringify(relayList)})`);
-    let filteredList = relayList.filter((relay) => relay.url != "");
-    let relays = Object.fromEntries(
-      filteredList.map((relay) => [
-        relay.url,
-        {
-          read: relay.read,
-          write: relay.write,
-        },
-      ])
-    );
-
-    // console.log(`saveRelays relays ${JSON.stringify(relays)}`);
-    await jsSaveRelays(pubkey, relays);
-    return true;
-  }
-
-  /* <!--- PERMISSIONS ---> */
-  // { <url>: {read: boolean, write: boolean} }
-  // <host>: {condition: string, level: number, created_at: number}
-  public async readPermissions(pubkey: string): Promise<Permission[]> {
-    let permissions = await jsReadPermissions(pubkey);
-    let permissionList: Permission[] = [];
-    let permissionEntries = [];
-
-    if (permissions) {
-      permissionEntries = Object.entries<{
-        condition: string;
-        level: number;
-        created_at: number;
-      }>(permissions);
-
-      permissionEntries.map(([host, data]) => {
-        permissionList.push(
-          new Permission(host, data.condition, data.level, data.created_at)
-        );
-      });
-    }
-
-    return permissionList;
-  }
-
-  public async deletePermission(pubkey: string, host: string) {
-    return jsRemovePermissions(pubkey, host);
+  if (i < keypairs.length) {
+    // console.log(`saving ${i} ${keypairs[i]} as current`);
+    await saveCurrentPubkey(keypairs[i].public_key);
   }
 }
 
-export default Storage;
+/* <!--- KEYS ---> */
+export async function getKeys(): Promise<KeyPair[]> {
+  // {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
+  let keys = await readKeys();
+  let currentPubkey = await readCurrentPubkey();
+  let keypairs: KeyPair[] = [];
+
+  if (keys) {
+    let keyList = Object.entries<{
+      name: string;
+      private_key: string;
+      created_at: number;
+    }>(keys);
+
+    keyList.map(([public_key, data]) => {
+      let isCurrent = public_key === currentPubkey;
+      keypairs.push(
+        KeyPair.initKeyPair(
+          data.private_key,
+          data.name,
+          isCurrent,
+          data.created_at
+        )
+      );
+    });
+  }
+  return keypairs;
+}
+
+// returns undefined if not found
+export async function getCurrentKey(): Promise<KeyPair> {
+  let keypairs = await getKeys();
+  let current = keypairs.find((keypair) => keypair.isCurrent);
+  return current;
+}
+
+export async function getKey(pubkey: string): Promise<KeyPair> {
+  let keypairs = await getKeys();
+  return keypairs.find((keypair) => keypair.public_key === pubkey);
+}
+
+export async function upsertKey(newKeypair: KeyPair) {
+  let keypairs = await getKeys();
+  let existingKey = keypairs.find(
+    (keypair) => keypair.private_key === newKeypair.private_key
+  );
+
+  // new isCurrent
+  if (newKeypair.isCurrent) {
+    keypairs.map((keypair) => {
+      if (keypair.private_key != newKeypair.private_key)
+        keypair.isCurrent = false;
+    });
+  }
+
+  if (!existingKey) {
+    // insert key
+    keypairs.push(newKeypair);
+  } else {
+    // update key
+    existingKey.name = newKeypair.name;
+    existingKey.isCurrent = newKeypair.isCurrent;
+  }
+
+  return saveKeyPairs(keypairs);
+}
+
+export async function setCurrentPubkey(pubkey: string) {
+  let keypairs = await getKeys();
+  let existingKey = keypairs.find((keypair) => keypair.public_key === pubkey);
+
+  if (!existingKey) throw new Error("Pubkey not found: " + pubkey);
+
+  keypairs.map((keypair) => {
+    keypair.isCurrent = keypair.public_key === pubkey;
+  });
+
+  return saveKeyPairs(keypairs);
+}
+
+export async function deleteKey(pubkey: string) {
+  let keypairs = await getKeys();
+
+  // delete associated profile
+  await jsRemoveProfile(pubkey);
+
+  // get index of element to delete
+  let i = -1;
+  for (i = 0; i < keypairs.length; i++) {
+    if (keypairs[i].public_key === pubkey) break;
+  }
+
+  // ensure index in range
+  if (i < 0 || i > keypairs.length - 1) return;
+
+  // delete item
+  keypairs.splice(i, 1);
+
+  // set new current
+  if (keypairs.length > 0) {
+    keypairs[0].isCurrent = true;
+  }
+
+  return saveKeyPairs(keypairs);
+}
+
+/* <!--- RELAYS ---> */
+
+// { <url>: {read: boolean, write: boolean} }
+export async function readRelays(pubkey: string): Promise<Relay[]> {
+  let relays = await jsReadRelays(pubkey);
+  let relayList: Relay[] = [];
+  let relayEntries = [];
+
+  if (relays) {
+    relayEntries = Object.entries<{
+      read: boolean;
+      write: boolean;
+    }>(relays);
+
+    relayEntries.map(([url, data]) => {
+      relayList.push(new Relay(url, data.read, data.write));
+    });
+  }
+
+  return relayList;
+}
+
+export async function saveRelays(
+  pubkey: string,
+  relayList: Relay[]
+): Promise<boolean> {
+  // console.log(`saveRelays(${pubkey},${JSON.stringify(relayList)})`);
+  let filteredList = relayList.filter((relay) => relay.url != "");
+  let relays = Object.fromEntries(
+    filteredList.map((relay) => [
+      relay.url,
+      {
+        read: relay.read,
+        write: relay.write,
+      },
+    ])
+  );
+
+  // console.log(`saveRelays relays ${JSON.stringify(relays)}`);
+  await jsSaveRelays(pubkey, relays);
+  return true;
+}
+
+/* <!--- PERMISSIONS ---> */
+// { <url>: {read: boolean, write: boolean} }
+// <host>: {condition: string, level: number, created_at: number}
+export async function readPermissions(pubkey: string): Promise<Permission[]> {
+  let permissions = await jsReadPermissions(pubkey);
+  let permissionList: Permission[] = [];
+  let permissionEntries = [];
+
+  if (permissions) {
+    permissionEntries = Object.entries<{
+      condition: string;
+      level: number;
+      created_at: number;
+    }>(permissions);
+
+    permissionEntries.map(([host, data]) => {
+      permissionList.push(
+        new Permission(host, data.condition, data.level, data.created_at)
+      );
+    });
+  }
+
+  return permissionList;
+}
+
+export async function deletePermission(pubkey: string, host: string) {
+  return jsRemovePermissions(pubkey, host);
+}

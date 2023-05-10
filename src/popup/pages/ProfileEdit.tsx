@@ -12,7 +12,7 @@ import {
 import Panel from "../../common/components/Panel";
 import InputButton from "../../common/components/InputButton";
 import { KeyPair } from "../../common/model/KeyPair";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
 import { BackButton } from "../components//BackButton";
 
@@ -81,7 +81,6 @@ function ProfileEdit() {
 }
 
 export const loader = async ({ params }) => {
-  const storage = Storage.getInstance();
   const currentKey = await storage.getCurrentKey();
 
   console.log("Profile loader() currentKey: " + JSON.stringify(currentKey));
@@ -91,7 +90,6 @@ export const loader = async ({ params }) => {
 };
 
 export async function action({ request, params }) {
-  const storage = Storage.getInstance();
   const formData = await request.formData();
   const formkey = formData.get("privateKey");
   let name = formData.get("name") as string;

@@ -6,7 +6,7 @@ import Splash from "../components/Splash";
 import Panel from "../../common/components/Panel";
 import InputButton from "../../common/components/InputButton";
 import { KeyPair } from "../../common/model/KeyPair";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
 
 const Popup = () => {
@@ -91,7 +91,7 @@ export async function action({ request }) {
     getNpubshort(private_key),
     true
   );
-  const storage = Storage.getInstance();
+
   await storage.upsertKey(newPair);
 
   // otherwise save the profile and redirect

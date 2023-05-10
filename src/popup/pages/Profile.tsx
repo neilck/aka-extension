@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Link, useLoaderData, redirect } from "react-router-dom";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 import Panel from "../../common/components/Panel";
 import { KeyPair } from "../../common/model/KeyPair";
 import { PencilSquareIcon } from "../components/PencilSquareIcon";
@@ -135,7 +135,6 @@ function Profile() {
 }
 
 export const loader = async () => {
-  const storage = Storage.getInstance();
   const currentKey = await storage.getCurrentKey();
 
   console.log("Profile loader() currentKey: " + JSON.stringify(currentKey));

@@ -4,7 +4,7 @@ import Panel from "../../common/components/Panel";
 import InputButton from "../../common/components/InputButton";
 import { BackButton } from "../components//BackButton";
 import { KeyPair } from "../../common/model/KeyPair";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
 import { getPublicKey, nip19 } from "nostr-tools";
 
@@ -103,7 +103,6 @@ function getNpubshort(private_key: string) {
 }
 
 export async function action({ request, params }) {
-  const storage = Storage.getInstance();
   const formData = await request.formData();
   const formkey = formData.get("privateKey");
 

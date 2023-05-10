@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 import { Relay } from "../../common/model/Relay";
 
 export function PermissionItem({ host, level, onDelete }) {
@@ -35,8 +35,9 @@ export function PermissionItem({ host, level, onDelete }) {
 // levels defined in ORDERED_PERMISSIONS
 function leveltoText(level: number) {
   if (level >= 20)
-    return "get public key, get relays, sign events, encrypt/decrypt messages";
-  if (level >= 10) return "get public key, get relays, sign events";
+    return "get public key, get relays, sign events, signing delegation, encrypt/decrypt messages";
+  if (level >= 10)
+    return "get public key, get relays, sign events, signing delegation";
   if (level >= 5) return "get public key, get relays";
   if (level >= 1) return "get public key";
 

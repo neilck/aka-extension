@@ -9,7 +9,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import ProfileNav from "../components/ProfileNav";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 import { KeyPair } from "../../common/model/KeyPair";
 
 export default function Root() {
@@ -33,7 +33,6 @@ export default function Root() {
 }
 
 export const loader = async (): Promise<KeyPair[]> => {
-  const storage = Storage.getInstance();
   const keypairs = await storage.getKeys();
   // console.log("Root loader() returning " + JSON.stringify(keypairs));
   return keypairs;
@@ -44,7 +43,6 @@ export async function action({ request, params }) {
   const updates = Object.fromEntries(formData);
   const selectedPubkey = updates.selectedPubkey;
 
-  const storage = Storage.getInstance();
   await storage.setCurrentPubkey(selectedPubkey);
   return redirect("/profiles");
 }

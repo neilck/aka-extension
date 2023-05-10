@@ -3,7 +3,7 @@ import { Form, useLoaderData, redirect } from "react-router-dom";
 import Panel from "../../common/components/Panel";
 import { BackButton } from "../components//BackButton";
 import { KeyPair } from "../../common/model/KeyPair";
-import Storage from "../../common/Storage";
+import * as storage from "../../common/storage";
 
 function ProfileDelete() {
   const currentProfile = useLoaderData() as KeyPair;
@@ -67,7 +67,6 @@ function ProfileDelete() {
 }
 
 export const loader = async ({ params }) => {
-  const storage = Storage.getInstance();
   const currentKey = await storage.getCurrentKey();
 
   console.log("Profile loader() currentKey: " + JSON.stringify(currentKey));
@@ -81,7 +80,6 @@ export async function action({ request, params }) {
   const updates = Object.fromEntries(formData);
   const pubkey = updates.pubkey;
 
-  const storage = Storage.getInstance();
   await storage.deleteKey(pubkey);
 
   return redirect("/profiles");

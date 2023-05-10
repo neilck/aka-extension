@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Storage from "../../common/Storage";
 import { Permission } from "../../common/model/Permission";
 import { PermissionItem } from "./PermissionItem";
+import * as storage from "../../common/storage";
 
 import Alert from "../../common/components/Alert";
 
@@ -9,7 +9,6 @@ function Permissions({ currentPublicKey }) {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
-  const storage = Storage.getInstance();
 
   useEffect(() => {
     const timer = setTimeout(() => {
