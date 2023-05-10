@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, useSubmit, useRouteLoaderData } from "react-router-dom";
 import { KeyPair } from "../../common/model/KeyPair";
 
 function AppBar({ onKeyChange }) {
   const keypairs = useRouteLoaderData("root") as KeyPair[];
-
-  const curProfile = keypairs.find((profile) => profile.isCurrent);
-  let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
+  const [currentKey, setCurrentKey] = useState(keypairs[0].public_key);
+  const curProfile = keypairs.find(
+    (keypair) => keypair.public_key === currentKey
+  );
   let hideDropdown = false;
 
   const profileButtonClick = () => {
@@ -18,16 +19,17 @@ function AppBar({ onKeyChange }) {
   const profileItemClick = (e: React.MouseEvent<HTMLElement>) => {
     // hidden input field
     const hiddenInput = document.querySelector("#optionSelectedPubkey") as any;
-    hiddenInput.value = e.currentTarget.id;
+    const selectedPubkey = e.currentTarget.id;
 
     // hide dropdown
     const dropdown = document.querySelector("#optionDropdown");
     dropdown.classList.toggle("hidden");
 
-    const form = document.querySelector("#optionProfileForm") as any;
-    onKeyChange(hiddenInput.value);
+    // update local state
+    setCurrentKey(selectedPubkey);
 
-    submit(form);
+    // send event to parent
+    onKeyChange(selectedPubkey);
   };
 
   const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
@@ -36,7 +38,6 @@ function AppBar({ onKeyChange }) {
     dropdown.classList.add("hidden");
   };
 
-  let submit = useSubmit();
   return (
     <nav className="bg-white dark:bg-slate-800 shadow-sm">
       <div className="max-w-6xl mx-auto h-10 px-4 py-2">
@@ -93,17 +94,19 @@ function AppBar({ onKeyChange }) {
                   className="py-2 text-sm text-gray-700 dark:text-gray-200"
                   aria-labelledby="dropdownDefaultButton"
                 >
-                  {otherProfiles.map((profile) => (
-                    <li key={profile.public_key}>
-                      <div
-                        id={profile.public_key}
-                        onClick={profileItemClick}
-                        className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      >
-                        {profile.name}
-                      </div>
-                    </li>
-                  ))}
+                  {keypairs
+                    .filter((keypair) => keypair.public_key != currentKey)
+                    .map((profile) => (
+                      <li key={profile.public_key}>
+                        <div
+                          id={profile.public_key}
+                          onClick={profileItemClick}
+                          className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        >
+                          {profile.name}
+                        </div>
+                      </li>
+                    ))}
                 </ul>
               </div>
             </Form>
