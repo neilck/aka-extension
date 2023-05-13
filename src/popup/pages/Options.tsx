@@ -15,7 +15,7 @@ const Options = () => {
   useEffect(() => {
     if (keys && keys.length > 0) {
       notEmpty = true;
-      let curPublicKey = keys.find((key) => key.isCurrent).public_key;
+      let curPublicKey = keys[0].public_key;
       setPublicKey(curPublicKey);
     }
   }, []);
