@@ -99,6 +99,20 @@ export async function saveCurrentPubkey(pubkey) {
   });
 }
 
+// returns current pubkey string, "" if not found
+export async function getCurrentOptionsPubkey() {
+  let result = await browser.storage.local.get("current_options_pubkey");
+  if (result.current_options_pubkey) return result.current_options_pubkey;
+  return "";
+}
+
+export async function saveCurrentOptionsPubkey(pubkey) {
+  console.log("saveCurrentOptionsPubkey: " + pubkey);
+  return browser.storage.local.set({
+    current_options_pubkey: pubkey,
+  });
+}
+
 export function getAllowedCapabilities(permission) {
   let requestedMethods = [];
   for (let i = 0; i < ORDERED_PERMISSIONS.length; i++) {

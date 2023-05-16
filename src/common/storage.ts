@@ -13,6 +13,9 @@ import {
   removePermissions as jsRemovePermissions,
   removeCurrentPubkey as jsRemoveCurrentPubkey,
   removeProfile as jsRemoveProfile,
+  saveCurrentOptionsPubkey as jsSaveCurrentOptionsPubkey,
+  getCurrentOptionsPubkey as jsGetCurrentOptionsPubkey,
+  readProfile as jsReadProfile,
 } from "./common";
 
 export async function saveKeyPairs(keypairs: KeyPair[]) {
@@ -41,12 +44,10 @@ export async function saveKeyPairs(keypairs: KeyPair[]) {
   let i = 0;
   for (i = 0; i < keypairs.length; i++) {
     let keypair = keypairs[i];
-    // console.log(`loop: ${keypair}`);
     if (keypair.isCurrent) break;
   }
 
   if (i < keypairs.length) {
-    // console.log(`saving ${i} ${keypairs[i]} as current`);
     await saveCurrentPubkey(keypairs[i].public_key);
   }
 }
@@ -157,6 +158,15 @@ export async function deleteKey(pubkey: string) {
   return saveKeyPairs(keypairs);
 }
 
+/* <!--- Options Key ---> */
+export async function setCurrentOptionPubkey(pubkey: string) {
+  return jsSaveCurrentOptionsPubkey(pubkey);
+}
+
+export async function getCurrentOptionPubkey() {
+  return jsGetCurrentOptionsPubkey();
+}
+
 /* <!--- RELAYS ---> */
 
 // { <url>: {read: boolean, write: boolean} }
@@ -202,7 +212,6 @@ export async function saveRelays(
   pubkey: string,
   relayList: Relay[]
 ): Promise<boolean> {
-  // console.log(`saveRelays(${pubkey},${JSON.stringify(relayList)})`);
   let filteredList = relayList.filter((relay) => relay.url != "");
   let relays = Object.fromEntries(
     filteredList.map((relay) => [
@@ -214,7 +223,6 @@ export async function saveRelays(
     ])
   );
 
-  // console.log(`saveRelays relays ${JSON.stringify(relays)}`);
   await jsSaveRelays(pubkey, relays);
   return true;
 }
@@ -270,4 +278,8 @@ export function getPermissionsFromProfile(profile: {
 
 export async function deletePermission(pubkey: string, host: string) {
   return jsRemovePermissions(pubkey, host);
+}
+
+export async function readProfile(pubkey: string) {
+  return jsReadProfile(pubkey);
 }
