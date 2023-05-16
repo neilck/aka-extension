@@ -1,8 +1,3 @@
-window.onload = (event) => {
-  console.log("page is fully loaded");
-  console.log("browser" + JSON.stringify(browser));
-};
-
 // inject the script that will provide window.nostr
 let script = document.createElement("script");
 script.setAttribute("async", "false");

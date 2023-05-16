@@ -1,10 +1,7 @@
 import React, { FocusEvent, useContext } from "react";
 import {
   Link,
-  useRouteLoaderData,
   Form,
-  useSubmit,
-  useLocation,
   redirect,
   useLoaderData,
   useActionData,
@@ -21,7 +18,6 @@ function ProfileEdit() {
   const error = useActionData() as string;
 
   const isUpdating = keypair.private_key != "";
-  console.log("ProfileEdit isUpdating: " + JSON.stringify(isUpdating));
 
   return (
     <div className="p-5">
@@ -82,8 +78,6 @@ function ProfileEdit() {
 
 export const loader = async ({ params }) => {
   const currentKey = await storage.getCurrentKey();
-
-  console.log("Profile loader() currentKey: " + JSON.stringify(currentKey));
   if (currentKey == null) return redirect("/popup");
 
   return currentKey;

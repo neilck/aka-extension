@@ -48,7 +48,6 @@ function ProfileNav() {
     const dropdown = document.querySelector("#dropdown");
     dropdown.classList.toggle("hidden");
 
-    console.log("new profile clicked");
     navigate("/profiles/create");
   };
 

@@ -136,8 +136,6 @@ function Profile() {
 
 export const loader = async () => {
   const currentKey = await storage.getCurrentKey();
-
-  console.log("Profile loader() currentKey: " + JSON.stringify(currentKey));
   if (currentKey == null) return redirect("/popup");
 
   return currentKey;
