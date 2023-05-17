@@ -19,7 +19,7 @@ import {
   readCurrentPubkey,
 } from "../common/common";
 
-console.log("background.js started");
+// console.log("background.js started");
 
 const { encrypt, decrypt } = nip04;
 
@@ -56,7 +56,7 @@ browser.windows.onRemoved.addListener((windowId) => {
 
 async function handleContentScriptMessage({ type, params, host }) {
   let pubkey = await readCurrentPubkey();
-  console.log("[hcsm] message received, pubkey: " + pubkey + " type " + type);
+  // console.log("[hcsm] message received, pubkey: " + pubkey + " type " + type);
   if (NO_PERMISSIONS_REQUIRED[type]) {
     // authorized, and we won't do anything with private key here, so do a separate handler
     switch (type) {
@@ -94,10 +94,10 @@ async function handleContentScriptMessage({ type, params, host }) {
     }
     return;
   } else {
-    console.log(`[hcsm] Checking permission level ${pubkey} ${host}`);
+    // console.log(`[hcsm] Checking permission level ${pubkey} ${host}`);
     let level = await readPermissionLevel(pubkey, host);
 
-    console.log("[hcsm] Permission level " + level);
+    // console.log("[hcsm] Permission level " + level);
     if (level >= PERMISSIONS_REQUIRED[type]) {
       // authorized, proceed
     } else {
@@ -114,9 +114,9 @@ async function handleContentScriptMessage({ type, params, host }) {
     }
   }
 
-  console.log(`[hcsm] getPrivateKey(${pubkey}) `);
+  // console.log(`[hcsm] getPrivateKey(${pubkey}) `);
   let sk = await getPrivateKey(pubkey);
-  console.log(`[hcsm] private key length ${sk.length}) `);
+  // console.log(`[hcsm] private key length ${sk.length}) `);
   if (!sk) {
     return { error: "no private key found" };
   }
