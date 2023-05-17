@@ -38,7 +38,7 @@ AKA Profiles uses the same app permission model as nos2x
 
 ## User Guide
 ### Compiling
-A precompiled version is available in `AKA-Profiles-1.0.0.zip`, otherwise run
+A precompiled version is available in `AKA-Profiles-<version>.zip`, otherwise run
 
 `npm start build`
 
@@ -46,7 +46,7 @@ The built extension files are written to `dist` folder.
 
 ### Installation
 
-Download [AKA-Profiles-1.0.0.zip](https://github.com/neilck/aka-extension/blob/master/AKA-Profiles-1.0.0.zip) and extract files. Otherwise, use the files in the `dist` folder after compiling.
+Download [AKA-Profiles-1.0.1.zip](https://github.com/neilck/aka-extension/blob/master/AKA-Profiles-1.0.1.zip) and extract files. Otherwise, use the files in the `dist` folder after compiling.
 
 1. Open Chrome browser and paste `chrome://extensions` into the address bar.
 2. Enable Developer mode by clicking Developer mode toggle (top right)
