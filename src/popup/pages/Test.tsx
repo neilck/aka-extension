@@ -4,7 +4,6 @@ import browser from "webextension-polyfill";
 
 export function Test() {
   const name: any = useLoaderData();
-  console.log("Test Render: " + JSON.stringify(name));
   // document.documentElement.classList.add("dark");
 
   return (
@@ -46,7 +45,6 @@ export function Test() {
 
 export const loader = async (): Promise<string> => {
   const data = await browser.storage.local.get("test");
-  console.log("test loader called: " + JSON.stringify(data));
   if (!data || !data.test || !data.test.name) return "<not set>";
   return data.test.name;
 };
@@ -54,7 +52,6 @@ export const loader = async (): Promise<string> => {
 export async function action({ request, params }) {
   let formData = await request.formData();
   const data = Object.fromEntries(formData);
-  console.log("test action called: " + JSON.stringify(data));
   const name = data.name;
 
   browser.storage.local.set({ test: { name: name } });

@@ -26,14 +26,6 @@ const Options = () => {
   let notEmpty = currentKey != "";
 
   useEffect(() => {
-    console.log("Options render");
-  }, []);
-
-  useEffect(() => {
-    console.log("Options rerender");
-  });
-
-  useEffect(() => {
     browser.storage.local.onChanged.addListener(handleChange);
     return () => {
       browser.storage.local.onChanged.removeListener(handleChange);
@@ -41,7 +33,6 @@ const Options = () => {
   }, []);
 
   const handleChange = async (changes) => {
-    console.log("Options handleChange " + JSON.stringify(changes));
     const changedItems = Object.keys(changes);
     let needsReload = false;
     const currentProfileKey = await storage.getCurrentOptionPubkey();
@@ -52,7 +43,6 @@ const Options = () => {
       if (!needsReload && item == currentProfileKey) needsReload = true;
     });
 
-    console.log("needsReload: " + needsReload);
     if (needsReload) {
       // loaded = await load();
       // setPublicKey(loaded.currentKey);
@@ -61,7 +51,6 @@ const Options = () => {
   };
 
   function onKeyChangeHandler(key: string) {
-    console.log(`Options onKeyChange(${key})`);
     storage.setCurrentOptionPubkey(key);
   }
 
@@ -132,7 +121,6 @@ const load = async (): Promise<{
   }
   let profile = await storage.getProfile(currentKey);
 
-  // console.log("Root loader() returning " + JSON.stringify(keypairs));
   return { currentKey, keypairs, profile };
 };
 
@@ -145,7 +133,6 @@ export const loader = async (): Promise<{
 };
 
 export async function action({ request, params }) {
-  console.log("Options action called");
   let formData = await request.formData();
   const updates = Object.fromEntries(formData);
   const selectedPubkey = updates.selectedPubkey;

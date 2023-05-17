@@ -107,7 +107,6 @@ export async function getCurrentOptionsPubkey() {
 }
 
 export async function saveCurrentOptionsPubkey(pubkey) {
-  console.log("saveCurrentOptionsPubkey: " + pubkey);
   return browser.storage.local.set({
     current_options_pubkey: pubkey,
   });
@@ -143,7 +142,6 @@ export function getPermissionsString(permission) {
 export async function readPermissions(pubkey) {
   let profile = await readProfile(pubkey);
   if (profile === null) {
-    console.log(`readPermissions(${pubkey}) returning null`);
     return null;
   }
 
