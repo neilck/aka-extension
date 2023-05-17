@@ -43,6 +43,7 @@ const Options = () => {
       if (!needsReload && item == currentProfileKey) needsReload = true;
     });
 
+    console.log("needsReload " + needsReload);
     if (needsReload) {
       // loaded = await load();
       // setPublicKey(loaded.currentKey);
@@ -117,7 +118,11 @@ const load = async (): Promise<{
   const keypairs = await storage.getKeys();
   let currentKey = await storage.getCurrentOptionPubkey();
   if (currentKey == "") {
-    currentKey = await storage.getCurrentKey();
+    const keypair = keypairs.find((keypair) => keypair.isCurrent);
+    if (keypair) {
+      currentKey = keypair.public_key;
+      storage.setCurrentOptionPubkey(currentKey);
+    }
   }
   let profile = await storage.getProfile(currentKey);
 
