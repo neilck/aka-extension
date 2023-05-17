@@ -1,36 +1,78 @@
 import React, { useEffect, useState } from "react";
-import { redirect, useRouteLoaderData } from "react-router-dom";
+import { redirect, useLoaderData, useRevalidator } from "react-router-dom";
 import Panel from "../../common/components/Panel";
 import Relays from "../components/Relays";
 import Permissions from "../components/Permissions";
 import AppBar from "../components/Appbar";
+import browser from "webextension-polyfill";
 import * as storage from "../../common/storage";
 import { KeyPair } from "../../common/model/KeyPair";
+import { Profile } from "../../common/model/Profile";
 
 const Options = () => {
-  const [public_key, setPublicKey] = useState("");
-  const onKeyChange = onKeyChangeHandler.bind(this);
+  let loaded = useLoaderData() as {
+    currentKey: string;
+    keypairs: KeyPair[];
+    profile: Profile;
+  };
+  let currentKey = loaded.currentKey;
+  let keypairs = loaded.keypairs;
+  let profile = loaded.profile;
 
-  let keys = useRouteLoaderData("root") as KeyPair[];
+  const keys = loaded.keypairs;
+  const onKeyChange = onKeyChangeHandler.bind(this);
+  let revalidator = useRevalidator();
+
+  let notEmpty = currentKey != "";
+
   useEffect(() => {
-    if (keys && keys.length > 0) {
-      notEmpty = true;
-      let curPublicKey = keys[0].public_key;
-      setPublicKey(curPublicKey);
-    }
+    console.log("Options render");
   }, []);
 
-  let notEmpty = public_key != "";
+  useEffect(() => {
+    console.log("Options rerender");
+  });
+
+  useEffect(() => {
+    browser.storage.local.onChanged.addListener(handleChange);
+    return () => {
+      browser.storage.local.onChanged.removeListener(handleChange);
+    };
+  }, []);
+
+  const handleChange = async (changes) => {
+    console.log("Options handleChange " + JSON.stringify(changes));
+    const changedItems = Object.keys(changes);
+    let needsReload = false;
+    const currentProfileKey = await storage.getCurrentOptionPubkey();
+
+    // options needs reload if options current key changed, or displayed profile changed
+    changedItems.map((item) => {
+      if (!needsReload && item == "current_options_pubkey") needsReload = true;
+      if (!needsReload && item == currentProfileKey) needsReload = true;
+    });
+
+    console.log("needsReload: " + needsReload);
+    if (needsReload) {
+      // loaded = await load();
+      // setPublicKey(loaded.currentKey);
+      revalidator.revalidate();
+    }
+  };
 
   function onKeyChangeHandler(key: string) {
     console.log(`Options onKeyChange(${key})`);
-    setPublicKey(key);
+    storage.setCurrentOptionPubkey(key);
   }
 
   return (
     <div className="w-[600px] mt-4 mx-auto border-2">
       <div className="z-40 relative">
-        <AppBar onKeyChange={onKeyChange}></AppBar>
+        <AppBar
+          onKeyChange={onKeyChange}
+          currentKey={loaded.currentKey}
+          keypairs={loaded.keypairs}
+        ></AppBar>
       </div>
       {!notEmpty && (
         <div>
@@ -47,13 +89,16 @@ const Options = () => {
             <h1 className="font-semibold text-lg text-aka-blue pt-1">
               App Permissions
             </h1>
-            <Permissions currentPublicKey={public_key} />
+            <Permissions
+              currentKey={loaded.currentKey}
+              profile={loaded.profile}
+            />
           </Panel>
           <Panel>
             <h1 className="font-semibold text-lg text-aka-blue pt-1">
               Preferred Relays
             </h1>
-            <Relays currentPublicKey={public_key} />
+            <Relays currentKey={loaded.currentKey} profile={loaded.profile} />
           </Panel>
         </div>
       )}
@@ -75,17 +120,35 @@ type ActionResult = {
   value: string;
 };
 
-export const loader = async (): Promise<KeyPair[]> => {
+const load = async (): Promise<{
+  currentKey: string;
+  keypairs: KeyPair[];
+  profile: Profile;
+}> => {
   const keypairs = await storage.getKeys();
+  let currentKey = await storage.getCurrentOptionPubkey();
+  if (currentKey == "") {
+    currentKey = await storage.getCurrentKey();
+  }
+  let profile = await storage.getProfile(currentKey);
+
   // console.log("Root loader() returning " + JSON.stringify(keypairs));
-  return keypairs;
+  return { currentKey, keypairs, profile };
+};
+
+export const loader = async (): Promise<{
+  currentKey: string;
+  keypairs: KeyPair[];
+  profile: Profile;
+}> => {
+  return load();
 };
 
 export async function action({ request, params }) {
+  console.log("Options action called");
   let formData = await request.formData();
   const updates = Object.fromEntries(formData);
   const selectedPubkey = updates.selectedPubkey;
-
   await storage.setCurrentPubkey(selectedPubkey);
   return redirect("/options");
 }

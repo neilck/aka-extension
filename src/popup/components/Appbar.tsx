@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { Form, useSubmit, useRouteLoaderData } from "react-router-dom";
+import { Form, useRouteLoaderData } from "react-router-dom";
 import { KeyPair } from "../../common/model/KeyPair";
 
-function AppBar({ onKeyChange }) {
-  const keypairs = useRouteLoaderData("root") as KeyPair[];
-  const [currentKey, setCurrentKey] = useState(keypairs[0].public_key);
+function AppBar({ currentKey, keypairs, onKeyChange }) {
   const curProfile = keypairs.find(
     (keypair) => keypair.public_key === currentKey
   );
@@ -24,9 +22,6 @@ function AppBar({ onKeyChange }) {
     // hide dropdown
     const dropdown = document.querySelector("#optionDropdown");
     dropdown.classList.toggle("hidden");
-
-    // update local state
-    setCurrentKey(selectedPubkey);
 
     // send event to parent
     onKeyChange(selectedPubkey);

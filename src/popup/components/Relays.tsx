@@ -4,17 +4,14 @@ import { Relay } from "../../common/model/Relay";
 import browser from "webextension-polyfill";
 import * as storage from "../../common/storage";
 
-function Relays({ currentPublicKey }) {
-  const [relays, setRelays] = useState<Relay[]>([]);
+function Relays({ currentKey, profile }) {
+  const [relays, setRelays] = useState(profile.relays);
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    browser.storage.local.onChanged.addListener(handleChange);
-    return () => {
-      browser.storage.local.onChanged.removeListener(handleChange);
-    };
-  }, []);
+    setRelays(profile.relays);
+  }, [profile]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -23,23 +20,9 @@ function Relays({ currentPublicKey }) {
     return () => clearTimeout(timer);
   });
 
-  useEffect(() => {
-    readRelays(currentPublicKey).then((relays) => setRelays(relays));
-  }, [currentPublicKey]);
-
-  const handleChange = (changes) => {
-    for (var key in changes) {
-      if (key === currentPublicKey) {
-        let profile = changes[key].newValue;
-        setRelays(storage.getRelaysFromProfile(profile));
-        break;
-      }
-    }
-  };
-
   return (
     <>
-      <div key={currentPublicKey} className="flex flex-col space-y-1">
+      <div key={currentKey} className="flex flex-col space-y-1">
         {relays.map(({ url, read, write }, i) => (
           <div key={i} className="flex flex-row content-center space-x-1">
             <input
@@ -85,7 +68,7 @@ function Relays({ currentPublicKey }) {
         <button
           className="mx-auto w-20 bg-aka-blue hover:bg-blue text-white font-bold py-1 px-4 rounded"
           onClick={(e) => {
-            saveRelays(currentPublicKey);
+            saveRelays(currentKey);
           }}
         >
           <p className="tracking-widest">Save</p>
@@ -119,10 +102,6 @@ function Relays({ currentPublicKey }) {
     if (cat === "write") relay.write = !relay.write;
 
     setRelays([...relays.slice(0, i), relay, ...relays.slice(i + 1)]);
-  }
-
-  async function readRelays(currentPublicKey: string): Promise<Relay[]> {
-    return storage.readRelays(currentPublicKey);
   }
 
   function addNewRelay() {

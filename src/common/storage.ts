@@ -1,6 +1,7 @@
 import { KeyPair } from "./model/KeyPair";
 import { Relay } from "./model/Relay";
 import { Permission } from "./model/Permission";
+import { Profile } from "./model/Profile";
 
 import {
   readKeys,
@@ -167,6 +168,55 @@ export async function getCurrentOptionPubkey() {
   return jsGetCurrentOptionsPubkey();
 }
 
+/* <!-- Profiles ---> */
+export async function getProfile(pubkey: string): Promise<Profile> {
+  let profile = new Profile([], [], "");
+
+  const profileObject = await jsReadProfile(pubkey);
+
+  // protocol_handler
+  profile.protocol_handler = profileObject.protocol_handler;
+
+  // relays
+  let relays = profileObject.relays;
+  let relayList: Relay[] = [];
+  let relayEntries = [];
+
+  if (relays) {
+    relayEntries = Object.entries<{
+      read: boolean;
+      write: boolean;
+    }>(relays);
+
+    relayEntries.map(([url, data]) => {
+      relayList.push(new Relay(url, data.read, data.write));
+    });
+  }
+  profile.relays = relayList;
+
+  // permissions
+  let permissions = profileObject.permissions;
+  let permissionList: Permission[] = [];
+  let permissionEntries = [];
+
+  if (permissions) {
+    permissionEntries = Object.entries<{
+      condition: string;
+      level: number;
+      created_at: number;
+    }>(permissions);
+
+    permissionEntries.map(([host, data]) => {
+      permissionList.push(
+        new Permission(host, data.condition, data.level, data.created_at)
+      );
+    });
+  }
+  profile.permissions = permissionList;
+
+  return profile;
+}
+
 /* <!--- RELAYS ---> */
 
 // { <url>: {read: boolean, write: boolean} }
@@ -278,8 +328,4 @@ export function getPermissionsFromProfile(profile: {
 
 export async function deletePermission(pubkey: string, host: string) {
   return jsRemovePermissions(pubkey, host);
-}
-
-export async function readProfile(pubkey: string) {
-  return jsReadProfile(pubkey);
 }
