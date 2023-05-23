@@ -5,7 +5,7 @@
 
 ## Nostr signer extension with multiple keys
 
-AKA Profiles is a Chrome Extension, based on [nos2x](https://github.com/fiatjaf/nos2x) and adds support for multiple public / private key pairs. 
+AKA Profiles is a [Chrome Extension](https://chrome.google.com/webstore/detail/aka-profiles/ncmflpbbagcnakkolfpcpogheckolnad), based on [nos2x](https://github.com/fiatjaf/nos2x) and adds support for multiple public / private key pairs. 
 
 The primary purpose is enabling web apps to request the signing of events using the locally stored private key, thereby eliminating the need to give the private key to web apps.
 
