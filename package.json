@@ -1,7 +1,7 @@
 {
-  "name": "reactjs-chrome",
+  "name": "aka-extension",
   "author": "Neil Chong-Kit",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

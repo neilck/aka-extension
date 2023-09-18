@@ -23,24 +23,24 @@ function PrivateKeyDisplay(props: any) {
           id="data"
           className="flex flex-col items-center flex-1 p-2 w-auto gap-2 border"
         >
-          <div id="nsec" className="w-80">
+          <div id="nsec" className="w-70">
             <div id="npsec_label" className="font-semibold">
               Private Key (nsec)
             </div>
-            <div id="nsec_value" className="break-words">
+            <div id="nsec_value" className="break-all">
               {profile.nsec}
             </div>
           </div>
-          <div id="privatekey" className="w-80">
+          <div id="privatekey" className="w-70">
             <div id="privatekey_label" className="font-semibold">
               Private Key (hex)
             </div>
-            <div id="privatekey_value" className="break-words">
+            <div id="privatekey_value" className="break-all">
               {profile.private_key}
             </div>
           </div>
 
-          <div id="toggleButton" className="w-80"></div>
+          <div id="toggleButton" className="w-70"></div>
           <button
             onClick={(e) => {
               setShowPrivate(false);
@@ -81,7 +81,7 @@ function Profile() {
   );
 
   return (
-    <div>
+    <div className="w-[360px]">
       <div id="panel_outer" className="p-5">
         <Panel>
           <div
@@ -106,19 +106,19 @@ function Profile() {
             id="data"
             className="flex flex-col items-center flex-1 p-1 w-auto gap-2"
           >
-            <div id="npub" className="w-80">
+            <div id="npub" className="w-70">
               <div id="npub_label" className="font-semibold">
                 Public Key (npub)
               </div>
-              <div id="npub_value" className="break-words">
+              <div id="npub_value" className="break-all">
                 {currentProfile.npub}
               </div>
             </div>
-            <div id="pubkey" className="w-80">
+            <div id="pubkey" className="w-70">
               <div id="pubkey_label" className="font-semibold">
                 Public Key (hex)
               </div>
-              <div id="pubkey_value" className="break-words">
+              <div id="pubkey_value" className="break-all">
                 {currentProfile.public_key}
               </div>
             </div>
