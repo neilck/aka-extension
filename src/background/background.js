@@ -1,12 +1,11 @@
 import browser from "webextension-polyfill";
 import {
   validateEvent,
-  signEvent,
   getEventHash,
-  getPublicKey,
+  getSignature,
+  nip04,
   nip19,
 } from "nostr-tools";
-import { nip04, nip26 } from "nostr-tools";
 import { Mutex } from "async-mutex";
 import {
   PERMISSIONS_REQUIRED,
@@ -138,7 +137,7 @@ async function handleContentScriptMessage({ type, params, host }) {
         if (!validateEvent(event))
           return { error: { message: "invalid event" } };
 
-        event.sig = await signEvent(event, sk);
+        event.sig = await getSignature(event, sk);
         return event;
       }
       case "nip04.encrypt": {
@@ -148,11 +147,6 @@ async function handleContentScriptMessage({ type, params, host }) {
       case "nip04.decrypt": {
         let { peer, ciphertext } = params;
         return decrypt(sk, peer, ciphertext);
-      }
-      case "nip26.delegate": {
-        let { delegateePubkey, conditionsJson } = params;
-        let parameters = { pubkey: delegateePubkey, ...conditionsJson };
-        return nip26.createDelegation(sk, parameters);
       }
     }
   } catch (error) {

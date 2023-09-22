@@ -2,10 +2,9 @@
 
 ![screenshot](docs/images/screenshot.png "AKA Profiles")
 
-
 ## Nostr signer extension with multiple keys
 
-AKA Profiles is a [Chrome Extension](https://chrome.google.com/webstore/detail/aka-profiles/ncmflpbbagcnakkolfpcpogheckolnad), based on [nos2x](https://github.com/fiatjaf/nos2x) and adds support for multiple public / private key pairs. 
+AKA Profiles is a [Chrome Extension](https://chrome.google.com/webstore/detail/aka-profiles/ncmflpbbagcnakkolfpcpogheckolnad), based on [nos2x](https://github.com/fiatjaf/nos2x) and adds support for multiple public / private key pairs.
 
 The primary purpose is enabling web apps to request the signing of events using the locally stored private key, thereby eliminating the need to give the private key to web apps.
 
@@ -15,62 +14,61 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 
 [NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md)
 
-* getPublicKey()
-* signEvent()
-* getRelays()
+- getPublicKey()
+- signEvent()
+- getRelays()
 
 [NIP-04](https://github.com/nostr-protocol/nips/blob/master/04.md)
 
-* nip04.encrypt()
-* nip04.decrypt()
+- nip04.encrypt()
+- nip04.decrypt()
 
-[NIP-26](https://github.com/nostr-protocol/nips/blob/master/26.md)
-
-* nip26.createDelegation()
-
-These javascript functions are made available to web apps through injection of `window.nostr` script element defined in `nostr-provider.js` into the DOM. 
+These javascript functions are made available to web apps through injection of `window.nostr` script element defined in `nostr-provider.js` into the DOM.
 
 AKA Profiles uses the same app permission model as nos2x
 
-* authorize app (forever or until permission revoked under Options)
-* 5 minutes only
-* just once
+- authorize app (forever or until permission revoked under Options)
+- 5 minutes only
+- just once
 
 ## User Guide
-### Compiling
-A precompiled version is available in `AKA-Profiles-<version>.zip`, otherwise run
 
-`npm start build`
+### Compiling
+
+`npm run build`
 
 The built extension files are written to `dist` folder.
 
 ### Installation
 
-Download [AKA-Profiles-1.0.1.zip](https://github.com/neilck/aka-extension/blob/master/AKA-Profiles-1.0.1.zip) and extract files. Otherwise, use the files in the `dist` folder after compiling.
+Install from [Chrome Web Store](https://chrome.google.com/webstore/detail/aka-profiles/ncmflpbbagcnakkolfpcpogheckolnad),
+
+Otherwise, use the files in the `dist` folder after compiling:
 
 1. Open Chrome browser and paste `chrome://extensions` into the address bar.
 2. Enable Developer mode by clicking Developer mode toggle (top right)
 3. Click Load Unpacked button in the menu bar.
-4. Select the `dist` folder if you compiled yourself OR the files unzipped from AKA-Profiles-1.0.0.zip
+4. Select the `dist` folder.
 5. Click the Extension icon in Chrome, and click AKA Profiles icon.
 6. Paste in your private key.
 
 ### Tips
 
-* "Add new profile..." is available in dropdown in top right 
-* Right click on AKA Profiles icon and select Options to revoke app permissions or to add preferred relays
+- "Add new profile..." is available in dropdown in top right
+- Right click on AKA Profiles icon and select Options to revoke app permissions or to add preferred relays
 
 If Access Request prompt dialog doesn't appear when loading a web page
 
-* Check to see if it is already open, but got hidden behind the current window
-* Ensure other signer extensions are not also enabled (e.g. nos2x, Alby)
+- Check to see if it is already open, but got hidden behind the current window
+- Ensure other signer extensions are not also enabled (e.g. nos2x, Alby)
 
 ## Integration Examples
+
 To integrate, see the following compatible web apps
 
-* [Nostr.chat](https://nostr.chat) - [repo](https://github.com/NostrChat/NostrChat)
-* [Snort.social](https://snort.social) - [repo](https://git.v0l.io/Kieran/snort)
-* [nostra.me](https://nosta.me/) - [repo](https://github.com/GBKS/nosta-me)
+- [Nostr.chat](https://nostr.chat) - [repo](https://github.com/NostrChat/NostrChat)
+- [Snort.social](https://snort.social) - [repo](https://git.v0l.io/Kieran/snort)
+- [nostra.me](https://nosta.me/) - [repo](https://github.com/GBKS/nosta-me)
 
 Search repositories for `window.nostr.getPublicKey()`
 
