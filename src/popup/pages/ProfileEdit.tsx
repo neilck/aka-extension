@@ -12,6 +12,7 @@ import { KeyPair } from "../../common/model/KeyPair";
 import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
 import { BackButton } from "../components//BackButton";
+import { saveProfile } from "../../common/common";
 
 function ProfileEdit() {
   const keypair = useLoaderData() as KeyPair;
@@ -94,6 +95,10 @@ export async function action({ request, params }) {
   // save data
   const keypair = KeyPair.initKeyPair(formkey, name, true);
   await storage.upsertKey(keypair);
+
+  // init profileData
+  let profileData = { policies: {}, relays: {}, protocol_handler: "" };
+  saveProfile(keypair.public_key, profileData);
 
   return redirect("/profiles");
 }

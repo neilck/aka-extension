@@ -142,7 +142,6 @@ const load = async (): Promise<{
     }
   }
   let profile = await storage.getProfile(currentKey);
-  console.log(currentKey + " profile: " + JSON.stringify(profile));
 
   return { currentKey, keypairs, profile };
 };

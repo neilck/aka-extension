@@ -35,9 +35,15 @@ function Prompt() {
   const isSigningEvent = type == "signEvent" && hasEventKind;
 
   let strMesg = PERMISSION_NAMES[type];
+  let authMesg = "always allow";
+  let eventName = "";
   if (isSigningEvent) {
-    strMesg = `sign ${getKindName(event.kind)} events using your private key`;
+    eventName = getKindName(event.kind);
+    strMesg = `sign ${eventName} events using your private key`;
+    authMesg = "full signing permission";
   }
+  const eventMesg = `always allow ${eventName} signing`;
+  const rejectEventMesg = `always deny ${eventName} signing`;
 
   return (
     <div className="h-full">
@@ -76,51 +82,49 @@ function Prompt() {
           </div>
           <div className="flex flex-col items-center flex-1 w-auto space-y-2 pt-6">
             <button
-              className="w-36 bg-aka-blue hover:bg-blue text-white font-semibold py-2 px-4 rounded"
+              className="w-48 bg-aka-blue hover:bg-blue text-white font-semibold py-2 px-4 rounded"
               onClick={authorizeHandler(true, {})}
             >
-              <p className="tracking-wider">authorize</p>
+              <p className="tracking-wider">{authMesg}</p>
             </button>
 
             {hasEventKind && (
               <button
-                className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
+                className="w-48 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
                 onClick={authorizeHandler(
                   true,
                   { kinds: { [event.kind]: true } } // store and always answer true for all events that match this condition
                 )}
               >
-                <p className="tracking-wider">authorize kind {event.kind}</p>
+                <p className="tracking-wider">{eventMesg}</p>
               </button>
             )}
 
             <button
-              className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
+              className="w-48 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
               onClick={authorizeHandler(true)}
             >
               <p className="tracking-wider">just once</p>
             </button>
             {hasEventKind && (
               <button
-                className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
+                className="w-48 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
                 onClick={authorizeHandler(
                   false,
                   { kinds: { [event.kind]: true } } // idem
                 )}
               >
-                <p className="tracking-wider">
-                  reject kind {event.kind} forever
-                </p>
+                <p className="tracking-wider">{rejectEventMesg}</p>
               </button>
             )}
             <button
-              className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
+              className="w-48 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
               onClick={authorizeHandler(
                 false,
                 {} // idem
               )}
             >
-              <p className="tracking-wider">reject forever</p>
+              <p className="tracking-wider">never allow</p>
             </button>
 
             <button

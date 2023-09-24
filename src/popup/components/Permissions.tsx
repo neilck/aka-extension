@@ -9,8 +9,6 @@ import * as storage from "../../common/storage";
 function Permissions(props: { currentKey: string; policies: Policy[] }) {
   const { currentKey, policies } = props;
 
-  console.log("policies " + JSON.stringify(policies));
-
   return (
     <>
       <div className="flex flex-col space-y-1">

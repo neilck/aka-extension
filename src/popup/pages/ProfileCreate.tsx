@@ -7,6 +7,7 @@ import { KeyPair } from "../../common/model/KeyPair";
 import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
 import { getPublicKey, nip19 } from "nostr-tools";
+import { saveProfile } from "../../common/common";
 
 function ProfileCreate() {
   const [errors, setErrors] = useState({ privateKey: "", name: "" });
@@ -126,6 +127,10 @@ export async function action({ request, params }) {
   // save data
   const keypair = KeyPair.initKeyPair(privatekey, name, true);
   await storage.upsertKey(keypair);
+
+  // init profileData
+  let profileData = { policies: {}, relays: {}, protocol_handler: "" };
+  saveProfile(keypair.public_key, profileData);
 
   return redirect("/profiles");
 }

@@ -1,3 +1,4 @@
+import { stringify } from "postcss";
 import browser from "webextension-polyfill";
 
 export const NO_PERMISSIONS_REQUIRED = {
@@ -22,14 +23,15 @@ function matchConditions(conditions, event) {
 }
 
 export async function getPermissionStatus(pubkey, host, type, event) {
+  // console.log("getPermissionStatus calling readProfile: " + pubkey);
   let profile = await readProfile(pubkey);
-  console.log("getPermissionStatus " + JSON.stringify(profile));
+  // console.log("getPermissionStatus profile: " + JSON.stringify(profile));
   // if profile exists
   if (profile === null) {
     throw Error("Profile does not exist " + pubkey);
   }
   let policies = profile.policies;
-  console.log(JSON.stringify(policies));
+  // console.log("getPermissionStatus policies:" + JSON.stringify(policies));
   let answers = [true, false];
   for (let i = 0; i < answers.length; i++) {
     let accept = answers[i];
@@ -150,18 +152,21 @@ function schemaUpdate(pubkey, profileData) {
   }
 
   if (needsSave) {
+    // console.log( "schemaUpdate updating profile: " + stringify.JSON(profileData) );
     saveProfile(pubkey, profileData);
   } else {
-    console.log("no schema update nedded");
+    // console.log("schemaUpdate pass, no schema update needed");
   }
   return profileData;
 }
 
 // returns {polides: {[{}]}, relays: {[]}, ... }
 export async function readProfile(pubkey) {
+  // console.log("readProfile fetching data from localStorage: " + pubkey);
   let profileDataWithKey = await browser.storage.local.get(pubkey);
   if (!profileDataWithKey) {
     let profileData = { policies: {}, relays: {}, protocol_handler: "" };
+    // console.log("readProfile initializing localStorage profile: " + pubkey);
     saveProfile(pubkey, profileData);
     return profileData;
   } else {
@@ -175,6 +180,7 @@ export async function readProfile(pubkey) {
 export async function saveProfile(pubkey, profileData) {
   let profile = {};
   profile[pubkey] = profileData;
+  // console.log("saveProfile: " + profile);
   return browser.storage.local.set(profile);
 }
 

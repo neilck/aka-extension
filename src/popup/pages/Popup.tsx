@@ -8,6 +8,7 @@ import InputButton from "../../common/components/InputButton";
 import { KeyPair } from "../../common/model/KeyPair";
 import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
+import { saveProfile } from "../../common/common";
 
 const Popup = () => {
   const errors = useActionData() as { privateKey: "" };
@@ -94,7 +95,9 @@ export async function action({ request }) {
 
   await storage.upsertKey(newPair);
 
-  // otherwise save the profile and redirect
-  // await createUser(email, password);
+  // init profileData
+  let profileData = { policies: {}, relays: {}, protocol_handler: "" };
+  saveProfile(newPair.public_key, profileData);
+
   return redirect("/profiles");
 }
