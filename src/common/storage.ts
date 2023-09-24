@@ -1,6 +1,6 @@
 import { KeyPair } from "./model/KeyPair";
 import { Relay } from "./model/Relay";
-import { Permission } from "./model/Permission";
+import { Policy } from "./model/Policy";
 import { Profile } from "./model/Profile";
 
 import {
@@ -10,7 +10,6 @@ import {
   saveCurrentPubkey,
   readRelays as jsReadRelays,
   saveRelays as jsSaveRelays,
-  readPermissions as jsReadPermissions,
   removePermissions as jsRemovePermissions,
   removeCurrentPubkey as jsRemoveCurrentPubkey,
   removeProfile as jsRemoveProfile,
@@ -170,7 +169,7 @@ export async function getCurrentOptionPubkey() {
 
 /* <!-- Profiles ---> */
 export async function getProfile(pubkey: string): Promise<Profile> {
-  let profile = new Profile([], [], "");
+  let profile: Profile = { relays: [], policies: [], protocol_handler: "" };
 
   const profileObject = await jsReadProfile(pubkey);
 
@@ -195,24 +194,30 @@ export async function getProfile(pubkey: string): Promise<Profile> {
   profile.relays = relayList;
 
   // permissions
-  let permissions = profileObject.permissions;
-  let permissionList: Permission[] = [];
-  let permissionEntries = [];
+  let policies = profileObject.policies;
+  let list: Policy[] = [];
 
-  if (permissions) {
-    permissionEntries = Object.entries<{
-      condition: string;
-      level: number;
-      created_at: number;
-    }>(permissions);
-
-    permissionEntries.map(([host, data]) => {
-      permissionList.push(
-        new Permission(host, data.condition, data.level, data.created_at)
-      );
+  Object.entries(policies).forEach(([host, accepts]) => {
+    Object.entries(accepts).forEach(([accept, types]) => {
+      // @ts-ignore
+      Object.entries(types).forEach(([type, { conditions, created_at }]) => {
+        list.push({
+          host,
+          type,
+          accept,
+          conditions,
+          created_at,
+        });
+      });
     });
-  }
-  profile.permissions = permissionList;
+  });
+
+  list.sort((a, b) => {
+    if (a.created_at > b.created_at) return -1;
+    return 1;
+  });
+
+  profile.policies = list;
 
   return profile;
 }
@@ -277,55 +282,12 @@ export async function saveRelays(
   return true;
 }
 
-/* <!--- PERMISSIONS ---> */
-// { <url>: {read: boolean, write: boolean} }
-// <host>: {condition: string, level: number, created_at: number}
-export async function readPermissions(pubkey: string): Promise<Permission[]> {
-  let permissions = await jsReadPermissions(pubkey);
-  let permissionList: Permission[] = [];
-  let permissionEntries = [];
-
-  if (permissions) {
-    permissionEntries = Object.entries<{
-      condition: string;
-      level: number;
-      created_at: number;
-    }>(permissions);
-
-    permissionEntries.map(([host, data]) => {
-      permissionList.push(
-        new Permission(host, data.condition, data.level, data.created_at)
-      );
-    });
-  }
-
-  return permissionList;
-}
-
-export function getPermissionsFromProfile(profile: {
-  permissions: {};
-}): Permission[] {
-  let permissions = profile.permissions;
-  let permissionList: Permission[] = [];
-  let permissionEntries = [];
-
-  if (permissions) {
-    permissionEntries = Object.entries<{
-      condition: string;
-      level: number;
-      created_at: number;
-    }>(permissions);
-
-    permissionEntries.map(([host, data]) => {
-      permissionList.push(
-        new Permission(host, data.condition, data.level, data.created_at)
-      );
-    });
-  }
-
-  return permissionList;
-}
-
-export async function deletePermission(pubkey: string, host: string) {
-  return jsRemovePermissions(pubkey, host);
+export async function deletePermission(
+  pubkey: string,
+  host: string,
+  accept: string,
+  type: string
+) {
+  return jsRemovePermissions(pubkey, host, accept, type);
+  return true;
 }

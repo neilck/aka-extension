@@ -8,14 +8,13 @@ import {
 } from "nostr-tools";
 import { Mutex } from "async-mutex";
 import {
-  PERMISSIONS_REQUIRED,
   NO_PERMISSIONS_REQUIRED,
-  readPermissionLevel,
   updatePermission,
   getPrivateKey,
   readRelays,
   getProtocolHandler,
   readCurrentPubkey,
+  getPermissionStatus,
 } from "../common/common";
 
 // console.log("background.js started");
@@ -49,7 +48,9 @@ browser.runtime.onMessageExternal.addListener(
 
 browser.windows.onRemoved.addListener((windowId) => {
   if (openPrompt) {
-    handlePromptMessage({ condition: "no" }, null);
+    // calling this with a simple "no" response will not store anything, so it's fine
+    // it will just return a failure
+    handlePromptMessage({ accept: false }, null);
   }
 });
 
@@ -93,26 +94,58 @@ async function handleContentScriptMessage({ type, params, host }) {
     }
     return;
   } else {
-    // console.log(`[hcsm] Checking permission level ${pubkey} ${host}`);
-    let level = await readPermissionLevel(pubkey, host);
+    // acquire mutex here before reading policies
+    releasePromptMutex = await promptMutex.acquire();
 
-    // console.log("[hcsm] Permission level " + level);
-    if (level >= PERMISSIONS_REQUIRED[type]) {
-      // authorized, proceed
+    let allowed = await getPermissionStatus(
+      pubkey,
+      host,
+      type,
+      type === "signEvent" ? params.event : undefined
+    );
+
+    if (allowed == true) {
+      releasePromptMutex();
+    } else if (allowed === false) {
+      // denied, just refuse immediately
+      releasePromptMutex();
+      return { error: "denied" };
     } else {
       // ask for authorization
       try {
-        await promptPermission(host, PERMISSIONS_REQUIRED[type], params);
-        // authorized, proceed
-      } catch (_) {
-        // not authorized, stop here
+        let id = Math.random().toString().slice(4);
+        let qs = new URLSearchParams({
+          host,
+          id,
+          params: JSON.stringify(params),
+          type,
+        });
+
+        // prompt will be resolved with true or false
+        let accept = await new Promise((resolve, reject) => {
+          openPrompt = { resolve, reject };
+
+          browser.windows.create({
+            url: `${browser.runtime.getURL("prompt.html")}?${qs.toString()}`,
+            type: "popup",
+            width: 360,
+            height: 600,
+          });
+        });
+
+        // denied, stop here
+        if (!accept) return { error: "denied" };
+      } catch (err) {
+        // errored, stop here
+        releasePromptMutex();
         return {
-          error: `insufficient permissions, required ${PERMISSIONS_REQUIRED[type]}`,
+          error: `error: ${err}`,
         };
       }
     }
   }
 
+  // if we're here this means it was accepted
   // console.log(`[hcsm] getPrivateKey(${pubkey}) `);
   let sk = await getPrivateKey(pubkey);
   // console.log(`[hcsm] private key length ${sk.length}) `);
@@ -137,7 +170,7 @@ async function handleContentScriptMessage({ type, params, host }) {
         if (!validateEvent(event))
           return { error: { message: "invalid event" } };
 
-        event.sig = await getSignature(event, sk);
+        event.sig = getSignature(event, sk);
         return event;
       }
       case "nip04.encrypt": {
@@ -154,52 +187,28 @@ async function handleContentScriptMessage({ type, params, host }) {
   }
 }
 
-async function handlePromptMessage({ id, condition, host, level }, sender) {
-  switch (condition) {
-    case "forever":
-    case "expirable":
-      openPrompt?.resolve?.();
+async function handlePromptMessage(result, sender) {
+  console.log("handlePromptMessage received " + JSON.stringify(result));
+  const { host, type, accept, conditions } = result;
+
+  // return response
+  openPrompt?.resolve?.(accept);
+
+  // update policies
+  if (conditions) {
+    {
       let pubkey = await readCurrentPubkey();
-      updatePermission(pubkey, host, {
-        level,
-        condition,
-      });
-      break;
-    case "single":
-      openPrompt?.resolve?.();
-      break;
-    case "no":
-      openPrompt?.reject?.();
-      break;
+      await updatePermission(pubkey, host, type, accept, conditions);
+    }
   }
 
+  // cleanup this
   openPrompt = null;
+
+  // release mutex here after updating policies
   releasePromptMutex();
 
   if (sender) {
     browser.windows.remove(sender.tab.windowId);
   }
-}
-
-async function promptPermission(host, level, params) {
-  releasePromptMutex = await promptMutex.acquire();
-
-  let id = Math.random().toString().slice(4);
-  let qs = new URLSearchParams({
-    host,
-    level,
-    id,
-    params: JSON.stringify(params),
-  });
-
-  return new Promise((resolve, reject) => {
-    openPrompt = { resolve, reject };
-
-    browser.windows.create({
-      url: `${browser.runtime.getURL("prompt.html")}?${qs.toString()}`,
-      type: "popup",
-      width: 340,
-      height: 520,
-    });
-  });
 }
