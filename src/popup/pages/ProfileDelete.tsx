@@ -9,7 +9,7 @@ function ProfileDelete() {
   const currentProfile = useLoaderData() as KeyPair;
 
   return (
-    <div>
+    <div className="flex flex-col items-center flex-1 w-[360px] ">
       <div id="panel_outer" className="p-5">
         <Panel>
           <div className="h-6 w-6 cursor-pointer hover:bg-gray-100">

@@ -20,7 +20,7 @@ function ProfileEdit() {
   const isUpdating = keypair.private_key != "";
 
   return (
-    <div className="p-5">
+    <div className="flex flex-col items-center flex-1 w-[360px] ">
       <Panel>
         <div className="h-6 w-6 cursor-pointer hover:bg-gray-100">
           <BackButton />

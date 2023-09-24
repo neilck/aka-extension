@@ -32,8 +32,10 @@ function Prompt() {
     params = null;
   }
 
+  const isSigningEvent = type == "signEvent" && hasEventKind;
+
   let strMesg = PERMISSION_NAMES[type];
-  if (type == "signEvent" && hasEventKind) {
+  if (isSigningEvent) {
     strMesg = `sign ${getKindName(event.kind)} events using your private key`;
   }
 

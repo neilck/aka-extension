@@ -17,7 +17,8 @@ export function PermissionItem(props: {
     .split("T")
     .join(" ");
 
-  const hasConditions = conditions && Object.keys(conditions).length > 0;
+  const hasConditions =
+    conditions && Object.keys(conditions) && Object.keys(conditions).length > 0;
   let strEvents = "";
   if (hasConditions) {
     Object.keys(conditions.kinds).map((kind) => {
