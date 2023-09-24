@@ -23,6 +23,13 @@ const Options = () => {
   const onKeyChange = onKeyChangeHandler.bind(this);
   let revalidator = useRevalidator();
 
+  const allowedPolicies = loaded.profile.policies.filter((policy) => {
+    return policy.accept == "true";
+  });
+  const deniedPolicies = loaded.profile.policies.filter((policy) => {
+    return policy.accept == "false";
+  });
+
   let notEmpty = currentKey != "";
 
   useEffect(() => {
@@ -43,7 +50,6 @@ const Options = () => {
       if (!needsReload && item == currentProfileKey) needsReload = true;
     });
 
-    console.log("needsReload " + needsReload);
     if (needsReload) {
       // loaded = await load();
       // setPublicKey(loaded.currentKey);
@@ -77,12 +83,23 @@ const Options = () => {
         <div className="z-10 relative flex flex-col space-y-4 p-4 bg-gray-100">
           <Panel>
             <h1 className="font-semibold text-lg text-aka-blue pt-1">
-              App Permissions
+              Allowed Permissions
             </h1>
             <Permissions
               currentKey={loaded.currentKey}
-              profile={loaded.profile}
+              policies={allowedPolicies}
             />
+            {deniedPolicies.length > 0 && (
+              <>
+                <h1 className="font-semibold text-lg text-aka-blue pt-2">
+                  Denied Permissions
+                </h1>
+                <Permissions
+                  currentKey={loaded.currentKey}
+                  policies={deniedPolicies}
+                />
+              </>
+            )}
           </Panel>
           <Panel>
             <h1 className="font-semibold text-lg text-aka-blue pt-1">
@@ -125,6 +142,7 @@ const load = async (): Promise<{
     }
   }
   let profile = await storage.getProfile(currentKey);
+  console.log(currentKey + " profile: " + JSON.stringify(profile));
 
   return { currentKey, keypairs, profile };
 };

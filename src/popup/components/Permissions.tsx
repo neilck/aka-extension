@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useRouteLoaderData } from "react-router-dom";
 import { Profile } from "../../common/model/Profile";
-import { Permission } from "../../common/model/Permission";
+import { Policy } from "../../common/model/Policy";
 import { PermissionItem } from "./PermissionItem";
 import browser from "webextension-polyfill";
 import * as storage from "../../common/storage";
 
-function Permissions({ currentKey, profile }) {
-  let permissions = profile.permissions;
+function Permissions(props: { currentKey: string; policies: Policy[] }) {
+  const { currentKey, policies } = props;
+
+  console.log("policies " + JSON.stringify(policies));
 
   return (
     <>
       <div className="flex flex-col space-y-1">
-        {permissions.map(({ host, level }, i) => (
-          <div key={host}>
+        {policies.map((policy, i) => (
+          <div key={i}>
             <PermissionItem
-              host={host}
-              level={level}
+              policy={policy}
               onDelete={onPermissionDeletedHandler}
             />
           </div>
@@ -25,9 +26,13 @@ function Permissions({ currentKey, profile }) {
     </>
   );
 
-  async function onPermissionDeletedHandler(host: string) {
+  async function onPermissionDeletedHandler(
+    host: string,
+    accept: string,
+    type: string
+  ) {
     // delete permission
-    await storage.deletePermission(currentKey, host);
+    await storage.deletePermission(currentKey, host, accept, type);
   }
 }
 

@@ -1,18 +1,8 @@
 import { Relay } from "./Relay";
-import { Permission } from "./Permission";
+import { Policy } from "./Policy";
 
-export class Profile {
-  relays: Relay[] = [];
-  permissions: Permission[] = [];
-  protocol_handler: string = "";
-
-  constructor(
-    relays: Relay[],
-    permissions: Permission[],
-    protocol_handler: string
-  ) {
-    this.relays = relays;
-    this.permissions = permissions;
-    this.protocol_handler = protocol_handler;
-  }
-}
+export type Profile = {
+  relays: Relay[];
+  policies: Policy[];
+  protocol_handler: string;
+};

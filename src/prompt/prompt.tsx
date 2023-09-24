@@ -1,17 +1,16 @@
 import "./prompt.css";
 
+import { PERMISSION_NAMES } from "../common/common";
 import browser from "webextension-polyfill";
-import { render } from "react-dom";
 import { redirect } from "react-router-dom";
 import React from "react";
-
-import { getAllowedCapabilities } from "../common/common";
 import * as storage from "../common/storage";
 import { KeyPair } from "../common/model/KeyPair";
 import AppBar from "./Appbar";
 import Panel from "../common/components/Panel";
 import ProfileSelect from "./ProfileSelect";
 import EventModal from "./EventModal";
+import { getKindName } from "../common/model/KindNames";
 
 function Prompt() {
   let qs = new URLSearchParams(location.search);
@@ -19,18 +18,24 @@ function Prompt() {
   let id = qs.get("id");
   // host name from URL
   let host = qs.get("host");
-  // index to permission description
-  let level = parseInt(qs.get("level"));
-  let params;
+  let type = qs.get("type");
+  let params, event;
+  let hasEventKind = false;
   try {
     params = JSON.parse(qs.get("params"));
     if (Object.keys(params).length === 0) params = null;
+    else if (params.event) {
+      event = params.event;
+      if (event.kind) hasEventKind = true;
+    }
   } catch (err) {
     params = null;
   }
 
-  const result = getAllowedCapabilities(level);
-  const allowedCapabilities = result == "nothing" ? null : result;
+  let strMesg = PERMISSION_NAMES[type];
+  if (type == "signEvent" && hasEventKind) {
+    strMesg = `sign ${getKindName(event.kind)} events using your private key`;
+  }
 
   return (
     <div className="h-full">
@@ -51,14 +56,8 @@ function Prompt() {
             </span>
             is requesting permission to
           </div>
-          <div className="pt-2 italic text-slate-900 dark:text-white font-semibold flex flex-col flex-nowrap justify-center">
-            {allowedCapabilities && (
-              <div className="mx-auto">
-                {allowedCapabilities.map((cap) => (
-                  <div key={cap}>{cap}</div>
-                ))}
-              </div>
-            )}
+          <div className="pt-2 italic text-slate-900 dark:text-white font-semibold text-center">
+            {strMesg}
           </div>
           {params && (
             <div className="pt-1 text-center">
@@ -76,28 +75,55 @@ function Prompt() {
           <div className="flex flex-col items-center flex-1 w-auto space-y-2 pt-6">
             <button
               className="w-36 bg-aka-blue hover:bg-blue text-white font-semibold py-2 px-4 rounded"
-              onClick={authorizeHandler("forever")}
+              onClick={authorizeHandler(true, {})}
             >
               <p className="tracking-wider">authorize</p>
             </button>
 
-            <button
-              className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
-              onClick={authorizeHandler("expirable")}
-            >
-              <p className="tracking-wider">5 minutes only</p>
-            </button>
+            {hasEventKind && (
+              <button
+                className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
+                onClick={authorizeHandler(
+                  true,
+                  { kinds: { [event.kind]: true } } // store and always answer true for all events that match this condition
+                )}
+              >
+                <p className="tracking-wider">authorize kind {event.kind}</p>
+              </button>
+            )}
 
             <button
               className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
-              onClick={authorizeHandler("single")}
+              onClick={authorizeHandler(true)}
             >
               <p className="tracking-wider">just once</p>
+            </button>
+            {hasEventKind && (
+              <button
+                className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
+                onClick={authorizeHandler(
+                  false,
+                  { kinds: { [event.kind]: true } } // idem
+                )}
+              >
+                <p className="tracking-wider">
+                  reject kind {event.kind} forever
+                </p>
+              </button>
+            )}
+            <button
+              className="w-36 bg-white hover:bg-blue text-aka-blue  font-semibold py-2 px-4 border-2 border-aka-blue rounded"
+              onClick={authorizeHandler(
+                false,
+                {} // idem
+              )}
+            >
+              <p className="tracking-wider">reject forever</p>
             </button>
 
             <button
               style={{ marginTop: "5px" }}
-              onClick={authorizeHandler("no")}
+              onClick={authorizeHandler(false)}
             >
               <p className="tracking-wider text-aka-blue pt-1">cancel</p>
             </button>
@@ -107,15 +133,16 @@ function Prompt() {
     </div>
   );
 
-  function authorizeHandler(condition) {
+  function authorizeHandler(accept, conditions?) {
     return function (ev) {
       ev.preventDefault();
       browser.runtime.sendMessage({
         prompt: true,
         id,
         host,
-        level,
-        condition,
+        type,
+        accept,
+        conditions,
       });
     };
   }

@@ -1,5 +1,6 @@
 import React from "react";
 import { useLoaderData, Form, redirect } from "react-router-dom";
+import { getPermissionStatus } from "../../common/common.js";
 import browser from "webextension-polyfill";
 
 export function Test() {
@@ -50,12 +51,22 @@ export const loader = async (): Promise<string> => {
 };
 
 export async function action({ request, params }) {
-  let formData = await request.formData();
-  const data = Object.fromEntries(formData);
-  const name = data.name;
+  console.log("action");
+  const value = await getPermissionStatus(
+    "8789ce0ba66d668a4d38fa98bb6fabe317ba64e1e21d9e787a7068d1445d6ced",
+    "localhost:3000",
+    "getPublicKey",
+    {}
+  );
+  console.log(value);
+  return null;
 
-  browser.storage.local.set({ test: { name: name } });
-  return redirect("/test");
+  // let formData = await request.formData();
+  // const data = Object.fromEntries(formData);
+  // const name = data.name;
+
+  // browser.storage.local.set({ test: { name: name } });
+  // return redirect("/test");
 }
 
 export default Test;
