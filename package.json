@@ -1,7 +1,7 @@
 {
   "name": "aka-extension",
   "author": "Neil Chong-Kit",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

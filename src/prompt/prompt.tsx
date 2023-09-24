@@ -37,10 +37,12 @@ function Prompt() {
   let strMesg = PERMISSION_NAMES[type];
   let authMesg = "always allow";
   let eventName = "";
+  let denyMesg = "never allow";
   if (isSigningEvent) {
     eventName = getKindName(event.kind);
     strMesg = `sign ${eventName} events using your private key`;
-    authMesg = "full signing permission";
+    authMesg = "always allow ALL signing";
+    denyMesg = "never allow ANY signing";
   }
   const eventMesg = `always allow ${eventName} signing`;
   const rejectEventMesg = `always deny ${eventName} signing`;
@@ -124,7 +126,7 @@ function Prompt() {
                 {} // idem
               )}
             >
-              <p className="tracking-wider">never allow</p>
+              <p className="tracking-wider">{denyMesg}</p>
             </button>
 
             <button

@@ -1,4 +1,3 @@
-import { stringify } from "postcss";
 import browser from "webextension-polyfill";
 
 export const NO_PERMISSIONS_REQUIRED = {
