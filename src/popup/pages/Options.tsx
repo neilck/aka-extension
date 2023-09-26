@@ -100,6 +100,9 @@ const Options = () => {
                 />
               </>
             )}
+            <p className="mt-2">
+              * Allowed permissions take precedence over denied permissions.
+            </p>
           </Panel>
           <Panel>
             <h1 className="font-semibold text-lg text-aka-blue pt-1">

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Alert from "../../common/components/Alert";
 import { Relay } from "../../common/model/Relay";
-import browser from "webextension-polyfill";
 import * as storage from "../../common/storage";
 
 function Relays({ currentKey, profile }) {

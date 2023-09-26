@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { KeyPair } from "./model/KeyPair";
 import { Relay } from "./model/Relay";
 import { Policy } from "./model/Policy";
@@ -23,8 +24,13 @@ export async function saveKeyPairs(keypairs: KeyPair[]) {
   // [ [<public_key>,{name: string, private_key: string, created_at: number}],
   //   [<public_key>,{...} ]]
   // so Object.fromEntries converts to {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
+  // maybe ""
+  // console.log("saveKeyPairs called");
+  const oldCurrentKey = await readCurrentPubkey();
+  // console.log(`saveKeyPairs oldCurrentKey: ${oldCurrentKey}`);
+
   if (keypairs.length === 0) {
-    jsRemoveCurrentPubkey();
+    await jsRemoveCurrentPubkey();
   }
 
   let filteredList = keypairs.filter((keypair) => keypair.public_key != "");
@@ -38,17 +44,35 @@ export async function saveKeyPairs(keypairs: KeyPair[]) {
       },
     ])
   );
-  await saveKeys(keys);
 
+  await saveKeys(keys);
   // and save current publickey
+
+  let newCurrentKeyPair: KeyPair | undefined = undefined;
   let i = 0;
   for (i = 0; i < keypairs.length; i++) {
     let keypair = keypairs[i];
-    if (keypair.isCurrent) break;
+    if (keypair.isCurrent) {
+      newCurrentKeyPair = keypairs[i];
+      break;
+    }
   }
 
+  // console.log(`saveKeyPairs newCurrentKeyPair: ${newCurrentKeyPair} ${i}`);
+
   if (i < keypairs.length) {
-    await saveCurrentPubkey(keypairs[i].public_key);
+    await saveCurrentPubkey(newCurrentKeyPair.public_key);
+  }
+
+  // sent message to background.js that account has changed
+  const newCurrentKey = newCurrentKeyPair ? newCurrentKeyPair.public_key : "";
+  // console.log(`saveKeyPairs current key, before:${oldCurrentKey} after:${newCurrentKey}`);
+  if (oldCurrentKey != newCurrentKey) {
+    // console.log(`saveKeyPairs sending accountChanged`);
+    browser.runtime.sendMessage({
+      accountChanged: true,
+    });
+  } else {
   }
 }
 

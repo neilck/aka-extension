@@ -30,6 +30,13 @@ browser.runtime.onInstalled.addListener((_, __, reason) => {
 });
 
 browser.runtime.onMessage.addListener(async (req, sender) => {
+  let { accountChanged } = req;
+  if (accountChanged) {
+    // console.log("[bg] received accountChanged: " + JSON.stringify(req));
+    sendAccountChanged();
+    return true;
+  }
+
   let { prompt } = req;
 
   if (prompt) {
@@ -38,6 +45,25 @@ browser.runtime.onMessage.addListener(async (req, sender) => {
     return handleContentScriptMessage(req);
   }
 });
+
+async function sendAccountChanged() {
+  // send to contentScript
+  const tabs = await chrome.tabs.query({});
+  const mesg = {
+    accountChanged: true,
+  };
+  // console.log("[bg] sending accountChanged to tabs " + tabs.length);
+
+  for (const tab of tabs) {
+    if (!tab.id) return;
+    try {
+      // send message to tab
+      const response = await browser.tabs.sendMessage(tab.id, mesg);
+    } catch (e) {
+      // console.log("Warning: ", e);
+    }
+  }
+}
 
 browser.runtime.onMessageExternal.addListener(
   async ({ type, params }, sender) => {
@@ -56,7 +82,7 @@ browser.windows.onRemoved.addListener((windowId) => {
 
 async function handleContentScriptMessage({ type, params, host }) {
   let pubkey = await readCurrentPubkey();
-  // console.log("[hcsm] message received, pubkey: " + pubkey + " type " + type);
+  // console.log("[bg.hcsm] message received, pubkey: " + pubkey + " type " + type);
   if (NO_PERMISSIONS_REQUIRED[type]) {
     // authorized, and we won't do anything with private key here, so do a separate handler
     switch (type) {
@@ -97,12 +123,20 @@ async function handleContentScriptMessage({ type, params, host }) {
     // acquire mutex here before reading policies
     releasePromptMutex = await promptMutex.acquire();
 
+    // console.log("[bg] calling getPermissionStatus");
+
+    if (pubkey == "") {
+      return { error: "No public key" };
+    }
+
     let allowed = await getPermissionStatus(
       pubkey,
       host,
       type,
       type === "signEvent" ? params.event : undefined
     );
+
+    // console.log("allowed: " + allowed);
 
     if (allowed == true) {
       releasePromptMutex();
@@ -129,7 +163,7 @@ async function handleContentScriptMessage({ type, params, host }) {
             url: `${browser.runtime.getURL("prompt.html")}?${qs.toString()}`,
             type: "popup",
             width: 360,
-            height: 600,
+            height: 620,
           });
         });
 

@@ -38,10 +38,26 @@ export function Test() {
               Submit
             </button>
           </Form>
+          <br />
+          <br />
+          <button
+            type="button"
+            onClick={(e) => {
+              acClicked();
+            }}
+          >
+            AccountChanged
+          </button>
         </div>
       </div>
     </>
   );
+}
+
+function acClicked() {
+  browser.runtime.sendMessage({
+    accountChanged: true,
+  });
 }
 
 export const loader = async (): Promise<string> => {
@@ -51,12 +67,6 @@ export const loader = async (): Promise<string> => {
 };
 
 export async function action({ request, params }) {
-  const value = await getPermissionStatus(
-    "8789ce0ba66d668a4d38fa98bb6fabe317ba64e1e21d9e787a7068d1445d6ced",
-    "localhost:3000",
-    "getPublicKey",
-    {}
-  );
   return null;
 }
 

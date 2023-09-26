@@ -22,15 +22,15 @@ function matchConditions(conditions, event) {
 }
 
 export async function getPermissionStatus(pubkey, host, type, event) {
-  // console.log("getPermissionStatus calling readProfile: " + pubkey);
+  console.log("getPermissionStatus calling readProfile: " + pubkey);
   let profile = await readProfile(pubkey);
-  // console.log("getPermissionStatus profile: " + JSON.stringify(profile));
+  console.log("getPermissionStatus profile: " + JSON.stringify(profile));
   // if profile exists
   if (profile === null) {
     throw Error("Profile does not exist " + pubkey);
   }
   let policies = profile.policies;
-  // console.log("getPermissionStatus policies:" + JSON.stringify(policies));
+  console.log("getPermissionStatus policies:" + JSON.stringify(policies));
   let answers = [true, false];
   for (let i = 0; i < answers.length; i++) {
     let accept = answers[i];

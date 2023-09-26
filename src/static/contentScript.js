@@ -11,10 +11,12 @@ window.addEventListener("message", async (message) => {
   if (!message.data) return;
   if (!message.data.params) return;
   if (message.data.ext !== "aka-profiles") return;
+  //console.log("[cs] received message from [np]: " + JSON.stringify(message.data));
 
   // pass on to background
   var response;
   try {
+    // console.log("[cs] sending message to [bg]: " + JSON.stringify(message.data));
     response = await browser.runtime.sendMessage({
       type: message.data.type,
       params: message.data.params,
@@ -29,4 +31,16 @@ window.addEventListener("message", async (message) => {
     { id: message.data.id, ext: "aka-profiles", response },
     message.origin
   );
+});
+
+// receive message from background
+browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  // console.log("[cs] received message from [bg] " + JSON.stringify(request));
+
+  if (request.accountChanged) {
+    const mesg = { ext: "aka-profiles", type: "accountChanged", origin: "*" };
+    // console.log("[cs] sending message to [np] " + JSON.stringify(mesg));
+    window.postMessage(mesg, mesg.origin);
+  }
+  return;
 });

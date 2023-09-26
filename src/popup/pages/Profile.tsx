@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Link, useLoaderData, redirect } from "react-router-dom";
 import * as storage from "../../common/storage";

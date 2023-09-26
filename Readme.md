@@ -10,6 +10,13 @@ The primary purpose is enabling web apps to request the signing of events using 
 
 It also stores a list of your public keys, reducing copying / pasting of keys into various apps.
 
+## Version 1.05
+
+- updated to newer permission model in nos2x
+- support for NIP-07 switching accounts
+- removed support for signing delegation
+- fixed screen width errors
+
 **Supported**
 
 [NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md)
@@ -23,13 +30,13 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 - nip04.encrypt()
 - nip04.decrypt()
 
+[NIP-07 switching accounts](https://github.com/nostr-protocol/nips/pull/701)
+
+- window.nostr.on('accountChanged', accountChangedHandler)
+
 These javascript functions are made available to web apps through injection of `window.nostr` script element defined in `nostr-provider.js` into the DOM.
 
 AKA Profiles uses the same app permission model as nos2x
-
-- authorize app (forever or until permission revoked under Options)
-- 5 minutes only
-- just once
 
 ## User Guide
 
@@ -76,7 +83,7 @@ Search repositories for `window.nostr.getPublicKey()`
 
 As much underlying code as possible was reused from `nos2x`. For reference, this is how both `AKA Profiles` and `nos2x` processes application requests.
 
-As specified in [NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md), the browser extension's `contentScript.js` adds a script element `window.nostr` on page load. The calling application needs to wait for the insertion before accessing.
+As specified in [NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md), the browser extension's `contentScript.js` injects nostr-provider.js script into element `window.nostr` on page load. The calling application needs to wait for the insertion before accessing.
 
 Functions like `window.nostr.getPublicKey()` are defined in nostr-provider.js, and when called, post a message (`window.postMessage`) with `ext: "aka-profiles"`.
 

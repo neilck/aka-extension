@@ -1,11 +1,9 @@
 window.nostr = {
   _requests: {},
-  _pubkey: null,
+  _accountChangedListeners: null,
 
   async getPublicKey() {
-    if (this._pubkey) return this._pubkey;
-    this._pubkey = await this._call("getPublicKey", {});
-    return this._pubkey;
+    return this._call("getPublicKey", {});
   },
 
   async signEvent(event) {
@@ -26,7 +24,9 @@ window.nostr = {
     },
   },
 
+  // send request to contentScript.js
   _call(type, params) {
+    // console.log("[np] sending mesg to [cs]: " + type + " " + JSON.stringify(params));
     return new Promise((resolve, reject) => {
       let id = Math.random().toString().slice(4);
       this._requests[id] = { resolve, reject };
@@ -41,9 +41,43 @@ window.nostr = {
       );
     });
   },
+
+  on(name, listener) {
+    if (name != "accountChanged") throw new Error(name + " not supported");
+    if (!this._accountChangedListeners) this._accountChangedListeners = [];
+    this._accountChangedListeners.push(listener);
+  },
+
+  off(name, listener) {
+    if (name != "accountChanged") throw new Error(name + " not supported");
+    if (this._accountChangedListeners) {
+      for (i = 0; i < this._listeners.length; i++) {
+        if (this._listeners[i] == listener) this._listeners.splice(i, 1);
+        return;
+      }
+    }
+  },
 };
 
 window.addEventListener("message", (message) => {
+  if (message.data && message.data.ext === "aka-profiles") {
+    // console.log("[np] recived message from [cs]: " + JSON.stringify(message.data));
+  }
+
+  if (
+    message.data.ext === "aka-profiles" &&
+    message.data.type === "accountChanged"
+  ) {
+    if (window.nostr && window.nostr._accountChangedListeners) {
+      for (let i = 0; i < window.nostr._accountChangedListeners.length; i++) {
+        // console.log("[n[] calling listener callbacks");
+        // console.log(window.nostr._accountChangedListeners[i]);
+        window.nostr._accountChangedListeners[i]();
+      }
+    }
+    return;
+  }
+
   if (
     !message.data ||
     message.data.response === null ||
@@ -54,9 +88,7 @@ window.addEventListener("message", (message) => {
     return;
 
   if (message.data.response.error) {
-    let error = new Error(
-      "aka-profiles: " + message.data.response.error.message
-    );
+    let error = new Error("aka-profiles: " + JSON.stringify(message.data));
     error.stack = message.data.response.error.stack;
     window.nostr._requests[message.data.id].reject(error);
   } else {
