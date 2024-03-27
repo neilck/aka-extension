@@ -181,6 +181,9 @@ async function handleContentScriptMessage({ type, params, host }) {
 
   // if we're here this means it was accepted
   // console.log(`[hcsm] getPrivateKey(${pubkey}) `);
+
+  // pubkey may be changed during prompt
+  pubkey = await readCurrentPubkey();
   let sk = await getPrivateKey(pubkey);
   // console.log(`[hcsm] private key length ${sk.length}) `);
   if (!sk) {
