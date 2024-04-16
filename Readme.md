@@ -10,6 +10,10 @@ The primary purpose is enabling web apps to request the signing of events using 
 
 It also stores a list of your public keys, reducing copying / pasting of keys into various apps.
 
+## Version 1.06
+
+- fixed issued where profile didn't change during permission ask
+
 ## Version 1.05
 
 - updated to newer permission model in nos2x
