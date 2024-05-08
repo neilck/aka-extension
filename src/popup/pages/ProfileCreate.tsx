@@ -45,7 +45,7 @@ function ProfileCreate() {
           <BackButton />
         </div>
         <h1 className="font-semibold text-lg text-aka-blue">New Profile</h1>
-        <Form id="profileForm" action="/profiles/create" method="post">
+        <Form id="profileForm" action="/profiles/create" method="post" autocomplete="off">
           <div className="flex flex-col items-center flex-1 w-auto">
             <div className="w-full">
               <label htmlFor="privateKey">Private key</label>
