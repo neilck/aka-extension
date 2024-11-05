@@ -12,8 +12,12 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 
 ## Version 1.07
 
+_in progress_
+
 - set autoComplete="off" so browser doesn't save nsec in autocomplete
 - updated list of kind names
+
+To test, download V1.0.7-\*.zip and extract files. Then search for "how to load unpacked extension in chrome".
 
 ## Version 1.06
 
@@ -31,7 +35,7 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 [NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md)
 
 - getPublicKey()
-- signEvent()
+- signEvent(event)
 - getRelays()
 
 [NIP-04](https://github.com/nostr-protocol/nips/blob/master/04.md)
