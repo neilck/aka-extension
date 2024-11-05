@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useRouteLoaderData } from "react-router-dom";
-import { Profile } from "../../common/model/Profile";
+import React from "react";
 import { Policy } from "../../common/model/Policy";
 import { PermissionItem } from "./PermissionItem";
-import browser from "webextension-polyfill";
 import * as storage from "../../common/storage";
 
-function Permissions(props: { currentKey: string; policies: Policy[] }) {
-  const { currentKey, policies } = props;
+function Permissions(props: {
+  currentKey: string;
+  policies: Policy[];
+  onChange: () => void;
+}) {
+  const { currentKey, policies, onChange } = props;
 
   return (
     <>
@@ -31,6 +32,7 @@ function Permissions(props: { currentKey: string; policies: Policy[] }) {
   ) {
     // delete permission
     await storage.deletePermission(currentKey, host, accept, type);
+    onChange();
   }
 }
 

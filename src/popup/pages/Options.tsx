@@ -1,73 +1,85 @@
 import React, { useEffect, useState } from "react";
-import { redirect, useLoaderData, useRevalidator } from "react-router-dom";
 import Panel from "../../common/components/Panel";
 import Relays from "../components/Relays";
 import Permissions from "../components/Permissions";
 import AppBar from "../components/Appbar";
-import browser from "webextension-polyfill";
 import * as storage from "../../common/storage";
 import { KeyPair } from "../../common/model/KeyPair";
 import { Profile } from "../../common/model/Profile";
+import { Policy } from "../../common/model/Policy";
 
 const Options = () => {
-  let loaded = useLoaderData() as {
+  const [data, setData] = useState<{
     currentKey: string;
     keypairs: KeyPair[];
-    profile: Profile;
+    profile: Profile | null;
+  }>({ currentKey: "", keypairs: [], profile: null });
+
+  const setKey = async (key: string) => {
+    if (data.currentKey == key) {
+      return;
+    }
+
+    const updated = await load(key);
+    setData(updated);
   };
-  let currentKey = loaded.currentKey;
-  let keypairs = loaded.keypairs;
-  let profile = loaded.profile;
 
-  const keys = loaded.keypairs;
+  const reload = async () => {
+    const updated = await load(data.currentKey);
+    setData(updated);
+  };
+
+  const getAllowedPolicies = () => {
+    if (!data.profile?.policies) {
+      return [] as Policy[];
+    }
+
+    return data.profile.policies.filter((policy) => {
+      return policy.accept == "true";
+    });
+  };
+
+  const getDeniedPolicies = () => {
+    if (!data.profile?.policies) {
+      return [] as Policy[];
+    }
+
+    return data.profile.policies.filter((policy) => {
+      return policy.accept == "false";
+    });
+  };
+
+  let notEmpty = data.currentKey != "";
+
+  // when app bar key selected
+  function onKeyChangeHandler(key: string) {
+    setKey(key);
+  }
+
+  // when polices changed
+  function onPolicyChangeHandler() {
+    reload();
+  }
+
   const onKeyChange = onKeyChangeHandler.bind(this);
-  let revalidator = useRevalidator();
-
-  const allowedPolicies = loaded.profile.policies.filter((policy) => {
-    return policy.accept == "true";
-  });
-  const deniedPolicies = loaded.profile.policies.filter((policy) => {
-    return policy.accept == "false";
-  });
-
-  let notEmpty = currentKey != "";
+  const onPolicyChange = onPolicyChangeHandler.bind(this);
 
   useEffect(() => {
-    browser.storage.local.onChanged.addListener(handleChange);
-    return () => {
-      browser.storage.local.onChanged.removeListener(handleChange);
+    const doInitialLoad = async () => {
+      const keypair = await storage.getCurrentKey();
+      setKey(keypair.public_key);
     };
+
+    doInitialLoad();
   }, []);
-
-  const handleChange = async (changes) => {
-    const changedItems = Object.keys(changes);
-    let needsReload = false;
-    const currentProfileKey = await storage.getCurrentOptionPubkey();
-
-    // options needs reload if options current key changed, or displayed profile changed
-    changedItems.map((item) => {
-      if (!needsReload && item == "current_options_pubkey") needsReload = true;
-      if (!needsReload && item == currentProfileKey) needsReload = true;
-    });
-
-    if (needsReload) {
-      // loaded = await load();
-      // setPublicKey(loaded.currentKey);
-      revalidator.revalidate();
-    }
-  };
-
-  function onKeyChangeHandler(key: string) {
-    storage.setCurrentOptionPubkey(key);
-  }
 
   return (
     <div className="w-[600px] mt-4 mx-auto border-2">
       <div className="z-40 relative">
         <AppBar
           onKeyChange={onKeyChange}
-          currentKey={loaded.currentKey}
-          keypairs={loaded.keypairs}
+          currentKey={data.currentKey}
+          keypairs={data.keypairs}
         ></AppBar>
       </div>
       {!notEmpty && (
@@ -85,21 +97,25 @@ const Options = () => {
             <h1 className="font-semibold text-lg text-aka-blue pt-1">
               Allowed Permissions
             </h1>
+
             <Permissions
-              currentKey={loaded.currentKey}
-              policies={allowedPolicies}
+              currentKey={data.currentKey}
+              policies={getAllowedPolicies()}
+              onChange={onPolicyChange}
             />
-            {deniedPolicies.length > 0 && (
+            {getDeniedPolicies().length > 0 && (
               <>
                 <h1 className="font-semibold text-lg text-aka-blue pt-2">
                   Denied Permissions
                 </h1>
                 <Permissions
-                  currentKey={loaded.currentKey}
-                  policies={deniedPolicies}
+                  currentKey={data.currentKey}
+                  policies={getDeniedPolicies()}
+                  onChange={onPolicyChange}
                 />
               </>
             )}
+
             <p className="mt-2">
               * Allowed permissions take precedence over denied permissions.
             </p>
@@ -108,7 +124,8 @@ const Options = () => {
             <h1 className="font-semibold text-lg text-aka-blue pt-1">
               Preferred Relays
             </h1>
-            <Relays currentKey={loaded.currentKey} profile={loaded.profile} />
+
+            <Relays currentKey={data.currentKey} profile={data.profile} />
           </Panel>
         </div>
       )}
@@ -116,53 +133,41 @@ const Options = () => {
   );
 };
 
-type Relay = Record<string, { read: boolean; write: boolean }>;
-type Permission = Record<
-  string,
-  { level: number; condition: string; created_a: number }
->;
-
 type LoaderResult = {
-  value: string;
-};
-
-type ActionResult = {
-  value: string;
-};
-
-const load = async (): Promise<{
   currentKey: string;
   keypairs: KeyPair[];
-  profile: Profile;
-}> => {
-  const keypairs = await storage.getKeys();
-  let currentKey = await storage.getCurrentOptionPubkey();
-  if (currentKey == "") {
-    const keypair = keypairs.find((keypair) => keypair.isCurrent);
+  profile: Profile | null;
+};
+
+const load = async (currentKey: string): Promise<LoaderResult> => {
+  let result: LoaderResult = {
+    currentKey: currentKey,
+    keypairs: [],
+    profile: null,
+  };
+
+  console.log(`load called with currentKey: ${currentKey}`);
+
+  try {
+    console.log(`load getCurrentOptionPubkey(): ${result.currentKey}`);
+
+    result.keypairs = await storage.getKeys();
+    if (result.currentKey != "") {
+      result.profile = await storage.getProfile(result.currentKey);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  if (result.currentKey == "") {
+    const keypair = result.keypairs.find((keypair) => keypair.isCurrent);
     if (keypair) {
-      currentKey = keypair.public_key;
-      storage.setCurrentOptionPubkey(currentKey);
+      result.currentKey = keypair.public_key;
     }
   }
-  let profile = await storage.getProfile(currentKey);
 
-  return { currentKey, keypairs, profile };
+  console.log(`load called: ${JSON.stringify(result)}`);
+  return result;
 };
-
-export const loader = async (): Promise<{
-  currentKey: string;
-  keypairs: KeyPair[];
-  profile: Profile;
-}> => {
-  return load();
-};
-
-export async function action({ request, params }) {
-  let formData = await request.formData();
-  const updates = Object.fromEntries(formData);
-  const selectedPubkey = updates.selectedPubkey;
-  await storage.setCurrentPubkey(selectedPubkey);
-  return redirect("/options");
-}
 
 export default Options;

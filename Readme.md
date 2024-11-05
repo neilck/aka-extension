@@ -10,6 +10,11 @@ The primary purpose is enabling web apps to request the signing of events using 
 
 It also stores a list of your public keys, reducing copying / pasting of keys into various apps.
 
+## Version 1.07
+
+- set autoComplete="off" so browser doesn't save nsec in autocomplete
+- updated list of kind names
+
 ## Version 1.06
 
 - fixed issued where profile didn't change during permission ask

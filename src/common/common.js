@@ -205,19 +205,6 @@ export async function saveCurrentPubkey(pubkey) {
   });
 }
 
-// returns current pubkey string, "" if not found
-export async function getCurrentOptionsPubkey() {
-  let result = await browser.storage.local.get("current_options_pubkey");
-  if (result.current_options_pubkey) return result.current_options_pubkey;
-  return "";
-}
-
-export async function saveCurrentOptionsPubkey(pubkey) {
-  return browser.storage.local.set({
-    current_options_pubkey: pubkey,
-  });
-}
-
 export async function removePermissions(pubkey, host, accept, type) {
   let profile = await readProfile(pubkey);
   let policies = profile.policies;

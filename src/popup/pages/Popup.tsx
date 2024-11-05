@@ -1,5 +1,5 @@
-import React, { FocusEvent } from "react";
-import { Form, useActionData, redirect, useLoaderData } from "react-router-dom";
+import React from "react";
+import { Form, useActionData, redirect } from "react-router-dom";
 import { getPublicKey, nip19 } from "nostr-tools";
 
 import Splash from "../components/Splash";

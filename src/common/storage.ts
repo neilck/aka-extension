@@ -14,8 +14,6 @@ import {
   removePermissions as jsRemovePermissions,
   removeCurrentPubkey as jsRemoveCurrentPubkey,
   removeProfile as jsRemoveProfile,
-  saveCurrentOptionsPubkey as jsSaveCurrentOptionsPubkey,
-  getCurrentOptionsPubkey as jsGetCurrentOptionsPubkey,
   readProfile as jsReadProfile,
 } from "./common";
 
@@ -180,15 +178,6 @@ export async function deleteKey(pubkey: string) {
   }
 
   return saveKeyPairs(keypairs);
-}
-
-/* <!--- Options Key ---> */
-export async function setCurrentOptionPubkey(pubkey: string) {
-  return jsSaveCurrentOptionsPubkey(pubkey);
-}
-
-export async function getCurrentOptionPubkey() {
-  return jsGetCurrentOptionsPubkey();
 }
 
 /* <!-- Profiles ---> */

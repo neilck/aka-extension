@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { Form, useRouteLoaderData } from "react-router-dom";
-import { KeyPair } from "../../common/model/KeyPair";
+import React from "react";
+import { Form } from "react-router-dom";
 
 function AppBar({ currentKey, keypairs, onKeyChange }) {
   const curProfile = keypairs.find(

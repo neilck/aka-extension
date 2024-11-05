@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  RouterProvider,
-  createMemoryRouter,
-  createHashRouter,
-} from "react-router-dom";
+import { RouterProvider, createHashRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import "../assets/tailwind.css";
 
@@ -27,10 +23,7 @@ import ProfileDelete, {
   loader as profileDeleteLoader,
   action as profileDeleteAction,
 } from "./pages/ProfileDelete";
-import Options, {
-  loader as optionsLoader,
-  action as optionsAction,
-} from "./pages/Options";
+import Options from "./pages/Options";
 import ErrorPage from "./pages/ErrorPage";
 import Test, { loader as testLoader, action as testAction } from "./pages/Test";
 
@@ -56,8 +49,6 @@ const routes = [
       },
       {
         path: "/options",
-        loader: optionsLoader,
-        action: optionsAction,
         id: "options",
         element: <Options />,
       },
