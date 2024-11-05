@@ -146,10 +146,10 @@ const load = async (currentKey: string): Promise<LoaderResult> => {
     profile: null,
   };
 
-  console.log(`load called with currentKey: ${currentKey}`);
+  // console.log(`load called with currentKey: ${currentKey}`);
 
   try {
-    console.log(`load getCurrentOptionPubkey(): ${result.currentKey}`);
+    // console.log(`load getCurrentOptionPubkey(): ${result.currentKey}`);
 
     result.keypairs = await storage.getKeys();
     if (result.currentKey != "") {
@@ -166,7 +166,7 @@ const load = async (currentKey: string): Promise<LoaderResult> => {
     }
   }
 
-  console.log(`load called: ${JSON.stringify(result)}`);
+  // console.log(`load called: ${JSON.stringify(result)}`);
   return result;
 };
 
