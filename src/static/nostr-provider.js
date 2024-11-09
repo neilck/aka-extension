@@ -6,6 +6,10 @@ window.nostr = {
     return this._call("getPublicKey", {});
   },
 
+  async getSharedPublicKeys() {
+    return this._call("getSharedPublicKeys", {});
+  },
+
   async signEvent(event) {
     return this._call("signEvent", { event });
   },

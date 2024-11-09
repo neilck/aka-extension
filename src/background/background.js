@@ -15,6 +15,7 @@ import {
   getProtocolHandler,
   readCurrentPubkey,
   getPermissionStatus,
+  getSharedPublicKeys,
 } from "../common/common";
 
 // console.log("background.js started");
@@ -92,7 +93,9 @@ async function handleContentScriptMessage({ type, params, host }) {
     pubkey = await readCurrentPubkey();
   }
 
-  // console.log("[bg.hcsm] message received, pubkey: " + pubkey + " type " + type);
+  console.log(
+    "[bg.hcsm] message received, pubkey: " + pubkey + " type " + type
+  );
   if (NO_PERMISSIONS_REQUIRED[type]) {
     // authorized, and we won't do anything with private key here, so do a separate handler
     switch (type) {
@@ -125,6 +128,10 @@ async function handleContentScriptMessage({ type, params, host }) {
           result = result.replace(new RegExp(`{ *${pattern} *}`, "g"), value);
         });
 
+        return result;
+      }
+      case "getSharedPublicKeys": {
+        const result = await getSharedPublicKeys(host);
         return result;
       }
     }

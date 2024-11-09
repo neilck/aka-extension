@@ -2,6 +2,7 @@ import browser from "webextension-polyfill";
 
 export const NO_PERMISSIONS_REQUIRED = {
   replaceURL: true,
+  getSharedPublicKeys: true,
 };
 
 export const PERMISSION_NAMES = {
@@ -122,6 +123,32 @@ export async function getPrivateKey(pubkey) {
   if (!key) return "";
 
   return key.private_key;
+}
+
+// returns all pubkeys for host with getPublicKey permission
+export async function getSharedPublicKeys(host) {
+  console.log(`getSharedPublicKeys host: ${host}`);
+  // Step 1: Retrieve the 'keys' data from localStorage and parse it
+  const keysObject = await browser.storage.local.get("keys");
+  console.log(`getSharedPublicKeys keys: ${JSON.stringify(keysObject)}`);
+
+  // Extract the public key values as an array
+  const publicKeys = Object.keys(keysObject.keys);
+  console.log(`getSharedPublicKeys publicKeys: ${JSON.stringify(publicKeys)}`);
+
+  // Step 2: Filter public keys that have the "getPublicKey" condition in localStorage
+  const result = [];
+  for (let i = 0; i < publicKeys.length; i++) {
+    const pubkey = publicKeys[i];
+    const record = await browser.storage.local.get(pubkey);
+    console.log(`getSharedPublicKeys record: ${JSON.stringify(record)}`);
+    if (record[pubkey].policies?.[host]?.true?.getPublicKey !== undefined) {
+      result.push(pubkey);
+    }
+  }
+
+  // Step 3: Return only the public key values where the above condition is true
+  return result;
 }
 
 /* <--- Profiles ---> */
