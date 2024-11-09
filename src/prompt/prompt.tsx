@@ -11,6 +11,7 @@ import Panel from "../common/components/Panel";
 import ProfileSelect from "./ProfileSelect";
 import EventModal from "./EventModal";
 import { getKindName } from "../common/model/KindNames";
+import { useRouteLoaderData } from "react-router-dom";
 
 function Prompt() {
   let qs = new URLSearchParams(location.search);
@@ -36,6 +37,12 @@ function Prompt() {
     }
   } catch (err) {
     params = null;
+  }
+
+  if (pubkey == null) {
+    const keypairs = useRouteLoaderData("prompt") as KeyPair[];
+    const curProfile = keypairs.find((profile) => profile.isCurrent);
+    pubkey = curProfile.public_key;
   }
 
   let strMesg = PERMISSION_NAMES[type];
