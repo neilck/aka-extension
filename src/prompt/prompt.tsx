@@ -21,24 +21,24 @@ function Prompt() {
   let type = qs.get("type");
   let params, event;
   let hasEventKind = false;
+  let pubkeySpecified = false;
   try {
     params = JSON.parse(qs.get("params"));
     if (Object.keys(params).length === 0) params = null;
     else if (params.event) {
       event = params.event;
       if (event.kind) hasEventKind = true;
+      if (event.pubkey && event.pubkey !== "") pubkeySpecified = true;
     }
   } catch (err) {
     params = null;
   }
 
-  const isSigningEvent = type == "signEvent" && hasEventKind;
-
   let strMesg = PERMISSION_NAMES[type];
   let authMesg = "always allow";
   let eventName = "";
   let denyMesg = "never allow";
-  if (isSigningEvent) {
+  if (type === "signEvent") {
     eventName = getKindName(event.kind);
     strMesg = `sign ${eventName} events using your private key`;
     authMesg = "always allow ALL signing";
@@ -78,7 +78,7 @@ function Prompt() {
             <div className="text-slate-500">
               Use profile
               <div className="relative z-30 text-slate-900 w-full">
-                <ProfileSelect></ProfileSelect>
+                <ProfileSelect disabled={pubkeySpecified}></ProfileSelect>
               </div>
             </div>
           </div>

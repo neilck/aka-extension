@@ -9,47 +9,44 @@ import {
 } from "react-router-dom";
 import { KeyPair } from "../common/model/KeyPair";
 
-function ProfileSelect() {
+function ProfileSelect({ disabled }: { disabled: boolean }) {
   const keypairs = useRouteLoaderData("prompt") as KeyPair[];
   const navigate = useNavigate();
 
   const curProfile = keypairs.find((profile) => profile.isCurrent);
-  let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
+  const otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
 
   const hideDropdownPaths = ["/popup", "/profiles/create"];
   const pathname = useLocation().pathname;
-  let hideDropdown = false;
-  hideDropdownPaths.map((path) => {
-    if (pathname.includes(path)) hideDropdown = true;
-  });
+  let hideDropdown = hideDropdownPaths.some((path) => pathname.includes(path));
 
   const profileButtonClick = () => {
+    if (disabled) return;
     const dropdown = document.querySelector("#dropdown");
-    dropdown.classList.toggle("hidden");
+    dropdown?.classList.toggle("hidden");
   };
 
-  // on dropdown select, send selected dropdown pubkey to root action
   const profileItemClick = (e: React.MouseEvent<HTMLElement>) => {
-    // hidden input field
-    const hiddenInput = document.querySelector("#selectedPubkey") as any;
+    if (disabled) return;
+
+    const hiddenInput = document.querySelector(
+      "#selectedPubkey"
+    ) as HTMLInputElement;
     hiddenInput.value = e.currentTarget.id;
 
-    // hide dropdown
     const dropdown = document.querySelector("#dropdown");
-    dropdown.classList.toggle("hidden");
+    dropdown?.classList.add("hidden");
 
-    const form = document.querySelector("#profileForm") as any;
+    const form = document.querySelector("#profileForm") as HTMLFormElement;
     submit(form);
   };
 
-  // new clicked from dropdown list
   const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
-    // hide dropdown
     const dropdown = document.querySelector("#dropdown");
-    dropdown.classList.add("hidden");
+    dropdown?.classList.add("hidden");
   };
 
-  let submit = useSubmit();
+  const submit = useSubmit();
 
   return (
     <div className="flex justify-between">
@@ -60,25 +57,28 @@ function ProfileSelect() {
           className="h-5 w-[12rem] bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white hover:bg-gray-200 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  text-center inline-flex items-center"
           type="button"
           onClick={profileButtonClick}
+          disabled={disabled}
         >
           <div id="profileButtonText" className="flex-1">
-            {curProfile && curProfile.name + " "}
+            {curProfile ? curProfile.name + " " : "Select Profile"}
           </div>
-          <svg
-            className="w-4 h-4 ml-2 mr-1"
-            aria-hidden="true"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M19 9l-7 7-7-7"
-            ></path>
-          </svg>
+          {!disabled && (
+            <svg
+              className="w-4 h-4 ml-2 mr-1"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          )}
         </button>
         {/* <!-- Dropdown menu --> */}
         <Form id="profileForm" action="/" method="post">
@@ -91,7 +91,7 @@ function ProfileSelect() {
           <div
             id="dropdown"
             onMouseLeave={onMouseLeave}
-            className="w-full hidden bg-gray-100 divide-y divide-gray-100 rounded-lg shadow  dark:bg-gray-700"
+            className="w-full hidden bg-gray-100 divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700"
           >
             <ul
               className="py-1 text-sm text-gray-700 dark:text-gray-200"
