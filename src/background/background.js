@@ -81,7 +81,17 @@ browser.windows.onRemoved.addListener((windowId) => {
 });
 
 async function handleContentScriptMessage({ type, params, host }) {
-  let pubkey = await readCurrentPubkey();
+  // if pubic specified in event for signing, use that
+  // otherwise current pubkey
+  let pubkey = "";
+  let pubkeySpecified = false;
+  if (type === "signEvent" && typeof params?.event?.pubkey === "string") {
+    pubkey = params.event.pubkey;
+    pubkeySpecified = true;
+  } else {
+    pubkey = await readCurrentPubkey();
+  }
+
   // console.log("[bg.hcsm] message received, pubkey: " + pubkey + " type " + type);
   if (NO_PERMISSIONS_REQUIRED[type]) {
     // authorized, and we won't do anything with private key here, so do a separate handler
@@ -129,6 +139,7 @@ async function handleContentScriptMessage({ type, params, host }) {
       return { error: "No public key" };
     }
 
+    console.log(`GetPermissionStatus ${pubkey} ${host} ${type}`);
     let allowed = await getPermissionStatus(
       pubkey,
       host,
@@ -183,7 +194,10 @@ async function handleContentScriptMessage({ type, params, host }) {
   // console.log(`[hcsm] getPrivateKey(${pubkey}) `);
 
   // pubkey may be changed during prompt
-  pubkey = await readCurrentPubkey();
+  if (!pubkeySpecified) {
+    pubkey = await readCurrentPubkey();
+  }
+
   let sk = await getPrivateKey(pubkey);
   // console.log(`[hcsm] private key length ${sk.length}) `);
   if (!sk) {

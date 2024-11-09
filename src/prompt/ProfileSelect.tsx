@@ -9,12 +9,26 @@ import {
 } from "react-router-dom";
 import { KeyPair } from "../common/model/KeyPair";
 
-function ProfileSelect({ disabled }: { disabled: boolean }) {
+function ProfileSelect({
+  pubkey,
+  disabled,
+}: {
+  pubkey?: string;
+  disabled: boolean;
+}) {
   const keypairs = useRouteLoaderData("prompt") as KeyPair[];
   const navigate = useNavigate();
 
-  const curProfile = keypairs.find((profile) => profile.isCurrent);
-  const otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
+  let curProfile = null;
+  if (pubkey) {
+    curProfile = keypairs.find((profile) => profile.public_key == pubkey);
+  } else {
+    curProfile = keypairs.find((profile) => profile.isCurrent);
+  }
+
+  const otherProfiles = keypairs.filter(
+    (profile) => !profile.public_key != curProfile.public_key
+  );
 
   const hideDropdownPaths = ["/popup", "/profiles/create"];
   const pathname = useLocation().pathname;

@@ -21,6 +21,7 @@ function Prompt() {
   let type = qs.get("type");
   let params, event;
   let hasEventKind = false;
+  let pubkey = null;
   let pubkeySpecified = false;
   try {
     params = JSON.parse(qs.get("params"));
@@ -28,7 +29,10 @@ function Prompt() {
     else if (params.event) {
       event = params.event;
       if (event.kind) hasEventKind = true;
-      if (event.pubkey && event.pubkey !== "") pubkeySpecified = true;
+      if (event.pubkey && event.pubkey !== "") {
+        pubkey = event.pubkey;
+        pubkeySpecified = true;
+      }
     }
   } catch (err) {
     params = null;
@@ -78,7 +82,10 @@ function Prompt() {
             <div className="text-slate-500">
               Use profile
               <div className="relative z-30 text-slate-900 w-full">
-                <ProfileSelect disabled={pubkeySpecified}></ProfileSelect>
+                <ProfileSelect
+                  pubkey={pubkey}
+                  disabled={pubkeySpecified}
+                ></ProfileSelect>
               </div>
             </div>
           </div>
