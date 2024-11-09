@@ -15,7 +15,9 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 _in progress_
 
 - set autoComplete="off" so browser doesn't save nsec in autocomplete
-- updated list of kind names
+- added new kind names displayed when granting permission
+- updated signEvent to allow for signing when pubkey is set in event, even if not current pubkey
+- added new function getSharedPublicKeys that returns public keys currently shared with host (always allow permission for getPublicKey)
 
 To test, download V1.0.7-\*.zip and extract files. Then search for "how to load unpacked extension in chrome".
 
