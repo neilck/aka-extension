@@ -28,7 +28,12 @@ const Popup = () => {
               <span className="font-semibold">AKA Profiles</span> allows to you
               connect to apps without revealing your real identity.
             </div>
-            <Form id="loginForm" method="post" className="w-full">
+            <Form
+              id="loginForm"
+              method="post"
+              className="w-full"
+              autoComplete="off"
+            >
               <div className="text-black">
                 <input
                   type="text"
