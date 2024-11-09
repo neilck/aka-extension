@@ -158,6 +158,7 @@ function Prompt() {
         type,
         accept,
         conditions,
+        pubkey,
       });
     };
   }

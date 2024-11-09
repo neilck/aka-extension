@@ -240,7 +240,7 @@ async function handleContentScriptMessage({ type, params, host }) {
 
 async function handlePromptMessage(result, sender) {
   console.log("handlePromptMessage received " + JSON.stringify(result));
-  const { host, type, accept, conditions } = result;
+  const { host, type, accept, conditions, pubkey } = result;
 
   // return response
   openPrompt?.resolve?.(accept);
@@ -248,7 +248,7 @@ async function handlePromptMessage(result, sender) {
   // update policies
   if (conditions) {
     {
-      let pubkey = await readCurrentPubkey();
+      console.log(`updatePermission ${pubkey}`);
       await updatePermission(pubkey, host, type, accept, conditions);
     }
   }
