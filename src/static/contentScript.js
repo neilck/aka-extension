@@ -21,6 +21,7 @@ window.addEventListener("message", async (message) => {
       type: message.data.type,
       params: message.data.params,
       host: location.host,
+      protocol: location.protocol,
     });
   } catch (error) {
     response = { error };

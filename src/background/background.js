@@ -15,6 +15,8 @@ import {
   getPermissionStatus,
   getSharedPublicKeys,
   getPosition,
+  isRecentsEnabled,
+  saveRecent,
 } from "../common/common";
 
 // console.log("background.js started");
@@ -80,7 +82,7 @@ browser.windows.onRemoved.addListener((windowId) => {
   }
 });
 
-async function handleContentScriptMessage({ type, params, host }) {
+async function handleContentScriptMessage({ type, params, host, protocol }) {
   // if pubic specified in event for signing, use that
   // otherwise current pubkey
   let pubkey = "";
@@ -218,6 +220,9 @@ async function handleContentScriptMessage({ type, params, host }) {
   try {
     switch (type) {
       case "getPublicKey": {
+        if (isRecentsEnabled() && protocol) {
+          saveRecent(host, protocol, pubkey);
+        }
         return pubkey;
       }
       case "getRelays": {
@@ -258,7 +263,7 @@ async function handleContentScriptMessage({ type, params, host }) {
 }
 
 async function handlePromptMessage(result, sender) {
-  console.log("handlePromptMessage received " + JSON.stringify(result));
+  // console.log("handlePromptMessage received " + JSON.stringify(result));
   const { host, type, accept, conditions, pubkey } = result;
 
   // return response
@@ -267,7 +272,7 @@ async function handlePromptMessage(result, sender) {
   try {
     // update policies
     if (conditions) {
-      console.log(`updatePermission ${pubkey}`);
+      // console.log(`updatePermission ${pubkey}`);
       await updatePermission(pubkey, host, type, accept, conditions);
     }
   } catch (error) {

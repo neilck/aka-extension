@@ -1,10 +1,10 @@
-import browser from "webextension-polyfill";
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Link, useLoaderData, redirect } from "react-router-dom";
 import * as storage from "../../common/storage";
 import Panel from "../../common/components/Panel";
 import { KeyPair } from "../../common/model/KeyPair";
 import { PencilSquareIcon } from "../components/PencilSquareIcon";
+import RecentSites from "../components/RecentSites";
 
 function PrivateKeyDisplay(props: any) {
   const childRef = useRef();
@@ -84,6 +84,11 @@ function Profile() {
   return (
     <div className="w-[360px]">
       <div id="panel_outer" className="p-5">
+        {!showPrivate && (
+          <div className="mb-3">
+            <RecentSites pubkey={currentProfile.public_key} />
+          </div>
+        )}
         <Panel>
           <div
             id="panel_inner"

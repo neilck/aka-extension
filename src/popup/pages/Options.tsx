@@ -3,6 +3,7 @@ import Panel from "../../common/components/Panel";
 import Relays from "../components/Relays";
 import Permissions from "../components/Permissions";
 import AppBar from "../components/Appbar";
+import ToggleRecents from "../components/ToggleRecents";
 import * as storage from "../../common/storage";
 import { KeyPair } from "../../common/model/KeyPair";
 import { Profile } from "../../common/model/Profile";
@@ -81,6 +82,9 @@ const Options = () => {
           currentKey={data.currentKey}
           keypairs={data.keypairs}
         ></AppBar>
+      </div>
+      <div className="z-10 relative flex flex-col space-y-4 p-4 bg-gray-100">
+        <ToggleRecents />
       </div>
       {!notEmpty && (
         <div>

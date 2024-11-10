@@ -32,16 +32,15 @@ export function isKeyValid(key: string): string {
 }
 
 export function getPublicKeyStr(private_key: string): string | null {
-  console.log(`getPublicKeyStr ${private_key}`);
   const privateKeyArray = hexToUint8Array(private_key);
-  console.log(`privateKeyArray ${privateKeyArray}`);
+
   try {
     const pubkey = getPublicKey(privateKeyArray);
-    console.log(`result: ${pubkey}`);
+
     return pubkey;
   } catch (error) {
     console.error(`getPublicKey error:`);
-    console.log(error);
+    console.error(error);
     return null;
   }
 }

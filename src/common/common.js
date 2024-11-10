@@ -129,21 +129,18 @@ export async function getPrivateKey(pubkey) {
 
 // returns all pubkeys for host with getPublicKey permission
 export async function getSharedPublicKeys(host) {
-  console.log(`getSharedPublicKeys host: ${host}`);
+  // console.log(`getSharedPublicKeys host: ${host}`);
   // Step 1: Retrieve the 'keys' data from localStorage and parse it
   const keysObject = await browser.storage.local.get("keys");
-  console.log(`getSharedPublicKeys keys: ${JSON.stringify(keysObject)}`);
 
   // Extract the public key values as an array
   const publicKeys = Object.keys(keysObject.keys);
-  console.log(`getSharedPublicKeys publicKeys: ${JSON.stringify(publicKeys)}`);
 
   // Step 2: Filter public keys that have the "getPublicKey" condition in localStorage
   const result = [];
   for (let i = 0; i < publicKeys.length; i++) {
     const pubkey = publicKeys[i];
     const record = await browser.storage.local.get(pubkey);
-    console.log(`getSharedPublicKeys record: ${JSON.stringify(record)}`);
     if (record[pubkey].policies?.[host]?.true?.getPublicKey !== undefined) {
       result.push(pubkey);
     }
@@ -298,4 +295,77 @@ export async function getPosition(width, height) {
     top,
     left,
   };
+}
+
+// Enable or disable the recents feature explicitly
+export async function setRecentsEnabled(isEnabled) {
+  await browser.storage.local.set({ recentsEnabled: isEnabled });
+  if (!isEnabled) {
+    await clearRecents();
+  }
+}
+
+// Check if the recents feature is enabled, defaulting to 'on' if not set
+export async function isRecentsEnabled() {
+  const { recentsEnabled } = await browser.storage.local.get("recentsEnabled");
+
+  // If recentsEnabled is undefined, default to enabling the feature
+  if (recentsEnabled === undefined) {
+    await setRecentsEnabled(true);
+    return true;
+  }
+
+  return recentsEnabled === true;
+}
+
+// Save a recent entry if the feature is enabled
+export async function saveRecent(host, protocol, pubkey) {
+  if (!(await isRecentsEnabled())) return;
+
+  const recents = await getRecents("");
+
+  // Find the index of an existing entry with the same host and pubkey
+  const existingIndex = recents.findIndex(
+    (entry) =>
+      entry.host === host &&
+      entry.protocol === protocol &&
+      entry.pubkey === pubkey
+  );
+
+  // If the entry exists, remove it from its current position
+  if (existingIndex !== -1) {
+    recents.splice(existingIndex, 1);
+  }
+
+  // Add the entry to the front of the list
+  const newEntry = { host, protocol, pubkey };
+  const updatedRecents = [newEntry, ...recents];
+
+  // Keep only the last 10 entries
+  if (updatedRecents.length > 50) {
+    updatedRecents.splice(50);
+  }
+
+  // Save the updated recents array to local storage
+  await browser.storage.local.set({ recents: updatedRecents });
+}
+
+export async function getRecents(pubkey) {
+  if (!(await isRecentsEnabled())) return [];
+
+  // Retrieve the 'recents' data from storage
+  const { recents = [] } = await browser.storage.local.get("recents");
+
+  // Filter by 'pubkey' if provided
+  const filteredRecents = pubkey
+    ? recents.filter((element) => element.pubkey === pubkey)
+    : recents;
+
+  // Return the most recent 5 entries (most recent first)
+  return filteredRecents.slice(0, 5);
+}
+
+// Clear all recent entries
+export async function clearRecents() {
+  await browser.storage.local.remove("recents");
 }
