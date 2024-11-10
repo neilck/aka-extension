@@ -16,6 +16,8 @@ _in progress_
 
 - set autoComplete="off" so browser doesn't save nsec in autocomplete
 - added new kind names displayed when granting permission
+- nip44.encrypt()
+- nip44.decrypt()
 - updated signEvent to allow for signing when pubkey is set in event, even if not current pubkey
 - added new function getSharedPublicKeys that returns public keys currently shared with host (always allow permission for getPublicKey)
 

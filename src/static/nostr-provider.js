@@ -6,10 +6,6 @@ window.nostr = {
     return this._call("getPublicKey", {});
   },
 
-  async getSharedPublicKeys() {
-    return this._call("getSharedPublicKeys", {});
-  },
-
   async signEvent(event) {
     return this._call("signEvent", { event });
   },
@@ -25,6 +21,16 @@ window.nostr = {
 
     async decrypt(peer, ciphertext) {
       return window.nostr._call("nip04.decrypt", { peer, ciphertext });
+    },
+  },
+
+  nip44: {
+    async encrypt(peer, plaintext) {
+      return window.nostr._call("nip44.encrypt", { peer, plaintext });
+    },
+
+    async decrypt(peer, ciphertext) {
+      return window.nostr._call("nip44.decrypt", { peer, ciphertext });
     },
   },
 
@@ -44,6 +50,10 @@ window.nostr = {
         "*"
       );
     });
+  },
+
+  async getSharedPublicKeys() {
+    return this._call("getSharedPublicKeys", {});
   },
 
   on(name, listener) {

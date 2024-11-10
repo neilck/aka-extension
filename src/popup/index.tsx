@@ -25,7 +25,6 @@ import ProfileDelete, {
 } from "./pages/ProfileDelete";
 import Options from "./pages/Options";
 import ErrorPage from "./pages/ErrorPage";
-import Test, { loader as testLoader, action as testAction } from "./pages/Test";
 
 const routes = [
   {
@@ -74,12 +73,6 @@ const routes = [
         loader: profileEditLoader,
         action: profileEditAction,
         element: <ProfileEdit />,
-      },
-      {
-        path: "/test",
-        element: <Test />,
-        loader: testLoader,
-        action: testAction,
       },
     ],
   },

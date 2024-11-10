@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, useActionData, redirect } from "react-router-dom";
-import { getPublicKey, nip19 } from "nostr-tools";
-
+import { nip19 } from "nostr-tools";
+import { getPublicKeyStr } from "../../common/util";
 import Splash from "../components/Splash";
 import Panel from "../../common/components/Panel";
 import InputButton from "../../common/components/InputButton";
@@ -74,7 +74,7 @@ const Popup = () => {
 };
 
 function getNpubshort(private_key: string) {
-  let public_key = getPublicKey(private_key);
+  let public_key = getPublicKeyStr(private_key);
   let npub = nip19.npubEncode(public_key);
   return npub.substring(0, 9) + "..." + npub.substring(npub.length - 5);
 }

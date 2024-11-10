@@ -1,11 +1,9 @@
 import browser from "webextension-polyfill";
-import {
-  validateEvent,
-  getEventHash,
-  getSignature,
-  nip04,
-  nip19,
-} from "nostr-tools";
+import { validateEvent, finalizeEvent } from "nostr-tools/pure";
+import * as nip19 from "nostr-tools/nip19";
+import * as nip04 from "nostr-tools/nip04";
+import * as nip44 from "nostr-tools/nip44";
+
 import { Mutex } from "async-mutex";
 import {
   NO_PERMISSIONS_REQUIRED,
@@ -16,6 +14,7 @@ import {
   readCurrentPubkey,
   getPermissionStatus,
   getSharedPublicKeys,
+  getPosition,
 } from "../common/common";
 
 // console.log("background.js started");
@@ -93,9 +92,9 @@ async function handleContentScriptMessage({ type, params, host }) {
     pubkey = await readCurrentPubkey();
   }
 
-  console.log(
-    "[bg.hcsm] message received, pubkey: " + pubkey + " type " + type
-  );
+  // console.log(
+  //   "[bg.hcsm] message received, pubkey: " + pubkey + " type " + type
+  // );
   if (NO_PERMISSIONS_REQUIRED[type]) {
     // authorized, and we won't do anything with private key here, so do a separate handler
     switch (type) {
@@ -146,7 +145,7 @@ async function handleContentScriptMessage({ type, params, host }) {
       return { error: "No public key" };
     }
 
-    console.log(`GetPermissionStatus ${pubkey} ${host} ${type}`);
+    // console.log(`GetPermissionStatus ${pubkey} ${host} ${type}`);
     let allowed = await getPermissionStatus(
       pubkey,
       host,
@@ -173,6 +172,9 @@ async function handleContentScriptMessage({ type, params, host }) {
           type,
         });
 
+        // center prompt
+        const { top, left } = await getPosition(360, 620);
+
         // prompt will be resolved with true or false
         let accept = await new Promise((resolve, reject) => {
           openPrompt = { resolve, reject };
@@ -182,6 +184,8 @@ async function handleContentScriptMessage({ type, params, host }) {
             type: "popup",
             width: 360,
             height: 620,
+            top: top,
+            left: left,
           });
         });
 
@@ -221,15 +225,11 @@ async function handleContentScriptMessage({ type, params, host }) {
         return relays || {};
       }
       case "signEvent": {
-        let { event } = params;
+        const event = finalizeEvent(params.event, sk);
 
-        if (!event.pubkey) event.pubkey = pubkey;
-        if (!event.id) event.id = getEventHash(event);
-        if (!validateEvent(event))
-          return { error: { message: "invalid event" } };
-
-        event.sig = getSignature(event, sk);
-        return event;
+        return validateEvent(event)
+          ? event
+          : { error: { message: "invalid event" } };
       }
       case "nip04.encrypt": {
         let { peer, plaintext } = params;
@@ -238,6 +238,18 @@ async function handleContentScriptMessage({ type, params, host }) {
       case "nip04.decrypt": {
         let { peer, ciphertext } = params;
         return decrypt(sk, peer, ciphertext);
+      }
+      case "nip44.encrypt": {
+        const { peer, plaintext } = params;
+        const key = getSharedSecret(sk, peer);
+
+        return nip44.v2.encrypt(plaintext, key);
+      }
+      case "nip44.decrypt": {
+        const { peer, ciphertext } = params;
+        const key = getSharedSecret(sk, peer);
+
+        return nip44.v2.decrypt(ciphertext, key);
       }
     }
   } catch (error) {
@@ -252,21 +264,23 @@ async function handlePromptMessage(result, sender) {
   // return response
   openPrompt?.resolve?.(accept);
 
-  // update policies
-  if (conditions) {
-    {
+  try {
+    // update policies
+    if (conditions) {
       console.log(`updatePermission ${pubkey}`);
       await updatePermission(pubkey, host, type, accept, conditions);
     }
-  }
+  } catch (error) {
+    console.error("Error updating permissions:", error);
+  } finally {
+    // cleanup this
+    openPrompt = null;
 
-  // cleanup this
-  openPrompt = null;
+    // release mutex here after updating policies
+    releasePromptMutex();
 
-  // release mutex here after updating policies
-  releasePromptMutex();
-
-  if (sender) {
-    browser.windows.remove(sender.tab.windowId);
+    if (sender) {
+      browser.windows.remove(sender.tab.windowId);
+    }
   }
 }

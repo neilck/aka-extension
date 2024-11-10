@@ -5,8 +5,8 @@ import InputButton from "../../common/components/InputButton";
 import { BackButton } from "../components//BackButton";
 import { KeyPair } from "../../common/model/KeyPair";
 import * as storage from "../../common/storage";
-import { isKeyValid } from "../../common/util";
-import { getPublicKey, nip19 } from "nostr-tools";
+import { isKeyValid, getPublicKeyStr } from "../../common/util";
+import { nip19 } from "nostr-tools";
 import { saveProfile } from "../../common/common";
 
 function ProfileCreate() {
@@ -103,7 +103,7 @@ function ProfileCreate() {
 }
 
 function getNpubshort(private_key: string) {
-  let public_key = getPublicKey(private_key);
+  let public_key = getPublicKeyStr(private_key);
   let npub = nip19.npubEncode(public_key);
   return npub.substring(0, 9) + "..." + npub.substring(npub.length - 5);
 }

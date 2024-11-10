@@ -77,7 +77,7 @@ export async function saveKeyPairs(keypairs: KeyPair[]) {
 /* <!--- KEYS ---> */
 export async function getKeys(): Promise<KeyPair[]> {
   // {<public_key>: {name: string, private_key: string, created_at: number}}, ... }
-  let keys = await readKeys();
+  let keys = (await readKeys()) as any;
   let currentPubkey = await readCurrentPubkey();
   let keypairs: KeyPair[] = [];
 
@@ -184,13 +184,13 @@ export async function deleteKey(pubkey: string) {
 export async function getProfile(pubkey: string): Promise<Profile> {
   let profile: Profile = { relays: [], policies: [], protocol_handler: "" };
 
-  const profileObject = await jsReadProfile(pubkey);
+  const profileObject = (await jsReadProfile(pubkey)) as any;
 
   // protocol_handler
   profile.protocol_handler = profileObject.protocol_handler;
 
   // relays
-  let relays = profileObject.relays;
+  let relays = profileObject.relays as any;
   let relayList: Relay[] = [];
   let relayEntries = [];
 
@@ -207,7 +207,7 @@ export async function getProfile(pubkey: string): Promise<Profile> {
   profile.relays = relayList;
 
   // permissions
-  let policies = profileObject.policies;
+  let policies = profileObject.policies as any;
   let list: Policy[] = [];
 
   Object.entries(policies).forEach(([host, accepts]) => {

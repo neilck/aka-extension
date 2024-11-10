@@ -1,4 +1,5 @@
-import { getPublicKey, nip19 } from "nostr-tools";
+import { getPublicKeyStr } from "../util";
+import { nip19 } from "nostr-tools";
 import { isKeyValid } from "../util";
 
 // only name, isCurrent, and privatekey actually stored
@@ -22,7 +23,7 @@ export class KeyPair {
     let keypair = new KeyPair();
     keypair._private_key = private_key;
     keypair._name = name;
-    keypair._public_key = getPublicKey(private_key);
+    keypair._public_key = getPublicKeyStr(private_key);
     if (typeof isCurrent !== "undefined") keypair._isCurrent = isCurrent;
     else keypair._isCurrent = false;
     if (typeof created_at !== "undefined") keypair._created_at = created_at;
@@ -52,7 +53,7 @@ export class KeyPair {
   }
 
   get nsec() {
-    return nip19.nsecEncode(this._private_key);
+    return nip19.nsecEncode(new TextEncoder().encode(this._private_key));
   }
 
   get public_key() {

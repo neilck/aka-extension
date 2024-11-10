@@ -18,8 +18,6 @@ function ProfileEdit() {
   const keypair = useLoaderData() as KeyPair;
   const error = useActionData() as string;
 
-  const isUpdating = keypair.private_key != "";
-
   return (
     <div className="flex flex-col items-center flex-1 w-[360px] ">
       <Panel>
