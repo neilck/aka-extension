@@ -1,6 +1,6 @@
 # AKA Profiles
 
-![screenshot](docs/images/screenshot.png "AKA Profiles")
+<img src="docs/images/screenshot.png" width="520px"  alt="AKA Profiles screen">
 
 ## Nostr signer extension with multiple keys
 
@@ -12,16 +12,23 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 
 ## Version 1.07
 
-_in progress_
+<img src="docs/images/recent.png" width="260px"  alt="most recent visits">
 
+Version 1.07 adds Most Recent Visits, allowing one click access to apps.
+Apps that have most recently requested getPublicKey() are shown first.
+This feature can be enable / disabled in Options.
+
+### Bug Fixes / Improvements
+
+- added NIP-44 support
+- turned off auto complete for forms
 - set autoComplete="off" so browser doesn't save nsec in autocomplete
-- added new kind names displayed when granting permission
-- nip44.encrypt()
-- nip44.decrypt()
-- updated signEvent to allow for signing when pubkey is set in event, even if not current pubkey
-- added new function getSharedPublicKeys that returns public keys currently shared with host (always allow permission for getPublicKey)
+- display names for new kinds during permission request
 
-To test, download V1.0.7-\*.zip and extract files. Then search for "how to load unpacked extension in chrome".
+## Experimental
+
+- during window.nostr.signEvent(event), if pubkey specified in event, sign event with corresponding private key instead of using current pubkey
+- added new function window.nostr.getSharedPublicKeys that returns all public keys previously shared with client. Based on always allow getPublicKey() permission
 
 ## Version 1.06
 
