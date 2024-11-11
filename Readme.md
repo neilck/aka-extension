@@ -10,6 +10,8 @@ The primary purpose is enabling web apps to request the signing of events using 
 
 It also stores a list of your public keys, reducing copying / pasting of keys into various apps.
 
+To install latest version, download V1.0.7-\*.zip and extract files. Then search for "how to load unpacked extension in chrome".
+
 ## Version 1.07
 
 <img src="docs/images/recent.png" width="260px"  alt="most recent visits">
@@ -21,9 +23,9 @@ This feature can be enable / disabled in Options.
 ### Bug Fixes / Improvements
 
 - added NIP-44 support
-- turned off auto complete for forms
-- set autoComplete="off" so browser doesn't save nsec in autocomplete
-- display names for new kinds during permission request
+- disable autocomplete for forms
+- updated display names for kinds during permission request
+- updated nostr-tools version
 
 ## Experimental
 
