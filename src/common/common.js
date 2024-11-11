@@ -119,6 +119,23 @@ export async function saveKeys(keys) {
   });
 }
 
+export async function hasPublicKey(pubkey) {
+  let data = await browser.storage.local.get("keys");
+
+  // Check if data exists and pubkey is a property
+  const keys = data?.keys;
+  if (!keys || !keys.hasOwnProperty(pubkey)) {
+    return false;
+  }
+
+  const key = keys[pubkey];
+  if (!keys || !keys.hasOwnProperty(pubkey)) {
+    return false;
+  }
+
+  return true;
+}
+
 export async function getPrivateKey(pubkey) {
   let results = await browser.storage.local.get("keys");
   let key = results.keys[pubkey];
@@ -187,8 +204,10 @@ function schemaUpdate(pubkey, profileData) {
 
 // returns {polides: {[{}]}, relays: {[]}, ... }
 export async function readProfile(pubkey) {
-  // console.log("readProfile fetching data from localStorage: " + pubkey);
+  console.log("readProfile fetching data from localStorage: " + pubkey);
   let profileDataWithKey = await browser.storage.local.get(pubkey);
+  console.log(profileDataWithKey);
+
   if (!profileDataWithKey) {
     let profileData = { policies: {}, relays: {}, protocol_handler: "" };
     // console.log("readProfile initializing localStorage profile: " + pubkey);
@@ -341,7 +360,7 @@ export async function saveRecent(host, protocol, pubkey) {
   const newEntry = { host, protocol, pubkey };
   const updatedRecents = [newEntry, ...recents];
 
-  // Keep only the last 10 entries
+  // Keep only the last 100 entries
   if (updatedRecents.length > 100) {
     updatedRecents.splice(100);
   }
@@ -362,7 +381,7 @@ export async function getRecents(pubkey) {
     : recents;
 
   // Return the most recent 5 entries (most recent first)
-  return filteredRecents.slice(0, 5);
+  return filteredRecents.slice(0, 10);
 }
 
 // Clear all recent entries
