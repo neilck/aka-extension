@@ -342,8 +342,8 @@ export async function saveRecent(host, protocol, pubkey) {
   const updatedRecents = [newEntry, ...recents];
 
   // Keep only the last 10 entries
-  if (updatedRecents.length > 50) {
-    updatedRecents.splice(50);
+  if (updatedRecents.length > 100) {
+    updatedRecents.splice(100);
   }
 
   // Save the updated recents array to local storage
