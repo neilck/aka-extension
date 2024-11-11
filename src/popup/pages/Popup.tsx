@@ -25,8 +25,9 @@ const Popup = () => {
             <div className="pb-2">
               <h1 className="font-semibold text-lg text-aka-blue">Welcome!</h1>
               <p className="text-slate-500 dark:text-slate-400" />
-              <span className="font-semibold">AKA Profiles</span> allows to you
-              connect to apps without revealing your real identity.
+              <span className="font-semibold">AKA Profiles</span> is a Nostr
+              signing extension supporting multiple keys. Please enter your
+              first private key to begin.
             </div>
             <Form
               id="loginForm"
