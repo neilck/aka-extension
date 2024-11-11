@@ -5,6 +5,8 @@ import * as nip04 from "nostr-tools/nip04";
 import * as nip44 from "nostr-tools/nip44";
 
 import { Mutex } from "async-mutex";
+import { LRUCache } from "./utils";
+
 import {
   NO_PERMISSIONS_REQUIRED,
   updatePermission,
@@ -20,13 +22,27 @@ import {
   saveRecent,
 } from "../common/common";
 
-// console.log("background.js started");
-
-const { encrypt, decrypt } = nip04;
-
 let openPrompt = null;
 let promptMutex = new Mutex();
 let releasePromptMutex = () => {};
+let secretsCache = new LRUCache(100);
+let previousSk = null;
+
+function getSharedSecret(sk, peer) {
+  // Detect a key change and erase the cache if they changed their key
+  if (previousSk !== sk) {
+    secretsCache.clear();
+  }
+
+  let key = secretsCache.get(peer);
+
+  if (!key) {
+    key = nip44.v2.utils.getConversationKey(sk, peer);
+    secretsCache.set(peer, key);
+  }
+
+  return key;
+}
 
 browser.runtime.onInstalled.addListener((_, __, reason) => {
   if (reason === "install") browser.runtime.openOptionsPage();
@@ -94,11 +110,10 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
 
     if (!pubkeyFound) {
       return {
-        error: `pubkey does not exist`,
+        error: { message: "denied" },
       };
     } else {
       pubkeySpecified = true;
-      console.log(`pubkey specified found: ${pubkey} ${pubkeySpecified}`);
     }
   } else {
     pubkey = await readCurrentPubkey();
@@ -155,7 +170,7 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
 
     if (pubkey == "") {
       releasePromptMutex();
-      return { error: "No public key" };
+      return { error: { message: "no public key" } };
     }
 
     // console.log(`GetPermissionStatus ${pubkey} ${host} ${type}`);
@@ -173,7 +188,7 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
     } else if (allowed === false) {
       // denied, just refuse immediately
       releasePromptMutex();
-      return { error: "denied" };
+      return { error: { message: "denied" } };
     } else {
       // ask for authorization
       try {
@@ -203,12 +218,12 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
         });
 
         // denied, stop here
-        if (!accept) return { error: "denied" };
-      } catch (err) {
+        if (!accept) return { error: { message: "denied" } };
+      } catch (error) {
         // errored, stop here
         releasePromptMutex();
         return {
-          error: `error: ${err}`,
+          error: { message: error.message, stack: error.stack },
         };
       }
     }
@@ -225,10 +240,11 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
   let sk = await getPrivateKey(pubkey);
   // console.log(`[hcsm] private key length ${sk.length}) `);
   if (!sk) {
-    return { error: "no private key found" };
+    return { error: { message: "private key missing" } };
   }
 
-  console.log("switching on " + type);
+  let lib = "x";
+
   try {
     switch (type) {
       case "getPublicKey": {
@@ -242,14 +258,8 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
         return relays || {};
       }
       case "signEvent": {
-        try {
-          console.log("starting finalizeEvent");
-          const event = finalizeEvent(params.event, sk);
-          console.log("done finalizeEvent");
-        } catch (error) {
-          console.error("Error during signEvent - finalizeEvent");
-          console.error(error);
-        }
+        lib = "nostr-tools/pure";
+        const event = finalizeEvent(params.event, sk);
 
         return validateEvent(event)
           ? event
@@ -257,27 +267,33 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
       }
       case "nip04.encrypt": {
         let { peer, plaintext } = params;
-        return encrypt(sk, peer, plaintext);
+        lib = "nostr-tools/nip04";
+        return await nip04.encrypt(sk, peer, plaintext);
       }
       case "nip04.decrypt": {
         let { peer, ciphertext } = params;
-        return decrypt(sk, peer, ciphertext);
+        lib = "nostr-tools/nip04";
+        return await nip04.decrypt(sk, peer, ciphertext);
       }
       case "nip44.encrypt": {
         const { peer, plaintext } = params;
+        lib = "nostr-tools/nip44";
         const key = getSharedSecret(sk, peer);
 
         return nip44.v2.encrypt(plaintext, key);
       }
       case "nip44.decrypt": {
         const { peer, ciphertext } = params;
+        lib = "nostr-tools/nip44";
         const key = getSharedSecret(sk, peer);
 
         return nip44.v2.decrypt(ciphertext, key);
       }
     }
   } catch (error) {
-    return { error: { message: error.message, stack: error.stack } };
+    return {
+      error: { message: `${type} ${lib} ${error.message}`, stack: error.stack },
+    };
   }
 }
 

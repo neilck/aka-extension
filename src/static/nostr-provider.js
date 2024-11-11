@@ -102,7 +102,9 @@ window.addEventListener("message", (message) => {
     return;
 
   if (message.data.response.error) {
-    let error = new Error("aka-profiles: " + JSON.stringify(message.data));
+    let error = new Error(
+      "aka-profiles: " + message.data.response.error.message
+    );
     error.stack = message.data.response.error.stack;
     window.nostr._requests[message.data.id].reject(error);
   } else {

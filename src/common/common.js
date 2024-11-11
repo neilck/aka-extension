@@ -204,13 +204,11 @@ function schemaUpdate(pubkey, profileData) {
 
 // returns {polides: {[{}]}, relays: {[]}, ... }
 export async function readProfile(pubkey) {
-  console.log("readProfile fetching data from localStorage: " + pubkey);
   let profileDataWithKey = await browser.storage.local.get(pubkey);
-  console.log(profileDataWithKey);
 
   if (!profileDataWithKey) {
     let profileData = { policies: {}, relays: {}, protocol_handler: "" };
-    // console.log("readProfile initializing localStorage profile: " + pubkey);
+
     saveProfile(pubkey, profileData);
     return profileData;
   } else {
