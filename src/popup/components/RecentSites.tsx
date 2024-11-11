@@ -15,8 +15,13 @@ function getFaviconUrl(u: string) {
   return url.toString();
 }
 
-const RecentSites: React.FC<{ pubkey?: string }> = ({ pubkey }) => {
+const RecentSites: React.FC<{
+  pubkey?: string;
+  showMore: boolean;
+  onShowMore: (isShowingMore: boolean) => void;
+}> = ({ pubkey, showMore, onShowMore }) => {
   const [recents, setRecents] = useState<RecentItem[]>([]);
+  const [showRecents, setShowRecents] = useState<RecentItem[]>([]);
 
   useEffect(() => {
     // Fetch recent items on component mount
@@ -29,7 +34,11 @@ const RecentSites: React.FC<{ pubkey?: string }> = ({ pubkey }) => {
       }
     };
     fetchRecents(pubkey);
-  }, [pubkey]);
+  }, [pubkey, recents]);
+
+  useEffect(() => {
+    setShowRecents(recents.slice(0, showMore ? 10 : 5));
+  }, [recents, showMore]);
 
   if (recents.length == 0) {
     return <></>;
@@ -43,7 +52,7 @@ const RecentSites: React.FC<{ pubkey?: string }> = ({ pubkey }) => {
       >
         <div className="font-semibold">Most Recent Visits</div>
         <ul className="w-full">
-          {recents.map((item, index) => {
+          {showRecents.map((item, index) => {
             // Construct the URL from protocol and host
             const url = `${item.protocol}//${item.host}`;
             const faviconUrl = getFaviconUrl(url);
@@ -76,6 +85,18 @@ const RecentSites: React.FC<{ pubkey?: string }> = ({ pubkey }) => {
           })}
         </ul>
       </div>
+      {recents.length > 5 && (
+        <div className="flex flex-col items-center">
+          <button
+            onClick={(e) => {
+              onShowMore(!showMore);
+            }}
+            className="bg-transparent hover:bg-aka-blue-light text-aka-blue font-semibold hover:text-white py-1 px-2 border border-aka-blue-light hover:border-transparent rounded"
+          >
+            {showMore ? "show less" : "show more"}
+          </button>
+        </div>
+      )}
     </Panel>
   );
 };

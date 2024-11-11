@@ -72,6 +72,7 @@ function PrivateKeyDisplay(props: any) {
 function Profile() {
   const currentProfile = useLoaderData() as KeyPair;
   const [showPrivate, setShowPrivate] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   // make wrapper function to give child
   const wrapperSetShowPrivate = useCallback(
@@ -86,55 +87,63 @@ function Profile() {
       <div id="panel_outer" className="p-5">
         {!showPrivate && (
           <div className="mb-3">
-            <RecentSites pubkey={currentProfile.public_key} />
-          </div>
-        )}
-        <Panel>
-          <div
-            id="panel_inner"
-            className="flex flex-col items-center flex-1 p-1 w-auto gap-1"
-          >
-            <div
-              id="top_row"
-              className="w-full flex flex-row flex-nowrap justify-between"
-            >
-              <div className="font-semibold text-lg text-aka-blue">
-                <Link to={`/profiles/edit`}>{currentProfile.name}</Link>
-              </div>
-              <Link to={`/profiles/edit`}>
-                <div className="w-6 h-6">
-                  <PencilSquareIcon stroke="#234e70" />
-                </div>
-              </Link>
-            </div>
-          </div>
-          <div
-            id="data"
-            className="flex flex-col items-center flex-1 p-1 w-auto gap-2"
-          >
-            <div id="npub" className="w-70">
-              <div id="npub_label" className="font-semibold">
-                Public Key (npub)
-              </div>
-              <div id="npub_value" className="break-all">
-                {currentProfile.npub}
-              </div>
-            </div>
-            <div id="pubkey" className="w-70">
-              <div id="pubkey_label" className="font-semibold">
-                Public Key (hex)
-              </div>
-              <div id="pubkey_value" className="break-all">
-                {currentProfile.public_key}
-              </div>
-            </div>
-            <PrivateKeyDisplay
-              showPrivate={showPrivate}
-              setShowPrivate={wrapperSetShowPrivate}
-              profile={currentProfile}
+            <RecentSites
+              pubkey={currentProfile.public_key}
+              showMore={showMore}
+              onShowMore={(showMore: boolean) => {
+                setShowMore(showMore);
+              }}
             />
           </div>
-        </Panel>
+        )}
+        {!showMore && (
+          <Panel>
+            <div
+              id="panel_inner"
+              className="flex flex-col items-center flex-1 p-1 w-auto gap-1"
+            >
+              <div
+                id="top_row"
+                className="w-full flex flex-row flex-nowrap justify-between"
+              >
+                <div className="font-semibold text-lg text-aka-blue">
+                  <Link to={`/profiles/edit`}>{currentProfile.name}</Link>
+                </div>
+                <Link to={`/profiles/edit`}>
+                  <div className="w-6 h-6">
+                    <PencilSquareIcon stroke="#234e70" />
+                  </div>
+                </Link>
+              </div>
+            </div>
+            <div
+              id="data"
+              className="flex flex-col items-center flex-1 p-1 w-auto gap-2"
+            >
+              <div id="npub" className="w-70">
+                <div id="npub_label" className="font-semibold">
+                  Public Key (npub)
+                </div>
+                <div id="npub_value" className="break-all">
+                  {currentProfile.npub}
+                </div>
+              </div>
+              <div id="pubkey" className="w-70">
+                <div id="pubkey_label" className="font-semibold">
+                  Public Key (hex)
+                </div>
+                <div id="pubkey_value" className="break-all">
+                  {currentProfile.public_key}
+                </div>
+              </div>
+              <PrivateKeyDisplay
+                showPrivate={showPrivate}
+                setShowPrivate={wrapperSetShowPrivate}
+                profile={currentProfile}
+              />
+            </div>
+          </Panel>
+        )}
       </div>
     </div>
   );

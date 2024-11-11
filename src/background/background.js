@@ -9,6 +9,7 @@ import {
   NO_PERMISSIONS_REQUIRED,
   updatePermission,
   getPrivateKey,
+  hasPublicKey,
   readRelays,
   getProtocolHandler,
   readCurrentPubkey,
@@ -89,7 +90,16 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
   let pubkeySpecified = false;
   if (type === "signEvent" && typeof params?.event?.pubkey === "string") {
     pubkey = params.event.pubkey;
-    pubkeySpecified = true;
+    const pubkeyFound = await hasPublicKey(pubkey);
+
+    if (!pubkeyFound) {
+      return {
+        error: `pubkey does not exist`,
+      };
+    } else {
+      pubkeySpecified = true;
+      console.log(`pubkey specified found: ${pubkey} ${pubkeySpecified}`);
+    }
   } else {
     pubkey = await readCurrentPubkey();
   }
@@ -144,6 +154,7 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
     // console.log("[bg] calling getPermissionStatus");
 
     if (pubkey == "") {
+      releasePromptMutex();
       return { error: "No public key" };
     }
 
@@ -217,6 +228,7 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
     return { error: "no private key found" };
   }
 
+  console.log("switching on " + type);
   try {
     switch (type) {
       case "getPublicKey": {
@@ -230,7 +242,14 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
         return relays || {};
       }
       case "signEvent": {
-        const event = finalizeEvent(params.event, sk);
+        try {
+          console.log("starting finalizeEvent");
+          const event = finalizeEvent(params.event, sk);
+          console.log("done finalizeEvent");
+        } catch (error) {
+          console.error("Error during signEvent - finalizeEvent");
+          console.error(error);
+        }
 
         return validateEvent(event)
           ? event
