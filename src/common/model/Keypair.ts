@@ -1,6 +1,7 @@
 import { getPublicKeyStr } from "../util";
 import { nip19 } from "nostr-tools";
 import { isKeyValid } from "../util";
+import { hexToBytes } from "@noble/hashes/utils";
 
 // only name, isCurrent, and privatekey actually stored
 // all other values calculated as needed
@@ -53,7 +54,7 @@ export class KeyPair {
   }
 
   get nsec() {
-    return nip19.nsecEncode(new TextEncoder().encode(this._private_key));
+    return nip19.nsecEncode(hexToBytes(this._private_key));
   }
 
   get public_key() {
