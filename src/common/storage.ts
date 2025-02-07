@@ -69,6 +69,7 @@ export async function saveKeyPairs(keypairs: KeyPair[]) {
     // console.log(`saveKeyPairs sending accountChanged`);
     browser.runtime.sendMessage({
       accountChanged: true,
+      profileChanged: true,
     });
   } else {
   }

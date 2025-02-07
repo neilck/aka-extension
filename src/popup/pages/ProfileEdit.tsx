@@ -124,6 +124,8 @@ export async function action({ request, params }) {
   };
 
   await saveProfile(keypair.public_key, profileData);
+  await chrome.runtime.sendMessage({ profileChanged: true });
+
 
   return redirect("/profiles");
 }
