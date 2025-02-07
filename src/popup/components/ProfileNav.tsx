@@ -8,7 +8,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { KeyPair } from "../../common/model/KeyPair";
-import { getProfile } from "../../common/storage";
+import { readProfile } from "../../common/common";
+import { Profile } from "../../common/model/Profile";
 
 function ProfileNav() {
   const keypairs = useRouteLoaderData("root") as KeyPair[];
@@ -29,7 +30,7 @@ function ProfileNav() {
     const loadProfileColors = async () => {
       const colors: {[key: string]: string} = {};
       for (const profile of keypairs) {
-        const profileData = await getProfile(profile.public_key);
+        const profileData = await readProfile(profile.public_key) as Profile;
         colors[profile.public_key] = profileData.color;
       }
       setProfileColors(colors);

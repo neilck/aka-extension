@@ -12,7 +12,7 @@ import { KeyPair } from "../../common/model/KeyPair";
 import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
 import { BackButton } from "../components//BackButton";
-import { saveProfile } from "../../common/common";
+import { saveProfile, readProfile } from "../../common/common";
 import { Profile } from "../../common/model/Profile";
 
 type LoaderData = {
@@ -97,7 +97,7 @@ export const loader = async ({ params }) => {
   const currentKey = await storage.getCurrentKey();
   if (currentKey == null) return redirect("/popup");
 
-  const profile = await storage.getProfile(currentKey.public_key);
+  const profile = await readProfile(currentKey.public_key) as Profile;
   return { keypair: currentKey, profile };
 };
 
@@ -115,14 +115,15 @@ export async function action({ request, params }) {
   await storage.upsertKey(keypair);
 
   // Get existing profile data first
-  const existingProfile = await storage.getProfile(keypair.public_key);
+  const existingProfile = await readProfile(keypair.public_key) as Profile;
 
   // Merge existing data with updates
   let profileData = {
     ...existingProfile,
     color: color
   };
-  saveProfile(keypair.public_key, profileData);
+
+  await saveProfile(keypair.public_key, profileData);
 
   return redirect("/profiles");
 }
