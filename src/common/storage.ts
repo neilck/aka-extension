@@ -182,12 +182,13 @@ export async function deleteKey(pubkey: string) {
 
 /* <!-- Profiles ---> */
 export async function getProfile(pubkey: string): Promise<Profile> {
-  let profile: Profile = { relays: [], policies: [], protocol_handler: "" };
+  let profile: Profile = { relays: [], policies: [], protocol_handler: "", color: "" };
 
   const profileObject = (await jsReadProfile(pubkey)) as any;
 
   // protocol_handler
   profile.protocol_handler = profileObject.protocol_handler;
+  profile.color = profileObject.color || "";
 
   // relays
   let relays = profileObject.relays as any;
