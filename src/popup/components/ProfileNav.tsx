@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Link,
   useRouteLoaderData,
@@ -8,10 +8,12 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { KeyPair } from "../../common/model/KeyPair";
+import { getProfile } from "../../common/storage";
 
 function ProfileNav() {
   const keypairs = useRouteLoaderData("root") as KeyPair[];
   const navigate = useNavigate();
+  const [profileColors, setProfileColors] = useState<{[key: string]: string}>({});
 
   const curProfile = keypairs.find((profile) => profile.isCurrent);
   let otherProfiles = keypairs.filter((profile) => !profile.isCurrent);
@@ -22,6 +24,18 @@ function ProfileNav() {
   hideDropdownPaths.map((path) => {
     if (pathname.includes(path)) hideDropdown = true;
   });
+
+  useEffect(() => {
+    const loadProfileColors = async () => {
+      const colors: {[key: string]: string} = {};
+      for (const profile of keypairs) {
+        const profileData = await getProfile(profile.public_key);
+        colors[profile.public_key] = profileData.color;
+      }
+      setProfileColors(colors);
+    };
+    loadProfileColors();
+  }, [keypairs]);
 
   const profileButtonClick = () => {
     const dropdown = document.querySelector("#dropdown");
@@ -83,8 +97,16 @@ function ProfileNav() {
               type="button"
               onClick={profileButtonClick}
             >
-              <div id="profileButtonText" className="flex-1">
-                {curProfile && curProfile.name + " "}
+              <div id="profileButtonText" className="flex-1 flex items-center gap-2 pl-2">
+                {curProfile && (
+                  <>
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: profileColors[curProfile.public_key] }}
+                    />
+                    {curProfile.name}
+                  </>
+                )}
               </div>
               <svg
                 className="w-4 h-4 ml-2 mr-1"
@@ -126,7 +148,13 @@ function ProfileNav() {
                         onClick={profileItemClick}
                         className="block px-4 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                       >
-                        {profile.name}
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: profileColors[profile.public_key] }}
+                          />
+                          {profile.name}
+                        </div>
                       </div>
                     </li>
                   ))}
