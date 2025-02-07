@@ -114,8 +114,14 @@ export async function action({ request, params }) {
   const keypair = KeyPair.initKeyPair(formkey, name, true);
   await storage.upsertKey(keypair);
 
-  // init profileData
-  let profileData = { policies: {}, relays: {}, protocol_handler: "", color: color};
+  // Get existing profile data first
+  const existingProfile = await storage.getProfile(keypair.public_key);
+
+  // Merge existing data with updates
+  let profileData = {
+    ...existingProfile,
+    color: color
+  };
   saveProfile(keypair.public_key, profileData);
 
   return redirect("/profiles");
