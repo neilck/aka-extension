@@ -7,11 +7,12 @@ import { KeyPair } from "../../common/model/KeyPair";
 import * as storage from "../../common/storage";
 import { isKeyValid, getPublicKeyStr } from "../../common/util";
 import { nip19 } from "nostr-tools";
-import { saveProfile } from "../../common/common";
+import { saveProfile, getDefaultColor } from "../../common/common";
 
 function ProfileCreate() {
   const [errors, setErrors] = useState({ privateKey: "", name: "" });
   const actionError = useActionData() as string;
+  const [defaultColor, setDefaultColor] = useState(getDefaultColor());
 
   const privateKeyOnBlurHandler = (e: FocusEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
@@ -70,7 +71,7 @@ function ProfileCreate() {
               </div>
             </div>
 
-            <div className="w-full pt-4">
+            <div className="w-full">
               <label htmlFor="privateKey">Profile name</label>
               <input
                 type="text"
@@ -86,6 +87,17 @@ function ProfileCreate() {
               <div className="h-4 text-red-500">
                 {errors?.name && <span>{errors.name}</span>}
               </div>
+            </div>
+
+            <div className="w-full">
+              <label htmlFor="color">Profile color</label>
+              <input
+                type="color"
+                id="color"
+                name="color"
+                defaultValue={defaultColor}
+                className="w-full h-10 p-1 bg-gray-100 dark:bg-slate-900 border border-slate-300"
+              />
             </div>
           </div>
           {actionError && (
@@ -111,6 +123,7 @@ function getNpubshort(private_key: string) {
 export async function action({ request, params }) {
   const formData = await request.formData();
   const formkey = formData.get("privateKey");
+  const color = formData.get("color");
 
   let name = formData.get("name") as string;
   name = name.replace(/\p{C}/gu, "");
@@ -134,7 +147,7 @@ export async function action({ request, params }) {
   await storage.upsertKey(keypair);
 
   // init profileData
-  let profileData = { policies: {}, relays: {}, protocol_handler: "" };
+  let profileData = { policies: {}, relays: {}, protocol_handler: "", color: color};
   saveProfile(keypair.public_key, profileData);
 
   return redirect("/profiles");

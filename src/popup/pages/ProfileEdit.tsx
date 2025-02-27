@@ -12,10 +12,16 @@ import { KeyPair } from "../../common/model/KeyPair";
 import * as storage from "../../common/storage";
 import { isKeyValid } from "../../common/util";
 import { BackButton } from "../components//BackButton";
-import { saveProfile } from "../../common/common";
+import { saveProfile, readProfile } from "../../common/common";
+import { Profile } from "../../common/model/Profile";
+
+type LoaderData = {
+  keypair: KeyPair;
+  profile: Profile;
+};
 
 function ProfileEdit() {
-  const keypair = useLoaderData() as KeyPair;
+  const { keypair, profile } = useLoaderData() as LoaderData;
   const error = useActionData() as string;
 
   return (
@@ -49,7 +55,19 @@ function ProfileEdit() {
               {error && <span>{error}</span>}
             </div>
           </div>
-          <div className="flex flex-col items-center flex-1 w-auto">
+
+          <div className="w-full font-semibold">
+            <label htmlFor="color">Profile color</label>
+            <input
+              type="color"
+              id="color"
+              name="color"
+              defaultValue={profile.color}
+              className="w-full h-10 p-1 bg-gray-100 dark:bg-slate-900 border border-slate-300"
+            />
+          </div>
+
+          <div className="flex flex-col items-center flex-1 w-auto pt-4">
             <div id="npub" className="w-80">
               <div id="npub_label" className="font-semibold">
                 Public Key (npub)
@@ -79,12 +97,14 @@ export const loader = async ({ params }) => {
   const currentKey = await storage.getCurrentKey();
   if (currentKey == null) return redirect("/popup");
 
-  return currentKey;
+  const profile = await readProfile(currentKey.public_key) as Profile;
+  return { keypair: currentKey, profile };
 };
 
 export async function action({ request, params }) {
   const formData = await request.formData();
   const formkey = formData.get("privateKey");
+  const color = formData.get("color");
   let name = formData.get("name") as string;
   name = name.replace(/\p{C}/gu, "");
 
@@ -94,9 +114,18 @@ export async function action({ request, params }) {
   const keypair = KeyPair.initKeyPair(formkey, name, true);
   await storage.upsertKey(keypair);
 
-  // init profileData
-  let profileData = { policies: {}, relays: {}, protocol_handler: "" };
-  saveProfile(keypair.public_key, profileData);
+  // Get existing profile data first
+  const existingProfile = await readProfile(keypair.public_key) as Profile;
+
+  // Merge existing data with updates
+  let profileData = {
+    ...existingProfile,
+    color: color
+  };
+
+  await saveProfile(keypair.public_key, profileData);
+  await chrome.runtime.sendMessage({ profileChanged: true });
+
 
   return redirect("/profiles");
 }

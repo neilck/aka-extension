@@ -169,6 +169,18 @@ export async function getSharedPublicKeys(host) {
 
 /* <--- Profiles ---> */
 
+const PROFILE_DEFAULT_COLORS = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ffbc42', '#d81159', '#293241', '#4e148c'];
+
+export function getDefaultColor(npub) {
+  // Use last 4 chars of npub as a simple hash
+  if (npub) {
+    const hash = npub.slice(-4);
+    const index = parseInt(hash, 16) % PROFILE_DEFAULT_COLORS.length;
+    return PROFILE_DEFAULT_COLORS[index];
+  }
+  return PROFILE_DEFAULT_COLORS[Date.now() % PROFILE_DEFAULT_COLORS.length];
+}
+
 function schemaUpdate(pubkey, profileData) {
   let needsSave = false;
 
@@ -190,6 +202,11 @@ function schemaUpdate(pubkey, profileData) {
 
   if (profileData.protocol_handler === undefined) {
     profileData.protocol_handler = "";
+    needsSave = true;
+  }
+
+  if (profileData.color === undefined) {
+    profileData.color = getDefaultColor(pubkey);
     needsSave = true;
   }
 
