@@ -10,7 +10,7 @@ The primary purpose is enabling web apps to request the signing of events using 
 
 It also stores a list of your public keys, reducing copying / pasting of keys into various apps.
 
-To install latest version, download V1.0.7-\*.zip and extract files. Then search for "how to load unpacked extension in chrome".
+To install latest version, download V1.0.8-\*.zip and extract files. Then search for "how to load unpacked extension in Chrome".
 
 ## Version 1.08
 
