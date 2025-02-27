@@ -50,10 +50,10 @@ async function updateProfileDot() {
   let color = profile.color;
 
   if (color) {
-    chrome.action.setBadgeText({ text: ' ' });
+    chrome.action.setBadgeText({ text: " " });
     chrome.action.setBadgeBackgroundColor({ color: color });
   } else {
-    chrome.action.setBadgeText({ text: '' });
+    chrome.action.setBadgeText({ text: "" });
   }
 }
 
@@ -69,7 +69,7 @@ browser.runtime.onInstalled.addListener(async (_, __, reason) => {
 });
 
 browser.runtime.onMessage.addListener(async (req, sender) => {
-  let {profileChanged, accountChanged} = req;
+  let { profileChanged, accountChanged } = req;
 
   let handled = false;
   if (profileChanged) {
@@ -78,7 +78,7 @@ browser.runtime.onMessage.addListener(async (req, sender) => {
   }
 
   if (accountChanged) {
-    console.log("[bg] received accountChanged: " + JSON.stringify(req));
+    // console.log("[bg] received accountChanged: " + JSON.stringify(req));
     sendAccountChanged();
     handled = true;
   }
