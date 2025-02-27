@@ -12,6 +12,12 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 
 To install latest version, download V1.0.7-\*.zip and extract files. Then search for "how to load unpacked extension in chrome".
 
+## Version 1.08
+
+<img src="docs/images/1.08.png" width="260px"  alt="most recent visits">
+
+Thanks to [@Tezar](https://github.com/Tezar) it's now easy to tell which key is the current key based on the icon's badge color.
+
 ## Version 1.07
 
 <img src="docs/images/recent.png" width="260px"  alt="most recent visits">

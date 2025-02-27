@@ -1,36 +1,34 @@
 {
-    "name": "AKA Profiles",
-    "description": "Nostr Signer Extension supporting multiple public / private key pairs.",
-    "version": "1.0.7",
-    "manifest_version": 3,
-    "action" : {
-        "default_popup": "app.html",
-        "default_title": "AKA Profiles",
-        "default_icon" : "icon.png"
-    },
-    "icons": {
-        "16" : "icon.png",
-        "48" : "icon.png",
-        "128" : "icon.png"
-    },
-    "options_page": "app.html#/options",
-    "background": {
-        "service_worker": "background.js"
-    },
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "js": ["browser-polyfill.js", "contentScript.js"],
-            "run_at": "document_end"
-        }
-    ],
-    "permissions": [
-        "storage", "favicon"
-    ],
-    "web_accessible_resources": [
-        {
-          "resources": ["nostr-provider.js"],
-          "matches": ["https://*/*", "http://localhost:*/*"]
-        }
-    ]
+  "name": "AKA Profiles",
+  "description": "Nostr Signer Extension supporting multiple public / private key pairs.",
+  "version": "1.0.8",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "app.html",
+    "default_title": "AKA Profiles",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "options_page": "app.html#/options",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["browser-polyfill.js", "contentScript.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": ["storage", "favicon"],
+  "web_accessible_resources": [
+    {
+      "resources": ["nostr-provider.js"],
+      "matches": ["https://*/*", "http://localhost:*/*"]
+    }
+  ]
 }
