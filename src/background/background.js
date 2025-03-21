@@ -7,6 +7,10 @@ import * as nip44 from "nostr-tools/nip44";
 import { Mutex } from "async-mutex";
 import { LRUCache } from "./utils";
 
+import {sha256} from "@noble/hashes/sha256";
+import {bytesToHex} from "@noble/hashes/utils";
+import {schnorr} from "@noble/curves/secp256k1";
+
 import {
   NO_PERMISSIONS_REQUIRED,
   updatePermission,
@@ -295,6 +299,12 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
         return validateEvent(event)
           ? event
           : { error: { message: "invalid event" } };
+      }
+      case "signString": {
+        const hash = bytesToHex(sha256(params.message));
+        const sig = bytesToHex(schnorr.sign(hash, sk));
+        const pubkey = bytesToHex(schnorr.getPublicKey(sk));
+        return {hash: hash, sig: sig, pubkey: pubkey};
       }
       case "nip04.encrypt": {
         let { peer, plaintext } = params;
