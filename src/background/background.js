@@ -301,6 +301,17 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
           : { error: { message: "invalid event" } };
       }
       case "signString": {
+        if (typeof params.message !== 'string') {
+          return { error: { message: "message is not a string" } };
+        }
+        try {
+            // Check this is not a stringified event
+            // trying to bypass permission checks
+            const obj = JSON.parse(params.message);
+            if (validateEvent(obj)){
+              return { error: { message: "use signEvent() to sign events" } };
+            }
+        } catch (e) {} // not a JSON string
         const hash = bytesToHex(sha256(params.message));
         const sig = bytesToHex(schnorr.sign(hash, sk));
         const pubkey = bytesToHex(schnorr.getPublicKey(sk));
