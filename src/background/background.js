@@ -312,7 +312,8 @@ async function handleContentScriptMessage({ type, params, host, protocol }) {
               return { error: { message: "use signEvent() to sign events" } };
             }
         } catch (e) {} // not a JSON string
-        const hash = bytesToHex(sha256(params.message));
+        const utf8Encoder = new TextEncoder();
+        const hash = bytesToHex(sha256(utf8Encoder.encode(params.message)));
         const sig = bytesToHex(schnorr.sign(hash, sk));
         const pubkey = bytesToHex(schnorr.getPublicKey(sk));
         return {hash: hash, sig: sig, pubkey: pubkey};
