@@ -12,6 +12,14 @@ It also stores a list of your public keys, reducing copying / pasting of keys in
 
 To install latest version, download V1.0.8-\*.zip and extract files. Then search for "how to load unpacked extension in Chrome".
 
+## Version 1.09
+
+Thanks to [@robwoodgate](https://github.com/robwoodgate) signString() is now supported. This allows applications (clients) to pass in a message string, and get a signed hash using your private key.
+
+See [NIPS PR-1842](https://github.com/nostr-protocol/nips/pull/1842) for more information.
+
+Note that the message can not be a JSON object (to prevent the signing of Nostr events using signString() instead of signEvent() which would bypass permission checks).
+
 ## Version 1.08
 
 <img src="docs/images/1.08.png" width="260px"  alt="most recent visits">
