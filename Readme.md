@@ -56,6 +56,7 @@ This feature can be enable / disabled in Options.
 - getPublicKey()
 - signEvent(event)
 - getRelays()
+- signString()
 
 [NIP-04](https://github.com/nostr-protocol/nips/blob/master/04.md)
 

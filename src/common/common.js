@@ -9,6 +9,7 @@ export const PERMISSION_NAMES = {
   getPublicKey: "read your public key",
   getRelays: "read your list of preferred relays",
   signEvent: "sign events using your private key",
+  signString: "sign messages using your private key",
   "nip04.encrypt": "encrypt messages to peers",
   "nip04.decrypt": "decrypt messages from peers",
   "nip44.encrypt": "encrypt messages to peers",
