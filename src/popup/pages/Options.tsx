@@ -133,6 +133,41 @@ const Options = () => {
           </Panel>
         </div>
       )}
+      <div className="z-10 relative flex flex-col space-y-4 p-4 bg-gray-100">
+        <Panel>
+          <h1 className="font-semibold text-lg text-aka-blue pt-1">
+            Tips appreciated!
+          </h1>
+          <p className="py-2">
+            This is a personal, open-source project & Lightning tips or a quick
+            thank you is appreciated!
+          </p>
+          <div className="flex">
+            <div className="font-semibold text-md pr-2">Nostr:</div>
+            <a
+              href="https://coracle.social/people/nprofile1qythwumn8ghj7un9d3shjtnswf5k6ctv9ehx2ap0qywhwumn8ghj7mn0wd68ytfsxgh8jcttd95x7mnwv5hxxmmd9uqsuamnwvaz7tmwdaejumr0dshsqgqqqqqqxa65qfqnt9dvnctp90k4pzq4ax8vf25adz3x9rlkz4y9durgmmyv"
+              target="_blank"
+              className="text-blue-500"
+            >
+              neilck
+            </a>
+          </div>
+          <div className="flex">
+            <div className="font-semibold text-md pr-2">Lightning:</div>
+            <p>tensesing63@walletofsatoshi.com</p>
+          </div>
+          <div className="flex">
+            <div className="font-semibold text-md pr-2">Github:</div>
+            <a
+              href="https://github.com/neilck/aka-extension"
+              target="_blank"
+              className="text-blue-500"
+            >
+              aka-extension
+            </a>
+          </div>
+        </Panel>
+      </div>
     </div>
   );
 };
