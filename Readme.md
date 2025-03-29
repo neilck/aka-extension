@@ -1,3 +1,7 @@
+This is a personal project & Lightning tips or a quick thank you is appreciated.\
+Nostr: [neilck](https://coracle.social/people/nprofile1qythwumn8ghj7un9d3shjtnswf5k6ctv9ehx2ap0qywhwumn8ghj7mn0wd68ytfsxgh8jcttd95x7mnwv5hxxmmd9uqsuamnwvaz7tmwdaejumr0dshsqgqqqqqqxa65qfqnt9dvnctp90k4pzq4ax8vf25adz3x9rlkz4y9durgmmyv)\
+Lightning: tensesing63@walletofsatoshi.com
+
 # AKA Profiles
 
 <img src="docs/images/screenshot.png" width="520px"  alt="AKA Profiles screen">
@@ -64,16 +68,21 @@ This feature can be enable / disabled in Options.
 - getPublicKey()
 - signEvent(event)
 - getRelays()
+
+[NIP-07 signString()](https://github.com/nostr-protocol/nips/pull/1842) 
 - signString()
 
+[NIP-07 switching accounts](https://github.com/nostr-protocol/nips/pull/701)
+- window.nostr.on('accountChanged', accountChangedHandler)
+  
 [NIP-04](https://github.com/nostr-protocol/nips/blob/master/04.md)
 
 - nip04.encrypt()
 - nip04.decrypt()
+- nip44.encrypt()
+- nip44.decrypt()
 
-[NIP-07 switching accounts](https://github.com/nostr-protocol/nips/pull/701)
 
-- window.nostr.on('accountChanged', accountChangedHandler)
 
 These javascript functions are made available to web apps through injection of `window.nostr` script element defined in `nostr-provider.js` into the DOM.
 
