@@ -42,6 +42,9 @@ export function PermissionItem(props: {
     case "nip04.decrypt":
       strMesg = "decrypt received messages";
       break;
+    case "nip60.signSecret":
+      strMesg = "decrypt received messages";
+      break;
     case "signEvent":
       if (strEvents != "") {
         strMesg = `sign ${strEvents} events`;

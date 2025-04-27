@@ -82,6 +82,10 @@ This feature can be enable / disabled in Options.
 - nip44.encrypt()
 - nip44.decrypt()
 
+[NIP-60](https://github.com/nostr-protocol/nips/blob/master/60.md)
+
+- nip60.[signSecret()](https://github.com/nostr-protocol/nips/pull/1890)
+
 
 
 These javascript functions are made available to web apps through injection of `window.nostr` script element defined in `nostr-provider.js` into the DOM.

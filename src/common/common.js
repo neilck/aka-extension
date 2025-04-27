@@ -14,6 +14,7 @@ export const PERMISSION_NAMES = {
   "nip04.decrypt": "decrypt messages from peers",
   "nip44.encrypt": "encrypt messages to peers",
   "nip44.decrypt": "decrypt messages from peers",
+  "nip60.signSecret": "sign cashu secrets using your private key",
 };
 
 function matchConditions(conditions, event) {
