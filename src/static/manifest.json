@@ -1,7 +1,7 @@
 {
   "name": "AKA Profiles",
   "description": "Nostr Signer Extension supporting multiple public / private key pairs.",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "manifest_version": 3,
   "action": {
     "default_popup": "app.html",

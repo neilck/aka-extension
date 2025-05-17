@@ -38,6 +38,12 @@ window.nostr = {
     },
   },
 
+  nip60: {
+    async signSecret(secret) {
+      return window.nostr._call('nip60.signSecret', {secret});
+    },
+  },
+
   // send request to contentScript.js
   _call(type, params) {
     // console.log("[np] sending mesg to [cs]: " + type + " " + JSON.stringify(params));
